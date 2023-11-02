@@ -1,0 +1,81 @@
+PostCactus conversion factors from Cactus Units (CU):- 
+ 
+ 
+Length: 
+1 CU = 1.4767161818921161e+05 cm = 1.4767161818921162e+00 km 
+1 km = 1e+05 cm = 6.7717819596091933e-01 CU 
+ 
+Time: 
+1 CU = 4.9257949707731345e-03 ms 
+1 ms = 2.0301291587112965e+02 CU 
+ 
+Mass: 
+1 CU = 1.9889199999999999e+33 g 
+1 g = 5.0278543128934301e-34 CU 
+ 
+Speed: 
+1 CU = 2.9979245799999996e+10 cm/s 
+1 cm/s = 3.3356409519815209e-11 CU 
+ 
+Rest mass density: 
+1 CU = 6.1762691458861658e+17 g/cm^3 
+1 g/cm^3 = 1.6191004251588859e-18 CU 
+ 
+Magnetic field (B): 
+1 CU = 8.3519664583273021e+19 Gauss 
+1 Gauss  = 1.1973228161170991e-20 CU 
+ 
+ 
+Other useful conversions:- 
+ 
+ 
+Frequency: 
+1 CU = 2.0301291587112966e+05 Hz 
+1 Hz = 4.9257949707731349e-06 CU 
+ 
+Acceleration: 
+1 CU = 6.0861741054753160e+15 cm/s^2 
+1 cm/s^2 = 1.6430683425575488e-16 CU 
+ 
+Area: 
+1 CU = 2.1806906818620296e+10 cm^2 
+1 cm^2 = 4.5857030908488520e-11 CU 
+ 
+Volume: 
+1 CU = 3.2202612176070115e+15 cm^3 
+1 cm^3 = 3.1053381462734378e-16 CU 
+ 
+Force: 
+1 CU = 1.2104913401861965e+49 g cm/s^2 
+1 g cm/s^2 = 8.2611082525066310e-50 CU 
+ 
+Pressure: 
+1 CU = 5.5509538801376105e+38 g/(cm s^2) 
+1 g/(cm s^2) = 1.8014921788094727e-39 CU 
+ 
+Energy: 
+1 CU = 1.7875521500932306e+54 g cm^2/s^2  [erg] 
+1 erg = 5.5942423830703035e-55 CU 
+ 
+Luminosity (Power): 
+1 CU = 3.6289617426213399e+59 g cm^2/ s^3  [erg/s] 
+1 erg/s = 2.7556090995813617e-60 CU 
+ 
+Energy density: 
+1 CU = 5.5509538801376105e+38 erg/cm^3 
+1 erg/cm^3 = 1.8014921788094727e-39 CU 
+ 
+Angular momentum: 
+1 CU = 8.8051153909239396e+48 g cm^2/s 
+1 g cm^2/s = 1.1357034582769594e-49 CU 
+ 
+Moment of inertia: 
+1 CU = 4.3372193109690279e+43 g cm^2 
+1 g cm^2  = 2.3056247062973134e-44 CU 
+ 
+k, polytropic proportionality constant (P = k rho^2): 
+1 CU = 1.4551748920065311e+03 g^-1 cm^5 s^-2 
+1 g^-1 cm^5 s^-2  = 6.8720262113724801e-04 CU 
+ 
+For k in CU, poly_rho in SI: 
+poly_rho = (6.1762691458861629e+20 kg/m^3)/k  
