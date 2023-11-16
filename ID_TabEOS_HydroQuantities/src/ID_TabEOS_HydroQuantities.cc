@@ -1,11 +1,13 @@
 #include <cctk.h>
 #include <cctk_Arguments.h>
 #include <cctk_Parameters.h>
+#include <cmath>
 
 #include "ID_TabEOS_HydroQuantities.hh"
 
 extern "C" void ID_TabEOS_HydroQuantities__initial_Y_e( const CCTK_INT  npoints,
                                                         const CCTK_REAL *restrict rho,
+                                                        const CCTK_REAL *restrict r,
                                                         CCTK_REAL *restrict Y_e ) {
 
   DECLARE_CCTK_PARAMETERS;
@@ -61,7 +63,12 @@ extern "C" void ID_TabEOS_HydroQuantities__initial_temperature( const CCTK_INT  
 }
 
 // Now recompute all HydroQuantities, to ensure consistent initial data
-extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const CCTK_INT npoints,
+extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const cGH *cctkGH,
+																																					const CCTK_INT imax,
+																																					const CCTK_INT jmax,
+																																					const CCTK_INT kmax,
+																																					const CCTK_INT npoints,
+                                                                          CCTK_REAL *restrict r,
                                                                           CCTK_REAL *restrict rho,
                                                                           CCTK_REAL *restrict Y_e,
                                                                           CCTK_REAL *restrict temperature,
@@ -90,43 +97,30 @@ extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const 
 
   CCTK_VInfo(CCTK_THORNSTRING,"Recomputing all HydroBase quantities ...");
 
+
   // Loop over the grid, recomputing the HydroBase quantities
 
-	int imin=0,jmin=0,kmin=0;
-	int imax=cctk_lsh[0],jmax=cctk_lsh[1],kmax=cctk_lsh[2];
-	for(int k=kmin;k<kmax;k++)
-		for(int j=jmin;j<jmax;j++)
-			for(int i=imin;i<imax;i++) {
+	for(int k=0;k<kmax;k++)
+		for(int j=0;j<jmax;j++)
+			for(int i=0;i<imax;i++) {
 				int index = CCTK_GFINDEX3D(cctkGH,i,j,k);
 
-				// Set atmospheric values
-				CCTK_REAL id_temp_atm  = id_temperature_atm;
-				CCTK_REAL id_press_atm = 0.0;
-				CCTK_REAL id_eps_atm   = 0.0;
-				CCTK_REAL id_ent_atm   = 0.0;
+				// Find Atmospheric Density
+				CCTK_REAL xrho    = rho[index];
+				const CCTK_REAL r_pow					= atmo_falloff ? -1.5 : 0.;
+				const CCTK_REAL r_atmo        = std::max(r_atmo_min, r[index]);
+				const CCTK_REAL id_rho_atm    = std::max(id_rho_atm_max*std::pow(r_atmo / r_atmo_min, r_pow), nuc_eos::eos_rhomin);
+
+				// CCTK_VINFO("For Debug: r = %e, r_atmo = %e, id_rho_atm = %e", r[index], r_atmo, id_rho_atm);
+
+				// Prepare for EoS function calls
 				CCTK_REAL dummy        = 0.0;
 				CCTK_INT  keyerr       = 0;
 				CCTK_INT  anyerr       = 0;
-				if( initialize_entropy ) {
-					// Only call EOS_Omni_short() if we need the entropy.
-					EOS_Omni_short(eoskey,havetemp,rf_precision,1,
-												 &id_rho_atm,&id_eps_atm,&id_temp_atm,&id_Y_e_atm,&id_press_atm,&id_ent_atm,
-												 &dummy,&dummy,&dummy,&dummy,&dummy,
-												 &keyerr,&anyerr);
-				}
-				else {
-					// Otherwise use EOS_Omni_press(), which performs fewer
-					// interpolations and therefore is more efficient.
-					EOS_Omni_press(eoskey,havetemp,rf_precision,1,
-												 &id_rho_atm,&id_eps_atm,&id_temp_atm,&id_Y_e_atm,&id_press_atm,
-												 &keyerr,&anyerr);
-				}
-
-				CCTK_REAL xrho    = rho[i];
 
 				if( xrho > id_rho_atm ) {
-					CCTK_REAL xye     = Y_e[i];
-					CCTK_REAL xtemp   = temperature[i];
+					CCTK_REAL xye     = Y_e[index];
+					CCTK_REAL xtemp   = temperature[index];
 					CCTK_REAL xpress  = 0.0;
 					CCTK_REAL xeps    = 0.0;
 					CCTK_REAL xent    = 0.0;
@@ -146,32 +140,45 @@ extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const 
 													 &keyerr,&anyerr);
 					}
 					// Now set press, eps, and entropy gridfunctions.
-					press[    i] = xpress;
-					eps[      i] = xeps;
+					press[    index] = xpress;
+					eps[      index] = xeps;
 					if( initialize_entropy )
-						entropy[i] = xent;
+						entropy[index] = xent;
 				}
 				else {
 					// Reset to atmosphere
+					CCTK_REAL id_temp_atm  = id_temperature_atm;
+					CCTK_REAL id_press_atm = 0.0;
+					CCTK_REAL id_eps_atm   = 0.0;
+					CCTK_REAL id_ent_atm   = 0.0;
+					dummy 								 = 0.0;
+					if( initialize_entropy ) {
+						// Only call EOS_Omni_short() if we need the entropy.
+						EOS_Omni_short(eoskey,havetemp,rf_precision,1,
+													 &id_rho_atm,&id_eps_atm,&id_temp_atm,&id_Y_e_atm,&id_press_atm,&id_ent_atm,
+													 &dummy,&dummy,&dummy,&dummy,&dummy,
+													 &keyerr,&anyerr);
+					}
+					else {
+						// Otherwise use EOS_Omni_press(), which performs fewer
+						// interpolations and therefore is more efficient.
+						EOS_Omni_press(eoskey,havetemp,rf_precision,1,
+													 &id_rho_atm,&id_eps_atm,&id_temp_atm,&id_Y_e_atm,&id_press_atm,
+													 &keyerr,&anyerr);
+					}
 
-					// Floor settings
-					const CCTK_REAL gamma_th			= 5.0 / 3.0; //Assuming IGL in atm zone
-					const CCTK_REAL r_atmo        = atmo_falloff ? std::max(r_atmo_min, r[index]) : 1.;
-					const CCTK_REAL id_rho_atm    = id_rho_atm_max*std::pow(r_atmo, -1.5);
-					const CCTK_REAL P_tau_falloff = std::pow(r_atmo, -1.5*gamma_th);
-					const CCTK_REAL id_press_atm  = id_press_max * P_tau_falloff;
-					const CCTK_REAL id_eps_atm    = id_eps_atm_max * P_tau_falloff;
-							
-					rho[          i] = id_rho_atm;
-					Y_e[          i] = id_Y_e_atm;
-					temperature[  i] = id_temperature_atm;
-					press[        i] = id_press_atm;
-					eps[          i] = id_eps_atm;
-					vel[          i] = 0.0;
-					vel[npoints  +i] = 0.0;
-					vel[2*npoints+i] = 0.0;
+					CCTK_VINFO("Performing atm reset: rho = %e at r = %g.", id_rho_atm, r[index]);
+
+					rho[          index] = id_rho_atm;
+					Y_e[          index] = id_Y_e_atm;
+					temperature[  index] = id_temperature_atm;
+					press[        index] = id_press_atm;
+					eps[          index] = id_eps_atm;
+					vel[          index] = 0.0;
+					vel[npoints  +index] = 0.0; //TODO: Check if this is right
+					vel[2*npoints+index] = 0.0;
 					if( initialize_entropy )
-						entropy[    i] = id_ent_atm;
+						entropy[    index] = id_ent_atm;
 				}
   }
 }
@@ -189,7 +196,7 @@ extern "C" void ID_TabEOS_HydroQuantities(CCTK_ARGUMENTS) {
   if( CCTK_EQUALS( initial_Y_e,"ID_TabEOS_HydroQuantities") ) {
     CCTK_VInfo(CCTK_THORNSTRING,"Y_e initialization is ENABLED!");
     // Initialize Y_e
-    ID_TabEOS_HydroQuantities__initial_Y_e( npoints, rho, Y_e );
+    ID_TabEOS_HydroQuantities__initial_Y_e( npoints, rho, r, Y_e );
   }
   else {
     CCTK_VInfo(CCTK_THORNSTRING,"Y_e initialization is DISABLED!");
@@ -211,8 +218,9 @@ extern "C" void ID_TabEOS_HydroQuantities(CCTK_ARGUMENTS) {
   if( CCTK_EQUALS( initial_Y_e        ,"ID_TabEOS_HydroQuantities") ||
       CCTK_EQUALS( initial_temperature,"ID_TabEOS_HydroQuantities") ||
       CCTK_EQUALS( initial_entropy    ,"ID_TabEOS_HydroQuantities") ) {
-    			ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( npoints,
-                                                              rho,Y_e,temperature,
+
+    ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( cctkGH,cctk_lsh[0],cctk_lsh[1],cctk_lsh[2],
+                                                              npoints,r,rho,Y_e,temperature,
                                                               press,eps,entropy,
                                                               vel );
   }

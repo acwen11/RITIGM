@@ -57,7 +57,7 @@ CCTK_REAL id_temperature "Initial temperature (constant everywhere on the grid)"
 
 #----------------- Atmospheric values -----------------
 restricted:
-CCTK_BOOLEAN atmo_falloff "If true, rho_atmo(r) = rho_b_atm_max/r^{3/2} and u_atmo(r) = u_atm_max/r^{{3/2}*gamma} outside a radius 'r_atmo_min' (see below)" STEERABLE=ALWAYS
+CCTK_BOOLEAN atmo_falloff "If true, rho_atmo(r) = rho_b_atm_max/r^{3/2} outside a radius 'r_atmo_min' (see below)" STEERABLE=ALWAYS
 {
 } false
 
@@ -72,18 +72,6 @@ CCTK_REAL id_rho_atm_max "Atmospheric density"
 {
   0:* :: "Should be positive"
 } 0
-
-restricted:
-REAL id_eps_atm_max "Maximum floor value on the specific internal energy. Given the variety of systems this code may encounter, there *is no reasonable default*. Effectively the current (enormous) value should disable the tau_atm floor. Please set this in your initial data thorn, and reset at will during evolutions." STEERABLE=ALWAYS
-{
- 0:* :: "Positive"
-} 1e100
-
-restricted:
-REAL id_press_atm_max "Maximum floor value on the pressure. Given the variety of systems this code may encounter, there *is no reasonable default*. Effectively the current (enormous) value should disable the tau_atm floor. Please set this in your initial data thorn, and reset at will during evolutions." STEERABLE=ALWAYS
-{
- 0:* :: "Positive"
-} 1e100
 
 restricted:
 CCTK_REAL id_Y_e_atm "Atmospheric electron fraction"
