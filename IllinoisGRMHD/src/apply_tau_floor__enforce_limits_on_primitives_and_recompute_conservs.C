@@ -1,7 +1,7 @@
 void eigenvalues_3by3_real_sym_matrix(CCTK_REAL & lam1, CCTK_REAL & lam2, CCTK_REAL & lam3,
                                       CCTK_REAL M11, CCTK_REAL M12, CCTK_REAL M13, CCTK_REAL M22, CCTK_REAL M23, CCTK_REAL M33);
 
-static inline int apply_tau_floor(const int index,const CCTK_REAL Psi6threshold,CCTK_REAL *PRIMS,CCTK_REAL *METRIC,CCTK_REAL *METRIC_PHYS,CCTK_REAL *METRIC_LAP_PSI4,output_stats &stats,igm_eos_parameters &eos,  CCTK_REAL *CONSERVS) {
+static inline int apply_tau_floor(const int index,const CCTK_REAL Psi6threshold,CCTK_REAL *PRIMS,CCTK_REAL *METRIC,CCTK_REAL *METRIC_PHYS,CCTK_REAL *METRIC_LAP_PSI4,output_stats &stats, igm_eos_parameters &eos, CCTK_REAL *CONSERVS) {
 
 
   //First apply the rho_star floor:
@@ -87,7 +87,7 @@ static inline int apply_tau_floor(const int index,const CCTK_REAL Psi6threshold,
 
   //tau fix, applicable when B==0 and B!=0:
   if(CONSERVS[TAUENERGY] < 0.5*METRIC_LAP_PSI4[PSI6]*Bbar2) {
-    CONSERVS[TAUENERGY] = eos.tau_atm+0.5*METRIC_LAP_PSI4[PSI6]*Bbar2;
+    CONSERVS[TAUENERGY] = eos.tau_atm_max+0.5*METRIC_LAP_PSI4[PSI6]*Bbar2;
     stats.failure_checker+=1000000;
   }
 
@@ -98,7 +98,7 @@ static inline int apply_tau_floor(const int index,const CCTK_REAL Psi6threshold,
   //if(PRIMS[BX_CENTER]==0 && PRIMS[BY_CENTER]==0 && PRIMS[BZ_CENTER]==0 && (METRIC_LAP_PSI4[PSI6]>30.0 || CONSERVS[RHOSTAR]/METRIC_LAP_PSI4[PSI6]<100*rho_b_atm)) {
   //if(check_B_small < 1.e-300) {
 
-  if(check_B_small*check_B_small < eos.P_atm*1e-32) {
+  if(check_B_small*check_B_small < eos.P_atm_max*1e-32) {
     CCTK_REAL rhot=CONSERVS[TAUENERGY]*(CONSERVS[TAUENERGY]+2.0*CONSERVS[RHOSTAR]);
     CCTK_REAL safetyfactor = 0.999999;
     //if(METRIC_LAP_PSI4[PSI6]>Psi6threshold) safetyfactor=0.99;
@@ -112,8 +112,8 @@ static inline int apply_tau_floor(const int index,const CCTK_REAL Psi6threshold,
     }
   } else if(METRIC_LAP_PSI4[PSI6]>Psi6threshold) {
     //Apply new Stilde fix.
-    if (tau_fluid_min < eos.tau_atm*1.001) {
-      tau_fluid_min = eos.tau_atm*1.001;
+    if (tau_fluid_min < eos.tau_atm_max*1.001) {
+      tau_fluid_min = eos.tau_atm_max*1.001;
       CONSERVS[TAUENERGY] = tau_fluid_min + 0.5*METRIC_LAP_PSI4[PSI6]*Bbar2 + (Bbar2*sdots - SQR(BbardotS))*0.5/(METRIC_LAP_PSI4[PSI6]*SQR(Wmin+Bbar2));
     }
 
@@ -143,7 +143,7 @@ static inline int apply_tau_floor(const int index,const CCTK_REAL Psi6threshold,
 
 
 void IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(const int already_computed_physical_metric_and_inverse,CCTK_REAL *PRIMS,struct output_stats &stats,igm_eos_parameters &eos,
-                                                                       CCTK_REAL *METRIC,CCTK_REAL g4dn[4][4],CCTK_REAL g4up[4][4], CCTK_REAL *TUPMUNU,CCTK_REAL *TDNMUNU,CCTK_REAL *CONSERVS) {
+                                                                       CCTK_REAL *METRIC,CCTK_REAL g4dn[4][4],CCTK_REAL g4up[4][4], CCTK_REAL *TUPMUNU,CCTK_REAL *TDNMUNU,CCTK_REAL *CONSERVS, const CCTK_REAL rho_b_atm, const CCTK_REAL r_test) {
 #ifndef ENABLE_STANDALONE_IGM_C2P_SOLVER
   DECLARE_CCTK_PARAMETERS;
 #endif
@@ -163,7 +163,7 @@ void IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(const int
   // S  (if evolving the entropy)
   // Ye (if tabulated EOS is enabled)
   // T  (if tabulated EOS is enabled)
-  apply_floors_and_ceilings_to_prims__recompute_prims(eos,METRIC_LAP_PSI4,PRIMS);
+  apply_floors_and_ceilings_to_prims__recompute_prims(eos, METRIC_LAP_PSI4, PRIMS, rho_b_atm, r_test);
 
   // Now compute the enthalpy
   const CCTK_REAL h_enthalpy = 1.0 + PRIMS[EPSILON] + PRIMS[PRESSURE]/PRIMS[RHOB];

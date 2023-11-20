@@ -5,6 +5,9 @@
 //     am2 = -1/16, am1 = 9/16, a0 = 9/16, a1 = -1/16
 // This will yield the third-order-accurate face values at m-1/2,
 //      using values specified at {m-2,m-1,m,m+1}
+
+#include "IllinoisGRMHD_headers.h"
+
 #define AM2 -0.0625
 #define AM1  0.5625
 #define A0   0.5625
@@ -77,7 +80,8 @@ static void add_fluxes_and_source_terms_to_hydro_rhss( const igm_eos_parameters 
                                                        CCTK_REAL *restrict s_tau,
                                                        CCTK_REAL *restrict s_sx,
                                                        CCTK_REAL *restrict s_sy,
-                                                       CCTK_REAL *restrict s_sz ) {
+                                                       CCTK_REAL *restrict s_sz,
+                                                       CCTK_REAL *restrict r ) {
 
   DECLARE_CCTK_PARAMETERS;
 
@@ -97,10 +101,15 @@ static void add_fluxes_and_source_terms_to_hydro_rhss( const igm_eos_parameters 
 	CCTK_REAL Ur[MAXNUMVARS]; for(int ii=0;ii<MAXNUMVARS;ii++) Ur[ii] = out_prims_r[ii].gf[index];
 	CCTK_REAL Ul[MAXNUMVARS]; for(int ii=0;ii<MAXNUMVARS;ii++) Ul[ii] = out_prims_l[ii].gf[index];
 
-        if( eos.evolve_entropy ) {
-          apply_floors_and_ceilings_to_prims__recompute_prims(eos,METRIC_LAP_PSI4,Ur);
-          apply_floors_and_ceilings_to_prims__recompute_prims(eos,METRIC_LAP_PSI4,Ul);
-        }
+	// Find scaled atmospheric density
+	const CCTK_REAL r_pow         = atmo_falloff ? -1.5 : 0.;
+	const CCTK_REAL r_atmo        = MAX(r_atmo_min, r[index]);
+	const CCTK_REAL rho_b_atm     = MAX(rho_b_atm_max*std::pow(r_atmo / r_atmo_min, r_pow), eos.rho_min);
+
+	if( eos.evolve_entropy ) {
+		apply_floors_and_ceilings_to_prims__recompute_prims(eos,METRIC_LAP_PSI4,Ur,rho_b_atm, r[index]);
+		apply_floors_and_ceilings_to_prims__recompute_prims(eos,METRIC_LAP_PSI4,Ul,rho_b_atm, r[index]);
+	}
 
 	// Read the T^{\mu \nu} gridfunction from memory, since computing T^{\mu \nu} is expensive
 	CCTK_REAL TUP[4][4]; int counter=0;

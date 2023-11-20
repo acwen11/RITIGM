@@ -44,9 +44,9 @@ typedef struct _igm_eos_parameters_ {
   // Whether or not to evolve the entropy
   bool evolve_T,evolve_entropy;
   // Baryonic density parameters
-  CCTK_REAL rho_atm, rho_min, rho_max;
+  CCTK_REAL rho_atm_max, rho_min, rho_max;
   // Atmospheric tau
-  CCTK_REAL tau_atm;
+  CCTK_REAL tau_atm_max;
   // Maximum Lorentz factor
   CCTK_REAL W_max,inv_W_max_squared;
   //------------------------------------------------
@@ -72,11 +72,11 @@ typedef struct _igm_eos_parameters_ {
   // Temperature parameters
   CCTK_REAL T_atm  , T_min  , T_max  ;
   // Pressure parameters
-  CCTK_REAL P_atm  , P_min  , P_max  ;
+  CCTK_REAL P_atm_max  , P_min  , P_max  ;
   // Specific internal energy parameters
-  CCTK_REAL eps_atm, eps_min, eps_max;
+  CCTK_REAL eps_atm_max, eps_min, eps_max;
   // Entropy parameters
-  CCTK_REAL S_atm  , S_min  , S_max  ;
+  CCTK_REAL S_atm_max  , S_min  , S_max  ;
   // Root-finding precision for table inversions
   CCTK_REAL root_finding_precision;
   // This threshold is used by the Palenzuela con2prim routine
@@ -87,7 +87,7 @@ typedef struct _igm_eos_parameters_ {
 //------------------------------------------------
 
 void initialize_igm_eos_parameters_from_input( const CCTK_INT* igm_eos_key, const CCTK_REAL cctk_time, igm_eos_parameters &eos );
-void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_parameters eos, const CCTK_REAL *restrict METRIC_LAP_PSI4, CCTK_REAL *restrict PRIMS );
+void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_parameters eos, const CCTK_REAL *restrict METRIC_LAP_PSI4, CCTK_REAL *restrict PRIMS, const CCTK_REAL rho_b_atm, const CCTK_REAL r_test );
 
 //----------- Hybrid Equation of State -----------
 void print_EOS_Hybrid( igm_eos_parameters eos );
@@ -104,7 +104,12 @@ void compute_entropy_function( const igm_eos_parameters eos,
                                const CCTK_REAL P,
                                CCTK_REAL *restrict S );
 
-void reset_prims_to_atmosphere( const igm_eos_parameters eos, CCTK_REAL *restrict PRIMS );
+void reset_prims_to_atmosphere( const igm_eos_parameters eos, 
+																const CCTK_REAL rho_atm,
+                                const CCTK_REAL P_atm,
+                                const CCTK_REAL eps_atm,
+                                const CCTK_REAL S_atm,
+																CCTK_REAL *restrict PRIMS );
 //------------------------------------------------
 
 //---------- Tabulated Equation of State ---------

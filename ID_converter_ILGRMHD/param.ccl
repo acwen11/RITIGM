@@ -5,9 +5,11 @@ USES INT neos
 USES REAL K_ppoly_tab0
 USES REAL rho_ppoly_tab_in[10]
 USES REAL Gamma_ppoly_tab_in[10]
+USES BOOLEAN atmo_falloff
+USES REAL r_atmo_min
 USES REAL rho_b_max
-USES REAL rho_b_atm
-USES REAL tau_atm
+USES REAL rho_b_atm_max
+USES REAL tau_atm_hybrid
 USES REAL Sym_Bz
 USES REAL GAMMA_SPEED_LIMIT
 USES REAL Psi6threshold

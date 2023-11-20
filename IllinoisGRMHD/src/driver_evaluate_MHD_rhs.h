@@ -103,6 +103,7 @@ static void add_fluxes_and_source_terms_to_hydro_rhss( const igm_eos_parameters 
                                                        CCTK_REAL *restrict s_tau,
                                                        CCTK_REAL *restrict s_sx,
                                                        CCTK_REAL *restrict s_sy,
-                                                       CCTK_REAL *restrict s_sz  );
+                                                       CCTK_REAL *restrict s_sz,
+                                                       CCTK_REAL *restrict r);
 
 #endif /* DRIVER_EVALUATE_MHD_RHS_H_ */

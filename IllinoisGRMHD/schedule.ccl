@@ -9,7 +9,7 @@ STORAGE: Tmunu_source_terms
 
 ####################
 # NEW STUFF
-schedule IllinoisGRMHD_EOS_get_key at BASEGRID after EOS_OMNI_get_energy_shift before IllinoisGRMHD_con2prim_test_suit
+schedule IllinoisGRMHD_EOS_get_key at BASEGRID after EOS_OMNI_get_energy_shift # before IllinoisGRMHD_con2prim_test_suit
 {
   LANG: C
   OPTIONS: GLOBAL
@@ -26,12 +26,12 @@ schedule IllinoisGRMHD_parameter_check at BASEGRID after IllinoisGRMHD_EOS_get_k
 } "Check input parameters"
 
 # Con2prim standalone test suite
-if( igm_con2prim_standalone ) {
-  schedule IllinoisGRMHD_con2prim_test_suit at CCTK_BASEGRID after EOS_OMNI_get_energy_shift
-  {
-    LANG: C
-  } "Performs a con2prim standalone test"
-}
+# if( igm_con2prim_standalone ) {
+#   schedule IllinoisGRMHD_con2prim_test_suit at CCTK_BASEGRID after EOS_OMNI_get_energy_shift
+#   {
+#     LANG: C
+#   } "Performs a con2prim standalone test"
+# }
 
 ####################
 # RUN INITIALLY ONLY
