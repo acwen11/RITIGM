@@ -6,6 +6,7 @@ USES REAL K_ppoly_tab0
 USES REAL rho_ppoly_tab_in[10]
 USES REAL Gamma_ppoly_tab_in[10]
 USES BOOLEAN atmo_falloff
+USES REAL r_power
 USES REAL r_atmo_min
 USES REAL rho_b_max
 USES REAL rho_b_atm_max

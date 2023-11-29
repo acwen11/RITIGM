@@ -42,9 +42,14 @@ BOOLEAN update_Tmunu "Update Tmunu, for RHS of Einstein's equations?" STEERABLE=
 
 ###########################
 # Radial-falloff atmosphere
-CCTK_BOOLEAN atmo_falloff "If true, rho_atmo(r) = rho_b_atm_max/r^{3/2} and u_atmo(r) = u_atm_max/r^{{3/2}*gamma} outside a radius 'r_atmo_min' (see below)" STEERABLE=ALWAYS
+CCTK_BOOLEAN atmo_falloff "If true, rho_atmo(r) = rho_b_atm_max*r^r_power outside a radius 'r_atmo_min' (see below)" STEERABLE=ALWAYS
 {
 } false
+
+CCTK_REAL r_power "Exponent of atmospheric density falloff." STEERABLE=ALWAYS
+{
+  *:0.] :: "Any non-positive number"
+} -1.5
 
 CCTK_REAL r_atmo_min "The falloff in the atmosphere is only applied outside a sphere of radius 'r_atmo_min'" STEERABLE=ALWAYS
 {

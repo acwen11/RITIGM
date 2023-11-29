@@ -107,7 +107,7 @@ extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const 
 
 				// Find Atmospheric Density
 				CCTK_REAL xrho    = rho[index];
-				const CCTK_REAL r_pow					= atmo_falloff ? -1.5 : 0.;
+				const CCTK_REAL r_pow					= atmo_falloff ? r_power : 0.;
 				const CCTK_REAL r_atmo        = std::max(r_atmo_min, r[index]);
 				const CCTK_REAL id_rho_atm    = std::max(id_rho_atm_max*std::pow(r_atmo / r_atmo_min, r_pow), nuc_eos::eos_rhomin);
 
@@ -171,7 +171,7 @@ extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const 
 													 &keyerr,&anyerr);
 					}
 
-					CCTK_VINFO("Performing atm reset: rho = %e at r = %g.", id_rho_atm, r[index]);
+					// CCTK_VINFO("Performing atm reset: rho = %e at r = %g.", id_rho_atm, r[index]);
 
 					rho[          index] = id_rho_atm;
 					Y_e[          index] = id_Y_e_atm;

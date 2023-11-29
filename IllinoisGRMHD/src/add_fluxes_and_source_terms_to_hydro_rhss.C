@@ -102,7 +102,7 @@ static void add_fluxes_and_source_terms_to_hydro_rhss( const igm_eos_parameters 
 	CCTK_REAL Ul[MAXNUMVARS]; for(int ii=0;ii<MAXNUMVARS;ii++) Ul[ii] = out_prims_l[ii].gf[index];
 
 	// Find scaled atmospheric density
-	const CCTK_REAL r_pow         = atmo_falloff ? -1.5 : 0.;
+	const CCTK_REAL r_pow         = atmo_falloff ? r_power : 0.;
 	const CCTK_REAL r_atmo        = MAX(r_atmo_min, r[index]);
 	const CCTK_REAL rho_b_atm     = MAX(rho_b_atm_max*std::pow(r_atmo / r_atmo_min, r_pow), eos.rho_min);
 

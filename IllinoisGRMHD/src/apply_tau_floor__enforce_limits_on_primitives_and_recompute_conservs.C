@@ -144,6 +144,8 @@ static inline int apply_tau_floor(const int index,const CCTK_REAL Psi6threshold,
 
 void IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(const int already_computed_physical_metric_and_inverse,CCTK_REAL *PRIMS,struct output_stats &stats,igm_eos_parameters &eos,
                                                                        CCTK_REAL *METRIC,CCTK_REAL g4dn[4][4],CCTK_REAL g4up[4][4], CCTK_REAL *TUPMUNU,CCTK_REAL *TDNMUNU,CCTK_REAL *CONSERVS, const CCTK_REAL rho_b_atm, const CCTK_REAL r_test) {
+
+	//TODO: passing in r_test only for debugging, remove when done.
 #ifndef ENABLE_STANDALONE_IGM_C2P_SOLVER
   DECLARE_CCTK_PARAMETERS;
 #endif

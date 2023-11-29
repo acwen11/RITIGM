@@ -18,7 +18,7 @@ void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_paramete
   DECLARE_CCTK_PARAMETERS;
 
   // The density floor and ceiling is always applied
-  CCTK_VINFO("Enforcing rho limit at radius %g: rho_b_atm = %e, rho_max = %e.", r_test, rho_b_atm, eos.rho_max); 
+  // CCTK_VINFO("Enforcing rho limit at radius %g: rho_b_atm = %e, rho_max = %e.", r_test, rho_b_atm, eos.rho_max); 
   PRIMS[RHOB] = MIN(MAX(PRIMS[RHOB], rho_b_atm),eos.rho_max);
 
   // Hybrid EOS specific floors and ceilings

@@ -283,7 +283,7 @@ extern "C" void IllinoisGRMHD_outer_boundaries_on_P_rho_b_vx_vy_vz(CCTK_ARGUMENT
           CCTK_REAL CONSERVS[NUM_CONSERVS],TUPMUNU[10],TDNMUNU[10];
 
 					// Find scaled atmospheric density
-					const CCTK_REAL r_pow         = atmo_falloff ? -1.5 : 0.;
+					const CCTK_REAL r_pow         = atmo_falloff ? r_power : 0.;
 					const CCTK_REAL r_atmo        = MAX(r_atmo_min, r[index]);
 					const CCTK_REAL rho_b_atm     = MAX(rho_b_atm_max*std::pow(r_atmo / r_atmo_min, r_pow), eos.rho_min);
 

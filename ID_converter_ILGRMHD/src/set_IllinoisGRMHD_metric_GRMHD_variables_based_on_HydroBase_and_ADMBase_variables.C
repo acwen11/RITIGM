@@ -338,7 +338,7 @@ extern "C" void set_IllinoisGRMHD_metric_GRMHD_variables_based_on_HydroBase_and_
         Bz[actual_index] = 0.5 * ( Bz_stagger[index] + Bz_stagger[indexkm1] );
       }
 
-	CCTK_VINFO("Enforcing limits on prims in ID_converter.");
+	// CCTK_VINFO("Enforcing limits on prims in ID_converter.");
   // Finally, enforce limits on primitives & compute conservative variables.
 #pragma omp parallel for
   for(int k=0;k<cctk_lsh[2];k++)
@@ -350,10 +350,10 @@ extern "C" void set_IllinoisGRMHD_metric_GRMHD_variables_based_on_HydroBase_and_
         int ww;
 
 				// Set floor, find scaled atmospheric density
-				const CCTK_REAL r_pow         = atmo_falloff ? -1.5 : 0.;
+				const CCTK_REAL r_pow         = atmo_falloff ? r_power : 0.;
 				const CCTK_REAL r_atmo        = MAX(r_atmo_min, r[index]);
 				const CCTK_REAL rho_b_atm     = MAX(rho_b_atm_max*std::pow(r_atmo / r_atmo_min, r_pow), eos.rho_min);
-				CCTK_VINFO("For debug: r_pow = %g; r = %g; r_atmo = %g; rho_min = %e; rho_b_atm = %e.", r_pow, r[index], r_atmo, eos.rho_min, rho_b_atm);
+				// CCTK_VINFO("For debug: r_pow = %g; r = %g; r_atmo = %g; rho_min = %e; rho_b_atm = %e.", r_pow, r[index], r_atmo, eos.rho_min, rho_b_atm);
 
         CCTK_REAL PRIMS[MAXNUMVARS];
         PRIMS[RHOB         ] = rho_b[index];
