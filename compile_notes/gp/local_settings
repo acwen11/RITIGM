@@ -1,0 +1,102 @@
+###############################################################
+#
+#  Edit the following lines according to your implementation.
+#
+#  The environment variable HOME_LORENE (root directory for the
+#   Lorene implementation) must be have been already defined.
+#
+###############################################################
+
+#===============================#
+#           COMPILERS           #
+#===============================#
+
+# C++ compiler:
+# ------------
+CXX      = icc
+
+# Options for the C++ compiler to produce the optimized library:
+# -------------------------------------------------------------
+CXXFLAGS = -O2 -DNDEBUG -xCORE-AVX512 -align 
+
+# Options for the C++ compiler to produce the library for debugging:
+# -----------------------------------------------------------------
+CXXFLAGS_G = -g -traceback -debug all -xCORE-AVX512 -align 
+
+# Path for the include files:
+# --------------------------
+INC    = -I$(HOME_LORENE)/C++/Include \
+	-I$(HOME_LORENE)/C++/Include_extra \
+	-I/home/spack/spack/var/spack/environments/etk/.spack-env/view/include/
+
+# Converting archives to random libraries (if required, otherwise just ls)
+# ------------------------------------------------------------------------
+RANLIB = ls
+
+# Fortran 77 compiler:
+# -------------------
+F77      = ifort
+#mpif77
+
+# Options for the Fortran 77 compiler to produce the optimized library:
+# ---------------------------------------------------------------------
+F77FLAGS = -g -traceback -debug all -xCORE-AVX512 -align -pad -safe-cray-ptr \
+	-check bounds -check format -extend-source 132 \
+	-L/opt/intel/compilers_and_libraries_2020.1.217/linux/compiler/lib/intel64 -lifcore -lirc_s \
+	-L/home/spack/spack/var/spack/environments/etk/.spack-env/view/lib -lfftw3 
+  -L/opt/intel/compilers_and_libraries_2020.1.217/linux/mkl/lib/intel64 -mkl
+
+# Options for the Fortran 77 compiler to produce the library for debugging:
+# ------------------------------------------------------------------------
+F77FLAGS_G = -g -traceback -debug all -xCORE-AVX512 -align -pad -safe-cray-ptr \
+	-check bounds -check format -extend-source 132 \
+	-L/opt/intel/compilers_and_libraries_2020.1.217/linux/compiler/lib/intel64 -lifcore -lirc_s \
+	-L/home/spack/spack/var/spack/environments/etk/.spack-env/view/lib -lfftw3 \
+  -L/opt/intel/compilers_and_libraries_2020.1.217/linux/mkl/lib/intel64 -mkl
+
+#===============================#
+#           MAKEDEPEND	        #
+#===============================#
+
+# First line uses  the C precompiler (usually called cpp)
+# if yours does not support the -M option try to figure out
+# how to output dependencies file, or use makedepend (2nd line)
+#--------------------------------------------------------------
+MAKEDEPEND = cpp $(INC) -M >> $(df).d $<
+#MAKEDEPEND = touch $(df).d && makedepend $(INC) -f $(df).d $<
+DEPDIR = .deps
+
+#===============================#
+#      SYSTEM LIBRARIES         #
+#===============================#
+
+# FFT library:    FFT991 in Fortran coming with Lorene
+#		  FFTW3 library (must be installed separately)
+# -------------------------------------------------------------------
+FFT_DIR = FFTW3
+#FFT991
+
+# C, C++ library, mathematical library and Fortran library
+# ---------------------------------------------------------
+ifeq ($(FFT_DIR),FFTW3)
+LIB_CXX    = -L/opt/intel/compilers_and_libraries_2020.1.217/linux/compiler/lib/intel64 -lifcore -lirc_s -lgfortran \
+						 -L/home/spack/spack/var/spack/environments/etk/.spack-env/view/lib -lfftw3 
+else
+LIB_CXX    =  -lgfortran -lstdc++ -lm
+endif
+
+# Linear Algebra Package (LAPACK) library
+# ---------------------------------------
+LIB_LAPACK = -L/opt/intel/compilers_and_libraries_2020.1.217/linux/mkl/lib/intel64 -mkl
+
+# Graphical libraries: PGPLOT and X11
+# -----------------------------------
+LIB_PGPLOT = -L/home/allenwen/pgplot/lib -lcpgplot -lpgplot -lX11
+
+# GNU scientific library
+# -----------------------------------
+LIB_GSL = -L/home/spack/spack/var/spack/environments/etk/.spack-env/view/lib -lgsl -lgslcblas
+
+
+
+
