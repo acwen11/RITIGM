@@ -1,4 +1,4 @@
-IMPLEMENTS: ID_tabEOS_HydroQuantities
+IMPLEMENTS: ID_TabEOS_HydroQuantities
 INHERITS: Grid HydroBase
 
 CCTK_INT FUNCTION EOS_Omni_GetHandle(CCTK_STRING IN name)

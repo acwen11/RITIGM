@@ -155,7 +155,8 @@ int con2prim( const igm_eos_parameters eos,
               const CCTK_REAL *restrict METRIC,const CCTK_REAL *restrict METRIC_PHYS,const CCTK_REAL *restrict METRIC_LAP_PSI4,
               const CCTK_REAL g4dn[NDIM][NDIM],const CCTK_REAL g4up[NDIM][NDIM],
               CCTK_REAL *restrict CONSERVS,CCTK_REAL *restrict PRIMS,
-              output_stats& stats );
+              const CCTK_REAL tau_atm, const CCTK_REAL rho_atm,
+              output_stats& stats ) ;
 
 int con2prim_select( const igm_eos_parameters eos,
                      const CCTK_INT c2p_key,
@@ -231,6 +232,7 @@ void set_cons_from_PRIMS_and_CONSERVS( const igm_eos_parameters eos,
                                        const CCTK_REAL *restrict METRIC_LAP_PSI4,
                                        const CCTK_REAL *restrict PRIMS,
                                        const CCTK_REAL *restrict CONSERVS,
+                                       const CCTK_REAL tau_atm,
                                        CCTK_REAL *restrict cons);
 
 void set_prim_from_PRIMS_and_CONSERVS( const igm_eos_parameters eos,
@@ -240,6 +242,7 @@ void set_prim_from_PRIMS_and_CONSERVS( const igm_eos_parameters eos,
                                        const CCTK_REAL *restrict METRIC_LAP_PSI4,
                                        const CCTK_REAL *restrict PRIMS,
                                        const CCTK_REAL *restrict CONSERVS,
+                                       const CCTK_REAL rho_atm,
                                        const CCTK_REAL *restrict cons,
                                        CCTK_REAL *restrict prim );
 

@@ -11,12 +11,15 @@
 
 void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_parameters eos,
                                                           const CCTK_REAL *restrict METRIC_LAP_PSI4,
-                                                          CCTK_REAL *restrict PRIMS ) {
+                                                          CCTK_REAL *restrict PRIMS,
+																													const CCTK_REAL rho_b_atm,
+																													const CCTK_REAL r_test) {
 
   DECLARE_CCTK_PARAMETERS;
 
   // The density floor and ceiling is always applied
-  PRIMS[RHOB] = MIN(MAX(PRIMS[RHOB],eos.rho_atm),eos.rho_max);
+  // CCTK_VINFO("Enforcing rho limit at radius %g: rho_b_atm = %e, rho_max = %e.", r_test, rho_b_atm, eos.rho_max); 
+  PRIMS[RHOB] = MIN(MAX(PRIMS[RHOB], rho_b_atm),eos.rho_max);
 
   // Hybrid EOS specific floors and ceilings
   if( eos.is_Hybrid ) {
@@ -35,7 +38,7 @@ void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_paramete
     // Now apply floors and ceilings to P
     if(PRIMS[PRESSURE]<P_min) PRIMS[PRESSURE] = P_min;
     // Finally, perform the last check
-    if((PRIMS[RHOB] < 100.0*eos.rho_atm || Psi6 > Psi6threshold) && PRIMS[PRESSURE]>P_max) {
+    if((PRIMS[RHOB] < 100.0*eos.rho_atm_max || Psi6 > Psi6threshold) && PRIMS[PRESSURE]>P_max) {
       PRIMS[PRESSURE] = P_max;
     }
     // Now compute eps
@@ -46,7 +49,7 @@ void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_paramete
 
   // Tabulated EOS specific floors and ceilings
   else if( eos.is_Tabulated ) {
-    // Apply floors and ceilings to Y_e and T
+    // Apply floors and ceilings to Y_e and T; TODO: This will need to be changed for non-constant T, Y_e
     const CCTK_REAL xye   = MIN(MAX(PRIMS[YEPRIM     ],eos.Ye_min),eos.Ye_atm);
     const CCTK_REAL xtemp = MIN(MAX(PRIMS[TEMPERATURE],eos.T_atm ),eos.T_max );
 

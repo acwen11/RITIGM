@@ -99,23 +99,25 @@ void initialize_Tabulated_EOS_parameters_from_input( const CCTK_REAL cctk_time,i
   eos.root_finding_precision = igm_eos_root_finding_precision;
 
   // --------- Atmospheric values ---------
+  // NOTE: in the radial falloff prescription: rho_atm_max denotes the density that is then scaled by radius^{-power}. 
+  // Currently, T_atm and Ye_atm are held constant and the other quantities are calculated from the EoS Table. I don't think the other (var)_atm_max quantities are used.
   // Atmospheric rho
-  eos.rho_atm = rho_b_atm;
+  eos.rho_atm_max = rho_b_atm_max;
   // Atmospheric electron fraction
   eos.Ye_atm  = igm_Ye_atm;
   // Atmospheric temperature fraction
   eos.T_atm   = igm_T_atm;
   // Compute P, eps, and S in the atmosphere
   if( eos.evolve_entropy ) {
-    WVU_EOS_P_eps_and_S_from_rho_Ye_T( eos.rho_atm,eos.Ye_atm,eos.T_atm,
-                                       &eos.P_atm,&eos.eps_atm,&eos.S_atm );
+    WVU_EOS_P_eps_and_S_from_rho_Ye_T( eos.rho_atm_max,eos.Ye_atm,eos.T_atm,
+                                       &eos.P_atm_max,&eos.eps_atm_max,&eos.S_atm_max );
   }
   else {
-    WVU_EOS_P_and_eps_from_rho_Ye_T( eos.rho_atm,eos.Ye_atm,eos.T_atm,
-                                     &eos.P_atm,&eos.eps_atm );
+    WVU_EOS_P_and_eps_from_rho_Ye_T( eos.rho_atm_max,eos.Ye_atm,eos.T_atm,
+                                     &eos.P_atm_max,&eos.eps_atm_max );
   }
   // Atmospheric tau
-  eos.tau_atm = eos.rho_atm * eos.eps_atm;
+  eos.tau_atm_max = eos.rho_atm_max * eos.eps_atm_max;
   // --------------------------------------
 
   // -------------- Ceilings --------------

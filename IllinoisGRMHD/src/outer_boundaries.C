@@ -282,9 +282,14 @@ extern "C" void IllinoisGRMHD_outer_boundaries_on_P_rho_b_vx_vy_vz(CCTK_ARGUMENT
           struct output_stats stats;
           CCTK_REAL CONSERVS[NUM_CONSERVS],TUPMUNU[10],TDNMUNU[10];
 
+					// Find scaled atmospheric density
+					const CCTK_REAL r_pow         = atmo_falloff ? r_power : 0.;
+					const CCTK_REAL r_atmo        = MAX(r_atmo_min, r[index]);
+					const CCTK_REAL rho_b_atm     = MAX(rho_b_atm_max*std::pow(r_atmo / r_atmo_min, r_pow), eos.rho_min);
+
           const int already_computed_physical_metric_and_inverse=0;
           CCTK_REAL g4dn[4][4],g4up[4][4];
-          IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(already_computed_physical_metric_and_inverse,PRIMS,stats,eos,METRIC,g4dn,g4up, TUPMUNU,TDNMUNU,CONSERVS);
+          IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(already_computed_physical_metric_and_inverse,PRIMS,stats,eos,METRIC,g4dn,g4up, TUPMUNU,TDNMUNU,CONSERVS,rho_b_atm, r[index]);
 
           rho_b            [index] = PRIMS[RHOB        ];
           P                [index] = PRIMS[PRESSURE    ];

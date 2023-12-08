@@ -70,14 +70,14 @@ void initialize_Hybrid_EOS_parameters_from_input(igm_eos_parameters &eos) {
 
   // --------- Atmospheric values ---------
   // Compute P and eps atm
-  CCTK_REAL P_atm,eps_atm;
-  compute_P_cold__eps_cold(eos,rho_b_atm,P_atm,eps_atm);
+  CCTK_REAL P_atm_max,eps_atm_max;
+  compute_P_cold__eps_cold(eos,rho_b_atm_max,P_atm_max,eps_atm_max);
   // Set atmospheric values
-  eos.rho_atm = rho_b_atm;
-  eos.P_atm   = P_atm;
-  eos.eps_atm = eps_atm;
+  eos.rho_atm_max = rho_b_atm_max;
+  eos.P_atm_max   = P_atm_max;
+  eos.eps_atm_max = eps_atm_max;
   // eos.tau_atm = tau_atm;
-  eos.tau_atm = eos.rho_atm * eos.eps_atm;
+  eos.tau_atm_max = eos.rho_atm_max * eos.eps_atm_max;
   // --------------------------------------
 
   // -------------- Ceilings --------------
@@ -92,9 +92,10 @@ void initialize_Hybrid_EOS_parameters_from_input(igm_eos_parameters &eos) {
 
   // --------------- Floors ---------------
   // We'll choose these as the atmospheric values
-  eos.rho_min = eos.rho_atm;
-  eos.P_min   = eos.P_atm;
-  eos.eps_min = eos.eps_atm;
+  // TODO: Assuming no radial falloff!!! This will have to be redone if we want to support hybrid EoS.
+  eos.rho_min = eos.rho_atm_max;
+  eos.P_min   = eos.P_atm_max;
+  eos.eps_min = eos.eps_atm_max;
   // --------------------------------------
 
 }

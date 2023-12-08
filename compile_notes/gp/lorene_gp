@@ -1,0 +1,12 @@
+Please forward questions to Allen Wen (acw6923@g.rit.edu)
+
+1. Install PGPLOT: https://lorene.obspm.fr/pgplot_quick.txt
+	- Use PSDRIV 1, 2, 3, 4 drivers
+  - On clusters, I build PGPLOT in my home directory. Must add pgplot lib to LD_LIBRARY_PATH.
+2. Download and install LORENE: https://lorene.obspm.fr/download.html
+	- Use local_settings provided here.
+	- C++/Source/Champ_cart seems to be empty? Remove directory from Makefile.
+3. Specify LORENE_DIR and LORENE_EXTRA_LIBS=fftw3 in .cfg file.
+
+
+NOTE: The Bin_star codes do not work!!! Something is causing the maximum entropy to be too high. This error is seen on Frontera and GP but not on my own laptop. The provided functions used by ETK thorns seem to work from qualitatively looking at HDF5 output and evaluating constraint violations.

@@ -4,6 +4,7 @@ int con2prim( const igm_eos_parameters eos,
               const CCTK_REAL *restrict METRIC,const CCTK_REAL *restrict METRIC_PHYS,const CCTK_REAL *restrict METRIC_LAP_PSI4,
               const CCTK_REAL g4dn[NDIM][NDIM],const CCTK_REAL g4up[NDIM][NDIM],
               CCTK_REAL *restrict CONSERVS,CCTK_REAL *restrict PRIMS,
+							const CCTK_REAL tau_atm, const CCTK_REAL rho_atm,
               output_stats& stats ) {
 
   DECLARE_CCTK_PARAMETERS;
@@ -66,10 +67,10 @@ int con2prim( const igm_eos_parameters eos,
   for(int which_guess=startguess;which_guess<3;which_guess++) {
 
     // Set the conserved variables required by the con2prim routine
-    set_cons_from_PRIMS_and_CONSERVS( eos, eos.c2p_routine, METRIC,METRIC_LAP_PSI4,PRIMS,CONSERVS, cons );
+    set_cons_from_PRIMS_and_CONSERVS( eos, eos.c2p_routine, METRIC,METRIC_LAP_PSI4,PRIMS,CONSERVS, tau_atm, cons );
 
     // Set primitive guesses
-    set_prim_from_PRIMS_and_CONSERVS( eos, eos.c2p_routine, which_guess,METRIC,METRIC_LAP_PSI4,PRIMS,CONSERVS, cons,prim );
+    set_prim_from_PRIMS_and_CONSERVS( eos, eos.c2p_routine, which_guess,METRIC,METRIC_LAP_PSI4,PRIMS,CONSERVS, rho_atm, cons,prim );
 
     /************* Conservative-to-primitive recovery ************/
     int check = con2prim_select(eos,eos.c2p_routine,METRIC_PHYS,g4dn,g4up,cons,prim,stats);
@@ -78,8 +79,8 @@ int con2prim( const igm_eos_parameters eos,
       // Backup 1 triggered
       stats.backup[0] = 1;
       // Recompute guesses
-      set_cons_from_PRIMS_and_CONSERVS( eos,eos.c2p_backup[0], METRIC,METRIC_LAP_PSI4,PRIMS,CONSERVS, cons );
-      set_prim_from_PRIMS_and_CONSERVS( eos,eos.c2p_backup[0], which_guess,METRIC,METRIC_LAP_PSI4,PRIMS,CONSERVS, cons,prim );
+      set_cons_from_PRIMS_and_CONSERVS( eos,eos.c2p_backup[0], METRIC,METRIC_LAP_PSI4,PRIMS,CONSERVS, tau_atm, cons );
+      set_prim_from_PRIMS_and_CONSERVS( eos,eos.c2p_backup[0], which_guess,METRIC,METRIC_LAP_PSI4,PRIMS,CONSERVS, rho_atm, cons,prim );
       // Backup routine #1
       check = con2prim_select(eos,eos.c2p_backup[0],METRIC_PHYS,g4dn,g4up,cons,prim,stats);
 
@@ -87,8 +88,8 @@ int con2prim( const igm_eos_parameters eos,
         // Backup 1 triggered
         stats.backup[1] = 1;
         // Recompute guesses
-        set_cons_from_PRIMS_and_CONSERVS( eos,eos.c2p_backup[1], METRIC,METRIC_LAP_PSI4,PRIMS,CONSERVS, cons );
-        set_prim_from_PRIMS_and_CONSERVS( eos,eos.c2p_backup[1], which_guess,METRIC,METRIC_LAP_PSI4,PRIMS,CONSERVS, cons,prim );
+        set_cons_from_PRIMS_and_CONSERVS( eos,eos.c2p_backup[1], METRIC,METRIC_LAP_PSI4,PRIMS,CONSERVS, tau_atm, cons );
+        set_prim_from_PRIMS_and_CONSERVS( eos,eos.c2p_backup[1], which_guess,METRIC,METRIC_LAP_PSI4,PRIMS,CONSERVS, rho_atm, cons,prim );
         // Backup routine #2
         check = con2prim_select(eos,eos.c2p_backup[1],METRIC_PHYS,g4dn,g4up,cons,prim,stats);
 
@@ -96,8 +97,8 @@ int con2prim( const igm_eos_parameters eos,
           // Backup 1 triggered
           stats.backup[2] = 1;
           // Recompute guesses
-          set_cons_from_PRIMS_and_CONSERVS( eos,eos.c2p_backup[2], METRIC,METRIC_LAP_PSI4,PRIMS,CONSERVS, cons );
-          set_prim_from_PRIMS_and_CONSERVS( eos,eos.c2p_backup[2], which_guess,METRIC,METRIC_LAP_PSI4,PRIMS,CONSERVS, cons,prim );
+          set_cons_from_PRIMS_and_CONSERVS( eos,eos.c2p_backup[2], METRIC,METRIC_LAP_PSI4,PRIMS,CONSERVS, tau_atm, cons );
+          set_prim_from_PRIMS_and_CONSERVS( eos,eos.c2p_backup[2], which_guess,METRIC,METRIC_LAP_PSI4,PRIMS,CONSERVS, rho_atm, cons,prim );
           // Backup routine #3
           check = con2prim_select(eos,eos.c2p_backup[2],METRIC_PHYS,g4dn,g4up,cons,prim,stats);
         }

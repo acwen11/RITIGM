@@ -6,6 +6,7 @@
 //------ EOS_Omni stuff ------
 namespace nuc_eos {
   extern double eos_yemin, eos_yemax;
+  extern double eos_rhomin, eos_rhomax;
 }
 
 namespace nuc_eos_private {

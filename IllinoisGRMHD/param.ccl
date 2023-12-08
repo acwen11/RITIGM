@@ -40,14 +40,30 @@ BOOLEAN update_Tmunu "Update Tmunu, for RHS of Einstein's equations?" STEERABLE=
 {
 } "yes"
 
+###########################
+# Radial-falloff atmosphere
+CCTK_BOOLEAN atmo_falloff "If true, rho_atmo(r) = rho_b_atm_max*r^r_power outside a radius 'r_atmo_min' (see below)" STEERABLE=ALWAYS
+{
+} false
+
+CCTK_REAL r_power "Exponent of atmospheric density falloff." STEERABLE=ALWAYS
+{
+  *:0.] :: "Any non-positive number"
+} -1.5
+
+CCTK_REAL r_atmo_min "The falloff in the atmosphere is only applied outside a sphere of radius 'r_atmo_min'" STEERABLE=ALWAYS
+{
+  [0.:* :: "Any non-negative number"
+} 0.
+
 ############################
 # Limiters on tau and rho_b:
-REAL tau_atm "Floor value on the energy variable tau (cf. tau_stildefix_enable). Given the variety of systems this code may encounter, there *is no reasonable default*. Effectively the current (enormous) value should disable the tau_atm floor. Please set this in your initial data thorn, and reset at will during evolutions." STEERABLE=ALWAYS
+REAL tau_atm_hybrid "TODO: FOR HYBRID EOS ONLY??? Floor value on the energy variable tau (cf. tau_stildefix_enable). Given the variety of systems this code may encounter, there *is no reasonable default*. Effectively the current (enormous) value should disable the tau_atm floor. Please set this in your initial data thorn, and reset at will during evolutions." STEERABLE=ALWAYS
 {
  *:* :: "Anything goes"
 } 1e100
 
-REAL rho_b_atm "Floor value on the baryonic rest mass density rho_b (atmosphere). Given the variety of systems this code may encounter, there *is no reasonable default*. Your run will die unless you override this default value in your initial data thorn." STEERABLE=ALWAYS
+REAL rho_b_atm_max "Floor value on the baryonic rest mass density rho_b (atmosphere) that will decrease with radius. Given the variety of systems this code may encounter, there *is no reasonable default*. Your run will die unless you override this default value in your initial data thorn." STEERABLE=ALWAYS
 {
  *:* :: "Allow for negative values.  This enables us to debug the code and verify if rho_b_atm is properly set."
 } 1e200

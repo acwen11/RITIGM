@@ -22,8 +22,8 @@ extern "C" void set_IllinoisGRMHD_metric_GRMHD_variables_based_on_HydroBase_and_
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
 
-  if(rho_b_atm > 1e199) {
-    CCTK_VError(VERR_DEF_PARAMS, "You MUST set rho_b_atm to some reasonable value in your param.ccl file.\n");
+  if(rho_b_atm_max > 1e199) {
+    CCTK_VError(VERR_DEF_PARAMS, "You MUST set rho_b_atm_max to some reasonable value in your param.ccl file.\n");
   }
 
   // Convert ADM variables (from ADMBase) to the BSSN-based variables expected by this routine.
@@ -127,15 +127,15 @@ extern "C" void set_IllinoisGRMHD_metric_GRMHD_variables_based_on_HydroBase_and_
 
           /* Compare P and P_cold */
           double P_rel_error = fabs(P[index] - P_cold)/P[index];
-          if( rho_b[index] > rho_b_atm && P_rel_error > 1e-2 ) {
+          if( rho_b[index] > rho_b_atm_max && P_rel_error > 1e-2 ) {
             const double Gamma_poly_local = log(P[index]/K_poly) / log(rho_b[index]);
             /* Determine the value of Gamma_poly_local associated with P[index] */
             CCTK_VWarn(CCTK_WARN_ALERT, __LINE__, __FILE__, CCTK_THORNSTRING,
                        "Expected a PP EOS with local Gamma_poly = %.15e, but found a point such that Gamma_poly_local = %.15e.",
                        Gamma_poly, Gamma_poly_local);
             CCTK_VWarn(CCTK_WARN_ALERT, __LINE__, __FILE__, CCTK_THORNSTRING,
-                       "{rho_b; rho_b_atm; P; P_cold; P_rel_Error} = %.10e %e %.10e %.10e %e",
-                       rho_b[index], rho_b_atm, P[index],P_cold,P_rel_error);
+                       "{rho_b; rho_b_atm_max; P; P_cold; P_rel_Error} = %.10e %e %.10e %.10e %e",
+                       rho_b[index], rho_b_atm_max, P[index],P_cold,P_rel_error);
           }
         }
 
@@ -338,6 +338,7 @@ extern "C" void set_IllinoisGRMHD_metric_GRMHD_variables_based_on_HydroBase_and_
         Bz[actual_index] = 0.5 * ( Bz_stagger[index] + Bz_stagger[indexkm1] );
       }
 
+	// CCTK_VINFO("Enforcing limits on prims in ID_converter.");
   // Finally, enforce limits on primitives & compute conservative variables.
 #pragma omp parallel for
   for(int k=0;k<cctk_lsh[2];k++)
@@ -347,6 +348,12 @@ extern "C" void set_IllinoisGRMHD_metric_GRMHD_variables_based_on_HydroBase_and_
         int index = CCTK_GFINDEX3D(cctkGH,i,j,k);
 
         int ww;
+
+				// Set floor, find scaled atmospheric density
+				const CCTK_REAL r_pow         = atmo_falloff ? r_power : 0.;
+				const CCTK_REAL r_atmo        = MAX(r_atmo_min, r[index]);
+				const CCTK_REAL rho_b_atm     = MAX(rho_b_atm_max*std::pow(r_atmo / r_atmo_min, r_pow), eos.rho_min);
+				// CCTK_VINFO("For debug: r_pow = %g; r = %g; r_atmo = %g; rho_min = %e; rho_b_atm = %e.", r_pow, r[index], r_atmo, eos.rho_min, rho_b_atm);
 
         CCTK_REAL PRIMS[MAXNUMVARS];
         PRIMS[RHOB         ] = rho_b[index];
@@ -396,7 +403,7 @@ extern "C" void set_IllinoisGRMHD_metric_GRMHD_variables_based_on_HydroBase_and_
 
         struct output_stats stats; stats.failure_checker=0;
         IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(zero_int,PRIMS,stats,eos,
-                                                                          METRIC,g4dn,g4up,TUPMUNU,TDNMUNU,CONSERVS);
+                                                                          METRIC,g4dn,g4up,TUPMUNU,TDNMUNU,CONSERVS,rho_b_atm, r[index]);
 
         rho_b      [index] = PRIMS[RHOB        ];
         P          [index] = PRIMS[PRESSURE    ];

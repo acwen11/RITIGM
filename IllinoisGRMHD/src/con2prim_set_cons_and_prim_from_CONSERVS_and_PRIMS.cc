@@ -17,6 +17,7 @@ void set_cons_from_PRIMS_and_CONSERVS( const igm_eos_parameters eos,
                                        const CCTK_REAL *restrict METRIC_LAP_PSI4,
                                        const CCTK_REAL *restrict PRIMS,
                                        const CCTK_REAL *restrict CONSERVS,
+                                       const CCTK_REAL tau_atm,
                                        CCTK_REAL *restrict cons ) {
 
   // IllinoisGRMHD's variable is the "densitised" version of
@@ -73,7 +74,7 @@ void set_cons_from_PRIMS_and_CONSERVS( const igm_eos_parameters eos,
   // Compute the conserv needed by the Noble routines
   cons[UU] = (uu - CONSERVS[RHOSTAR]) * psim6;
   // Then set tau
-  cons[TAU] = MAX(CONSERVS[TAUENERGY] * psim6,eos.tau_atm);
+  cons[TAU] = MAX(CONSERVS[TAUENERGY] * psim6,tau_atm);
 
   //----------------------------------------
 
@@ -111,6 +112,7 @@ void set_prim_from_PRIMS_and_CONSERVS( const igm_eos_parameters eos,
                                        const CCTK_REAL *restrict METRIC_LAP_PSI4,
                                        const CCTK_REAL *restrict PRIMS,
                                        const CCTK_REAL *restrict CONSERVS,
+                                       const CCTK_REAL rho_atm,
                                        const CCTK_REAL *restrict cons,
                                        CCTK_REAL *restrict prim ) {
 
@@ -161,7 +163,7 @@ void set_prim_from_PRIMS_and_CONSERVS( const igm_eos_parameters eos,
 
     if(which_guess==2) {
       //Use atmosphere as initial guess:
-      rho_b_oldL = 100.0*eos.rho_atm;
+      rho_b_oldL = 100.0*rho_atm;
 
       /**********************************
        * Piecewise Polytropic EOS Patch *
