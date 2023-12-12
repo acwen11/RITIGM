@@ -1,0 +1,27 @@
+# Schedule definitions for thorn smallbPoynET
+# $Header:$
+
+STORAGE: smallbPoynETGFs
+STORAGE: Total_Energy
+STORAGE: grid_spacing_product_mhd
+
+STORAGE: ADMBase::metric[metric_timelevels], ADMBase::curv[metric_timelevels], ADMBase::lapse[lapse_timelevels], ADMBase::shift[shift_timelevels]
+
+STORAGE: HydroBase::rho[timelevels],HydroBase::press[timelevels],HydroBase::eps[timelevels],HydroBase::vel[timelevels],HydroBase::Bvec[timelevels]
+
+#SCHEDULE compute_bi_b2_Poyn_fluxET AT CCTK_POSTINITIAL AFTER SetTmunu
+#{
+#  LANG: C
+#} "Set b^mu, b^2, and Poynting flux gridfunctions."
+
+SCHEDULE compute_bi_b2_Poyn_fluxET AT CCTK_ANALYSIS BEFORE VolumeIntegralGroup
+{
+  LANG: C
+  OPTIONS: GLOBAL-EARLY,LOOP-LOCAL
+} "Set b^mu, b^2, B^2, EM energy, and Poynting flux gridfunctions."
+
+SCHEDULE compute_total_energy AT CCTK_ANALYSIS AFTER compute_bi_b2_Poyn_fluxET 
+{
+	LANG: C
+	OPTIONS: GLOBAL
+} "Perform reduction on EM energy"
