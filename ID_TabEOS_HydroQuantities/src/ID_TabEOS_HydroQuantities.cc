@@ -111,18 +111,12 @@ extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const 
 				const CCTK_REAL r_atmo        = std::max(r_atmo_min, r[index]);
 				const CCTK_REAL id_rho_atm    = std::max(id_rho_atm_max*std::pow(r_atmo / r_atmo_min, r_pow), nuc_eos::eos_rhomin);
 
-				if (r[index] < r_atmo_min){
-					CCTK_VINFO("For Debug of default: r = %e, r_atmo = %e, id_rho_atm = %e", r[index], r_atmo, id_rho_atm);
-				}
-
 				// Prepare for EoS function calls
 				CCTK_REAL dummy        = 0.0;
 				CCTK_INT  keyerr       = 0;
 				CCTK_INT  anyerr       = 0;
 
 				if( xrho > id_rho_atm_max ) {
-					CCTK_VINFO("For debug of default: no atm reset at r = %g.", r[index]);
-
 					CCTK_REAL xye     = Y_e[index];
 					CCTK_REAL xtemp   = temperature[index];
 					CCTK_REAL xpress  = 0.0;
