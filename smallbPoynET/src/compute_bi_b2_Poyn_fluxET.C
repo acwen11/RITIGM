@@ -210,7 +210,8 @@ void compute_bi_b2_Poyn_fluxET(CCTK_ARGUMENTS) {
 	double B_z = gxzL*(Bx_center) + gyzL*(By_center) + gzzL*(Bz_center);
 	double B2big = Bx_center * B_x + By_center * B_y + Bz_center * B_z;
 
-	double EMenergyL = (B2big - 0.5 * smallb2L) * std::sqrt(det);
+	// TODO: Check this. Multiply by 4pi to convert back to Gaussian units.
+	double EMenergyL = 4 * M_PI * (B2big - 0.5 * smallb2L) * std::sqrt(det); 
 
 	minus_one_minus_u_0[index] = -1.0 - u_0;
 
