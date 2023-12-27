@@ -82,6 +82,7 @@ Carpet::poison_new_timelevels    = "yes"
 Carpet::prolongation_order_space = 5
 Carpet::prolongation_order_time  = 2
 Carpet::storage_verbose          = "no"
+Carpet::time_refinement_factors  = "[1, 1, 1, 1, 1, 2,  4,  8,  16,  32,  64,  128,  256, 512]"
 Carpet::use_buffer_zones         = "yes"
 Carpet::verbose                  = "no"
 Carpet::veryverbose              = "no"
@@ -245,8 +246,6 @@ CarpetLib::support_staggered_operators = "yes"
 CarpetReduce::verbose = "no"
 
 # Parameters of thorn CarpetRegrid2 (implementing CarpetRegrid2)
-carpet::time_refinement_factors = "[1, 1, 1, 1, 1, 2,  4,  8,  16,  32,  64,  128,  256, 512]"
-
 carpetregrid2::num_centres               = 3
 carpetregrid2::num_levels_1              = 10 # Levels 0 to 9 already activated. 10 and 11 activate at merger. 12 activates at collapse. 13 can be activated if required
 carpetregrid2::num_levels_2              = 12
