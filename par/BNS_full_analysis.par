@@ -52,7 +52,7 @@ AHFinderDirect::reset_horizon_after_not_finding[2]       = "no"
 AHFinderDirect::reshape_while_moving                     = "yes"
 AHFinderDirect::surface_interpolator_name                = "Lagrange polynomial interpolation"
 AHFinderDirect::surface_interpolator_pars                = "order=4"
-AHFinderDirect::verbose_level                            = "physics details"
+AHFinderDirect::verbose_level                            = "algorithm details"
 AHFinderDirect::which_surface_to_store_info[1]           = 0
 AHFinderDirect::which_surface_to_store_info[2]           = 1
 
