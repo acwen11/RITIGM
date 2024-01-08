@@ -1,0 +1,14 @@
+# Interface definition for thorn smallbPoyn
+# $Header:$
+
+implements: smallbPoynET
+inherits: grid HydroBase ADMBase
+
+real smallbPoynETGFs TYPE=GF TIMELEVELS=1 tags='InterpNumTimelevels=1 prolongation="none" Checkpoint="no"'
+{
+  smallbt,smallbx,smallby,smallbz,smallb2,Poynx,Poyny,Poynz,minus_one_minus_u_0,Bmag,EMenergy
+}
+
+real Total_Energy TYPE=SCALAR
+
+real grid_spacing_product_mhd type=SCALAR tags='checkpoint="no"' "product of cctk_delta_space, to be computed in local mode and later used in global mode (carpet problems)"
