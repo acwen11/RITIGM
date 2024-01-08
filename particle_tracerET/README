@@ -1,0 +1,48 @@
+Cactus Code Thorn particle_tracerET
+Author(s)    : Zachariah B. Etienne
+Note         : particle_tracerET tracks the motion of test particles
+               that comove with fluid flows. As magnetic field
+               lines remain attached to the fluid elements they
+               thread in the MHD approximation, this thorn provides
+               essential functionality for self-consistent
+               visualizations of the dynamics of magnetic field lines
+               (i.e., magnetic field vector streamlines) over time in
+               a GRMHD simulation.
+
+               Magnetic field lines can be visualized by first
+               picking a fluid element (i.e., a point in space at
+               which the fluid density and magnetic fields are
+               nonzero), and then generating the vector field
+               streamline according to the magnetic field vector.
+
+               The instantaneous velocity of these test particles
+               is given by the velocity in the induction equation
+               v^i = u^i/u^0 at the location of each test particle,
+               so this thorn tracks particle dynamics by solving
+               the ODEs:
+
+               dx/dt = v^x
+               dy/dt = v^y
+               dz/dt = v^z
+
+               subject to the initial conditions
+               x(0)=x_0
+               y(0)=y_0
+               z(0)=z_0.
+
+               The above IVP is solved for each particle using
+               an RK4 ODE integration, interpolating the velocity
+               vector at each particle position, at each RK4
+               substep. The frequency of RK4 substeps generally
+               can be far lower than that of the global simulation
+               RK substepping, and is set to be every "update_RK4_freq"
+               cctk_iteration's.
+
+               The velocities v^i = u^i/u^0 are computed using as
+               inputs the HydroBase velocity and ADMBase spacetime
+               metric variables. particle_tracerET stores v^i to
+               MHDvx,MHDvy,MHDvz.
+
+Maintainer(s): Zachariah B. Etienne
+License      : BSD 2-Clause (FreeBSD license)
+--------------------------------------------------------------------------

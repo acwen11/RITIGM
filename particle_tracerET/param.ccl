@@ -1,0 +1,133 @@
+# Parameter definitions for thorn particle_tracerET
+# $Header:$
+
+#############################################################################
+### import HydroBase & ADMBase parameters
+
+shares: HydroBase
+USES CCTK_INT timelevels
+
+shares: ADMBase
+USES CCTK_INT lapse_timelevels
+USES CCTK_INT shift_timelevels
+USES CCTK_INT metric_timelevels
+
+shares: IO
+USES STRING out_dir
+USES CCTK_INT out_every
+#############################################################################
+
+
+private:
+
+STRING outdir "Directory for particle tracerET output files, overrides IO::out_dir" STEERABLE = RECOVER
+{
+  "^$" :: "An empty string to choose the default from IO::out_dir"
+  ".+" :: "A valid directory name"
+} ""
+
+CCTK_INT start_tracing_particles_iteration "Iteration at which to start tracing particles"
+{
+  0:* :: "zero or some positive number."
+} 0
+
+CCTK_INT update_RK4_freq "How often (in units of cctk_iteration) to perform an RK4 substep? Usually 4--8 works best. Definitely choose a power of 2."
+{
+  0:4096 :: "zero (disable integration) or some other number"
+} 0
+
+CCTK_INT num_particles "Number of particles"
+{
+  0:* :: "zero (disable particle generation), or some other number"
+} 0
+
+CCTK_REAL out_of_bounds_xyz "fabs(x) > out_of_bounds_xyz || fabs(y) > out_of_bounds_xyz || fabs(z) > out_of_bounds_xyz -> OUT OF BOUNDS." STEERABLE=ALWAYS
+{
+  0:* :: "Any number"
+} 800.0
+
+CCTK_INT output_freq "How often to do particle tracer output, overrides IO::out_every" STEERABLE = ALWAYS
+{
+  -3   :: "Default value: 2*update_RK4_freq"
+  -2   :: "Use IO::out_every"
+   1:* :: "Output every so many time steps"
+  -1:0 :: "No output"
+} -3
+
+STRING output_format "Output format" STEERABLE = RECOVER
+{
+  "default"         :: "First column is time then particles positions."
+  "with_iterations" :: "First column is iteration, second column is time, then particles positions."
+} "default"
+
+########################################
+# Algorithm for seeding particles initially:
+# 1) Choose random point (x,y,z) within sphere.
+# 2) Probability of accepting random point = (density(x,y,z)/density_max)^central_condensation_paramter
+# 3) Go to (1) until all particles are seeded.
+
+CCTK_REAL density_max "Maximum density within sphere." STEERABLE=ALWAYS
+{
+  *:* :: "Any number"
+} 0
+
+CCTK_REAL central_condensation_parameter "Probability of accepting random point x,y,z = (density(x,y,z)/density_max)^central_condensation_paramter" STEERABLE=ALWAYS
+{
+  *:* :: "Any number"
+} 1.0
+
+CCTK_REAL seed_particles_inside_sphere__x_coord "x-coord of sphere center, within which to seed particles" STEERABLE=ALWAYS
+{
+  *:* :: "Any number"
+} 0
+CCTK_REAL seed_particles_inside_sphere__y_coord "y-coord of sphere center, within which to seed particles" STEERABLE=ALWAYS
+{
+  *:* :: "Any number"
+} 0
+CCTK_REAL seed_particles_inside_sphere__z_coord "z-coord of sphere center, within which to seed particles" STEERABLE=ALWAYS
+{
+  *:* :: "Any number"
+} 0
+CCTK_REAL seed_particles_inside_sphere__radius "radius of sphere within which to seed particles" STEERABLE=ALWAYS
+{
+  0:* :: "Any number"
+} 0
+
+
+########################################
+## Interpolator information
+CCTK_STRING interpolator_name "Which interpolator should I use"
+{
+  ".+" :: "Any nonempty string"
+} "Lagrange polynomial interpolation"
+
+CCTK_STRING interpolator_pars "Parameters for the interpolator"
+{
+  ".*" :: "Any string that Util_TableSetFromString() will take"
+} "order=4"
+
+
+########################################
+CCTK_INT verbose "Set verbosity level: 1=useful info; 2=moderately annoying (though useful for debugging)" STEERABLE=ALWAYS
+{
+  0:2 :: "0 = no output; 1=useful info; 2=moderately annoying (though useful for debugging)"
+} 1
+
+CCTK_INT debug "Evolve analytic velocity data and verify that the RK4 solution is consistent to 4th order."
+{
+  0:1 :: "0 = disable; 1=enable debug"
+} 0
+
+BOOLEAN output_four_velocity_u4U "Whether or not to output the particles' contravariant four-velocity" STEERABLE=ALWAYS
+{
+} "no"
+
+BOOLEAN output_four_velocity_u4D "Whether or not to output the particles' covariant four-velocity" STEERABLE=ALWAYS
+{
+} "no"
+
+CCTK_STRING output_file_format "File format (ASCII or Binary)"
+{
+  "ascii"  :: "ASCII format"
+  "binary" :: "Binary format"
+} "ascii"

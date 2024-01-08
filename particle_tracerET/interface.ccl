@@ -1,0 +1,85 @@
+# Interface definition for thorn particle_tracerET
+# $Header:$
+
+implements: particle_tracerET
+inherits: grid HydroBase ADMBase
+
+CCTK_INT RK4IterationCounterVar type=SCALAR DISTRIB=CONSTANT
+{
+  RK4IterationCounter
+} "Counter that keeps track of which RK4 iteration we are on."
+
+CCTK_INT AuxIterationCounterVars type=SCALAR DISTRIB=CONSTANT
+{
+  file_output_freq, initial_number_of_active_refinement_levels
+} "Auxiliary variables"
+
+CCTK_REAL RK4_delta_time type=SCALAR DISTRIB=CONSTANT
+
+CCTK_REAL particle_position_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=num_particles
+{
+  particle_position_x,particle_position_y,particle_position_z
+} "Position of each particle"
+
+CCTK_REAL particle_velocity_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=num_particles
+{
+  particle_velx,particle_vely,particle_velz
+} "Three-velocity of each particle"
+
+CCTK_REAL particle_position_aux_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=num_particles
+{
+  particle_position_x_k1,particle_position_y_k1,particle_position_z_k1,
+  particle_position_x_k2,particle_position_y_k2,particle_position_z_k2,
+  particle_position_x_k3,particle_position_y_k3,particle_position_z_k3,
+  particle_position_x_k4,particle_position_y_k4,particle_position_z_k4,
+} "RK4 coefficients k1,k2,k3,k4 of each particle"
+
+#vvvvvvv u^i/u^0 3-velocity must be used here, as it is used in MHD induction equations. This way fluid flow is consistent with MHD frozen-in condition vvvvvvv#
+CCTK_REAL velocity_consistent_with_MHD_induction_equations type = GF TAGS='InterpNumTimelevels=1 prolongation="none" Checkpoint="no"'
+{
+  MHDvx,MHDvy,MHDvz
+}
+#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
+
+#########################################
+###     Four-velocity quantities      ###
+#########################################
+# Four-velocity at particles' positions
+CCTK_REAL particle_four_velocity_u4U_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=num_particles
+{
+  particle_u4U0,particle_u4U1,particle_u4U2,particle_u4U3
+} "Particle contravariant four-velocity arrays"
+
+CCTK_REAL particle_four_velocity_u4D_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=num_particles
+{
+  particle_u4D0,particle_u4D1,particle_u4D2,particle_u4D3
+} "Particle covariant four-velocity arrays"
+
+
+# Four-velocity gridfunctions
+CCTK_REAL particle_four_velocity_u4U_gridfunctions TYPE=GF TAGS='InterpNumTimelevels=1 prolongation="none" Checkpoint="no"'
+{
+  u4U0GF, u4U1GF, u4U2GF, u4U3GF
+} "Particle contravariant four-velocity gridfunctions"
+
+CCTK_REAL particle_four_velocity_u4D_gridfunctions TYPE=GF TAGS='InterpNumTimelevels=1 prolongation="none" Checkpoint="no"'
+{
+  u4D0GF, u4D1GF, u4D2GF, u4D3GF
+} "Particle covariant four-velocity gridfunctions"
+#########################################
+
+#########################################
+###  Aliased functions from Carpet    ###
+#########################################
+# Get maximum number of requested refinement levels
+CCTK_INT FUNCTION GetMaxRefinementLevels(CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION GetMaxRefinementLevels
+
+# Get number of currently active refinement levels
+CCTK_INT FUNCTION GetRefinementLevels(CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION GetRefinementLevels
+
+# Get current refinement level
+CCTK_INT FUNCTION GetRefinementLevel(CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION GetRefinementLevel
+#########################################
