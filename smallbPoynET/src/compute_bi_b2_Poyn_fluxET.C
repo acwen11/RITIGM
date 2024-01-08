@@ -205,13 +205,16 @@ void compute_bi_b2_Poyn_fluxET(CCTK_ARGUMENTS) {
 	double PoynzL = -lapse*(smallb2L*(u0L*vzL)*u_0 + 0.5*smallb2L*g4upz_0 - smallbzL*smallb_0L);
 
 	// Magnetic Energy Calculation
-	double B_x = gxxL*(Bx_center) + gxyL*(By_center) + gxzL*(Bz_center);
-	double B_y = gxyL*(Bx_center) + gyyL*(By_center) + gyzL*(Bz_center);
-	double B_z = gxzL*(Bx_center) + gyzL*(By_center) + gzzL*(Bz_center);
-	double B2big = Bx_center * B_x + By_center * B_y + Bz_center * B_z;
+	// double B_x = gxxL*(Bx_center) + gxyL*(By_center) + gxzL*(Bz_center);
+	// double B_y = gxyL*(Bx_center) + gyyL*(By_center) + gyzL*(Bz_center);
+	// double B_z = gxzL*(Bx_center) + gyzL*(By_center) + gzzL*(Bz_center);
+	// double B2big = Bx_center * B_x + By_center * B_y + Bz_center * B_z;
 
 	// TODO: Check this. Multiply by 4pi to convert back to Gaussian units.
-	double EMenergyL = 4 * M_PI * (B2big - 0.5 * smallb2L) * std::sqrt(det); 
+	// double EMenergyL = 4 * M_PI * (B2big - 0.5 * smallb2L) * std::sqrt(det); 
+	
+	// From Baumgarte + Shapiro eq. 5.152
+	double EMenergyL = (smallb2L * (std::pow(alpha_u0, 2) - 0.5) - std::pow(lapse * smallbtL, 2)) * std::sqrt(det);
 
 	minus_one_minus_u_0[index] = -1.0 - u_0;
 
