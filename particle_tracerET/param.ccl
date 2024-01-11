@@ -26,7 +26,7 @@ STRING outdir "Directory for particle tracerET output files, overrides IO::out_d
   ".+" :: "A valid directory name"
 } ""
 
-CCTK_INT start_tracing_particles_iteration "Iteration at which to start tracing particles"
+CCTK_INT start_tracing_particles_iteration[10] "Iteration at which to start tracing particles"
 {
   0:* :: "zero or some positive number."
 } 0
@@ -36,7 +36,7 @@ CCTK_INT update_RK4_freq "How often (in units of cctk_iteration) to perform an R
   0:4096 :: "zero (disable integration) or some other number"
 } 0
 
-CCTK_INT num_particles "Number of particles"
+CCTK_INT num_particles[10] "Number of particles"
 {
   0:* :: "zero (disable particle generation), or some other number"
 } 0
@@ -76,23 +76,34 @@ CCTK_REAL central_condensation_parameter "Probability of accepting random point 
   *:* :: "Any number"
 } 1.0
 
-CCTK_REAL seed_particles_inside_sphere__x_coord "x-coord of sphere center, within which to seed particles" STEERABLE=ALWAYS
+CCTK_REAL seed_particles_inside_sphere__x_coord[10] "x-coord of sphere center, within which to seed particles" STEERABLE=ALWAYS
 {
   *:* :: "Any number"
 } 0
-CCTK_REAL seed_particles_inside_sphere__y_coord "y-coord of sphere center, within which to seed particles" STEERABLE=ALWAYS
+CCTK_REAL seed_particles_inside_sphere__y_coord[10] "y-coord of sphere center, within which to seed particles" STEERABLE=ALWAYS
 {
   *:* :: "Any number"
 } 0
-CCTK_REAL seed_particles_inside_sphere__z_coord "z-coord of sphere center, within which to seed particles" STEERABLE=ALWAYS
+CCTK_REAL seed_particles_inside_sphere__z_coord[10] "z-coord of sphere center, within which to seed particles" STEERABLE=ALWAYS
 {
   *:* :: "Any number"
 } 0
-CCTK_REAL seed_particles_inside_sphere__radius "radius of sphere within which to seed particles" STEERABLE=ALWAYS
+CCTK_REAL seed_particles_inside_sphere__radius[10] "radius of sphere within which to seed particles" STEERABLE=ALWAYS
 {
   0:* :: "Any number"
 } 0
-
+CCTK_REAL seed_particles_outside_sphere__radius[10] "radius of sphere outside of which to seed particles" STEERABLE=ALWAYS
+{
+  0:* :: "Any number"
+} 0
+CCTK_REAL seed_particles_theta_min[10] "seed particles in a range of polar angle" STEERABLE=ALWAYS
+{
+  0:180 :: "0 to 180 degrees"
+} 0
+CCTK_REAL seed_particles_theta_max[10] "seed particles in a range of polar angle" STEERABLE=ALWAYS
+{
+  0:180 :: "0 to 180 degrees"
+} 180
 
 ########################################
 ## Interpolator information

@@ -8,16 +8,19 @@
 
 extern void Interpolate_density_many_pts(cGH *cctkGH,int interp_num_points,double *particle_x_temp,double *particle_y_temp,double *particle_z_temp, double *particle_density_temp);
 
-void get_random_position(double &x,double &y,double &z) {
+void get_random_position(double &x,double &y,double &z, const int fam) {
   DECLARE_CCTK_PARAMETERS;
 
   double r=1e100;
-  while(r>seed_particles_inside_sphere__radius) {
-    x = 2.0*(drand48()-0.5)*seed_particles_inside_sphere__radius;
-    y = 2.0*(drand48()-0.5)*seed_particles_inside_sphere__radius;
-    z = 2.0*(drand48()-0.5)*seed_particles_inside_sphere__radius;
+  double theta=1e100;
+  while(r>seed_particles_inside_sphere__radius[fam]) || (r < seed_particles_outside_sphere__radius[fam]) 
+					|| (theta < seed_particles_theta_min[fam]) || (theta > seed_particles_theta_max[fam]) {
+    x = 2.0*(drand48()-0.5)*seed_particles_inside_sphere__radius[fam];
+    y = 2.0*(drand48()-0.5)*seed_particles_inside_sphere__radius[fam];
+    z = 2.0*(drand48()-0.5)*seed_particles_inside_sphere__radius[fam];
 
     r = sqrt(x*x+y*y+z*z);
+    theta = atan2(z, sqrt(x*x+y*y));
   }
 
   x += seed_particles_inside_sphere__x_coord;
@@ -37,7 +40,7 @@ void InitializeParticlePositions(CCTK_ARGUMENTS)
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
 
-  if(cctk_iteration!=start_tracing_particles_iteration || !num_particles) return;
+  if(cctk_iteration!=start_tracing_particles_iteration[particle_family] || !num_particles) return;
 
   double *particle_x_temp  = (double *)malloc(sizeof(double)*num_particles);
   double *particle_y_temp  = (double *)malloc(sizeof(double)*num_particles);
