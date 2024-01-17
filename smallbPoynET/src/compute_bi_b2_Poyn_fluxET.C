@@ -210,11 +210,11 @@ void compute_bi_b2_Poyn_fluxET(CCTK_ARGUMENTS) {
 	double B_z = gxzL*(Bx_center) + gyzL*(By_center) + gzzL*(Bz_center);
 	double B2big = Bx_center * B_x + By_center * B_y + Bz_center * B_z;
 
-	// TODO: Check this. Multiply by 4pi to convert back to Gaussian units.
-	// double EMenergyL = 4 * M_PI * (B2big - 0.5 * smallb2L) * std::sqrt(det); 
+	// TODO: Check this.
+	double EMenergyL = ((B2big / (4 * M_PI)) - 0.5 * smallb2L) * std::sqrt(det); 
 	
 	// From Baumgarte + Shapiro eq. 5.152
-	double EMenergyL = (smallb2L * (std::pow(alpha_u0, 2) - 0.5) - std::pow(lapse * smallbtL, 2)) * std::sqrt(det);
+	// double EMenergyL = (smallb2L * (std::pow(alpha_u0, 2) - 0.5) - std::pow(lapse * smallbtL, 2)) * std::sqrt(det);
 
 	minus_one_minus_u_0[index] = -1.0 - u_0;
 
@@ -256,5 +256,6 @@ void compute_total_energy(CCTK_ARGUMENTS) {
      CCTK_WARN(0, "Failed to integrate EM energy");
 	}
 
+	CCTK_VINFO("d3x = %e", *grid_spacing_product_mhd);
   *Total_Energy = tot_energy_reduce * (*grid_spacing_product_mhd);
 }
