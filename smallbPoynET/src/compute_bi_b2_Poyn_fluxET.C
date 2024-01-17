@@ -231,11 +231,6 @@ void compute_bi_b2_Poyn_fluxET(CCTK_ARGUMENTS) {
 	EMenergy[index] = EMenergyL;
 	Bmag[index] = std::sqrt(B2big);
 
-	double grid_spacing_L = 1.0;
-	for(int ii=0; ii<cctk_dim; ii++){
-		grid_spacing_L *= cctk_delta_space[ii];
-	}
-	*grid_spacing_product_mhd = grid_spacing_L;
       } // Loop over grid
 }
 
@@ -244,6 +239,14 @@ void compute_total_energy(CCTK_ARGUMENTS) {
   DECLARE_CCTK_PARAMETERS;
 
   if(smallbPoynET_compute_every<=0 || cctk_iteration%smallbPoynET_compute_every!=0) return;
+
+	//double grid_spacing_L = 1.0;
+	//for(int ii=0; ii<cctk_dim; ii++){
+	//	grid_spacing_L *= cctk_delta_space[ii];
+	//}
+	//*grid_spacing_product_mhd = grid_spacing_L;
+
+	double d3x = cctk_delta_space[0]*cctk_delta_space[1]*cctk_delta_space[2];
 
   const int reduction_handle = CCTK_ReductionHandle("sum");
   const int var_index = CCTK_VarIndex("smallbPoynET::EMenergy");
@@ -256,6 +259,6 @@ void compute_total_energy(CCTK_ARGUMENTS) {
      CCTK_WARN(0, "Failed to integrate EM energy");
 	}
 
-	CCTK_VINFO("d3x = %e", *grid_spacing_product_mhd);
-  *Total_Energy = tot_energy_reduce * (*grid_spacing_product_mhd);
+	CCTK_VINFO("d3x = %e", d3x);
+  *Total_Energy = tot_energy_reduce * d3x;
 }
