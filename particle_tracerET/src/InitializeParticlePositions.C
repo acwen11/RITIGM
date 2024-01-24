@@ -40,26 +40,29 @@ void InitializeParticlePositions(CCTK_ARGUMENTS)
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
 
-  if(cctk_iteration!=start_tracing_particles_iteration[particle_family] || !num_particles) return;
+  if(cctk_iteration!=start_tracing_particles_iteration[particle_family] || !num_particles[particle_family]) return;
 
-  double *particle_x_temp  = (double *)malloc(sizeof(double)*num_particles);
-  double *particle_y_temp  = (double *)malloc(sizeof(double)*num_particles);
-  double *particle_z_temp  = (double *)malloc(sizeof(double)*num_particles);
-  double *particle_density_temp = (double *)malloc(sizeof(double)*num_particles);
+	int pf = *particle_family; 
+	int np = num_particles[particle_family];
+
+  double *particle_x_temp  = (double *)malloc(sizeof(double)*np);
+  double *particle_y_temp  = (double *)malloc(sizeof(double)*np);
+  double *particle_z_temp  = (double *)malloc(sizeof(double)*np);
+  double *particle_density_temp = (double *)malloc(sizeof(double)*np);
 
   srand48(42);
 
-  int which_particle=0;
-  int total_trials=0;
+  int which_particle = *num_active;
+  int total_trials = 0;
   //Technically, this algorithm is nondeterministic. However it should complete within a few iterations.
   for(int iter=0;iter<100000;iter++) {
-    for(int i=0;i<num_particles;i++) {
+    for(int i=0;i<np;i++) {
       // Find all particles whose positions still need to be set:
       get_random_position(particle_x_temp[i],particle_y_temp[i],particle_z_temp[i]);
     }
-    Interpolate_density_many_pts(cctkGH,num_particles,particle_x_temp,particle_y_temp,particle_z_temp, particle_density_temp);
+    Interpolate_density_many_pts(cctkGH,np,particle_x_temp,particle_y_temp,particle_z_temp, particle_density_temp);
 
-    for(int i=0;i<num_particles;i++) {
+    for(int i=0;i<np;i++) {
       double random_number_zero_to_one = drand48();
       if(random_number_zero_to_one < pow(particle_density_temp[i]/density_max,central_condensation_parameter)) {
         // Accept particle!
@@ -69,7 +72,7 @@ void InitializeParticlePositions(CCTK_ARGUMENTS)
         which_particle++;
       }
       total_trials++;
-      if(which_particle==num_particles) {
+      if(which_particle == *num_active + np) {
         // If we've already seeded all the particles, break out of the loop!
         iter=1000000;
         i=num_particles+100;

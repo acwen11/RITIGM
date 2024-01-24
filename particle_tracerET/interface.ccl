@@ -6,6 +6,8 @@ inherits: grid HydroBase ADMBase
 
 CCTK_INT particle_family type=SCALAR DISTRIB=CONSTANT
 
+CCTK_INT num_active type=SCALAR DISTRIB=CONSTANT
+
 CCTK_INT RK4IterationCounterVar type=SCALAR DISTRIB=CONSTANT
 {
   RK4IterationCounter
@@ -18,17 +20,17 @@ CCTK_INT AuxIterationCounterVars type=SCALAR DISTRIB=CONSTANT
 
 CCTK_REAL RK4_delta_time type=SCALAR DISTRIB=CONSTANT
 
-CCTK_REAL particle_position_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=num_particles
+CCTK_REAL particle_position_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=max_num_particles
 {
   particle_position_x,particle_position_y,particle_position_z
 } "Position of each particle"
 
-CCTK_REAL particle_velocity_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=num_particles
+CCTK_REAL particle_velocity_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=max_num_particles
 {
   particle_velx,particle_vely,particle_velz
 } "Three-velocity of each particle"
 
-CCTK_REAL particle_position_aux_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=num_particles
+CCTK_REAL particle_position_aux_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=max_num_particles
 {
   particle_position_x_k1,particle_position_y_k1,particle_position_z_k1,
   particle_position_x_k2,particle_position_y_k2,particle_position_z_k2,
@@ -47,12 +49,12 @@ CCTK_REAL velocity_consistent_with_MHD_induction_equations type = GF TAGS='Inter
 ###     Four-velocity quantities      ###
 #########################################
 # Four-velocity at particles' positions
-CCTK_REAL particle_four_velocity_u4U_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=num_particles
+CCTK_REAL particle_four_velocity_u4U_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=max_num_particles
 {
   particle_u4U0,particle_u4U1,particle_u4U2,particle_u4U3
 } "Particle contravariant four-velocity arrays"
 
-CCTK_REAL particle_four_velocity_u4D_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=num_particles
+CCTK_REAL particle_four_velocity_u4D_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=max_num_particles
 {
   particle_u4D0,particle_u4D1,particle_u4D2,particle_u4D3
 } "Particle covariant four-velocity arrays"

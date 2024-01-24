@@ -128,7 +128,7 @@ void particle_tracerET_file_output_ascii(CCTK_ARGUMENTS) {
   /* Next print one line of data, corresponding to a single point in time. */
   char *buffer = (char *) malloc(sizeof(char)*5000000); // <- Allocate 5MB; sizeof(char) is 1.
   sprintf(buffer,"%e",cctk_time);
-  for(int which_particle=0;which_particle<num_particles;which_particle++) {
+  for(int which_particle=0;which_particle<num_active;which_particle++) {
     sprintf(buffer, "%s %e %e %e", buffer, particle_position_x[which_particle], particle_position_y[which_particle], particle_position_z[which_particle]);
   }
   fprintf(file,"%s\n",buffer);
@@ -139,7 +139,7 @@ void particle_tracerET_file_output_ascii(CCTK_ARGUMENTS) {
     if(!(file = fopen(filename, "a+"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
     add_header_if_file_is_empty(file, "# Col. 1: Time (cctk_time). Subsequent columns: u^{t},u^{x},u^{y},u^{z} of particle i\n");
     sprintf(buffer,"%e",cctk_time);
-    for(int which_particle=0;which_particle<num_particles;which_particle++) {
+    for(int which_particle=0;which_particle<num_active;which_particle++) {
       sprintf(buffer, "%s %e %e %e %e", buffer, particle_u4U0[which_particle], particle_u4U1[which_particle], particle_u4U2[which_particle], particle_u4U3[which_particle]);
     }
     fprintf(file, "%s\n", buffer);
@@ -150,7 +150,7 @@ void particle_tracerET_file_output_ascii(CCTK_ARGUMENTS) {
     if(!(file = fopen(filename, "a+"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
     add_header_if_file_is_empty(file, "# Col. 1: Time (cctk_time). Subsequent columns: u_{t},u_{x},u_{y},u_{z} of particle i\n");
     sprintf(buffer,"%e",cctk_time);
-    for(int which_particle=0;which_particle<num_particles;which_particle++) {
+    for(int which_particle=0;which_particle<num_active;which_particle++) {
       sprintf(buffer, "%s %e %e %e %e", buffer, particle_u4D0[which_particle], particle_u4D1[which_particle], particle_u4D2[which_particle], particle_u4D3[which_particle]);
     }
     fprintf(file, "%s\n", buffer);
@@ -172,34 +172,34 @@ void particle_tracerET_file_output_binary(CCTK_ARGUMENTS) {
   FILE *file = fopen(filename,"a+b");
   if(!file) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
   int num_quantities = 3;
-  add_number_of_particles_and_quantities_if_file_is_empty(file, num_particles, num_quantities);
+  add_number_of_particles_and_quantities_if_file_is_empty(file, num_active, num_quantities);
   fwrite(&cctk_time         , sizeof(CCTK_REAL), 1            , file);
-  fwrite(particle_position_x, sizeof(CCTK_REAL), num_particles, file);
-  fwrite(particle_position_y, sizeof(CCTK_REAL), num_particles, file);
-  fwrite(particle_position_z, sizeof(CCTK_REAL), num_particles, file);
+  fwrite(particle_position_x, sizeof(CCTK_REAL), num_active, file);
+  fwrite(particle_position_y, sizeof(CCTK_REAL), num_active, file);
+  fwrite(particle_position_z, sizeof(CCTK_REAL), num_active, file);
   fclose(file);
 
   if( output_four_velocity_u4U ) {
     num_quantities = 4;
     sprintf(filename, "%sparticles_u4U.bin", actual_dir);
     if(!(file = fopen(filename, "a+b"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
-    add_number_of_particles_and_quantities_if_file_is_empty(file, num_particles, num_quantities);
+    add_number_of_particles_and_quantities_if_file_is_empty(file, num_active, num_quantities);
     fwrite(&cctk_time   , sizeof(CCTK_REAL), 1            , file);
-    fwrite(particle_u4U0, sizeof(CCTK_REAL), num_particles, file);
-    fwrite(particle_u4U1, sizeof(CCTK_REAL), num_particles, file);
-    fwrite(particle_u4U2, sizeof(CCTK_REAL), num_particles, file);
-    fwrite(particle_u4U3, sizeof(CCTK_REAL), num_particles, file);
+    fwrite(particle_u4U0, sizeof(CCTK_REAL), num_active, file);
+    fwrite(particle_u4U1, sizeof(CCTK_REAL), num_active, file);
+    fwrite(particle_u4U2, sizeof(CCTK_REAL), num_active, file);
+    fwrite(particle_u4U3, sizeof(CCTK_REAL), num_active, file);
     fclose(file);
   }
   if( output_four_velocity_u4D ) {
     sprintf(filename, "%sparticles_u4D.bin", actual_dir);
     if(!(file = fopen(filename, "a+b"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
-    add_number_of_particles_and_quantities_if_file_is_empty(file, num_particles, num_quantities);
+    add_number_of_particles_and_quantities_if_file_is_empty(file, num_active, num_quantities);
     fwrite(&cctk_time   , sizeof(CCTK_REAL), 1            , file);
-    fwrite(particle_u4D0, sizeof(CCTK_REAL), num_particles, file);
-    fwrite(particle_u4D1, sizeof(CCTK_REAL), num_particles, file);
-    fwrite(particle_u4D2, sizeof(CCTK_REAL), num_particles, file);
-    fwrite(particle_u4D3, sizeof(CCTK_REAL), num_particles, file);
+    fwrite(particle_u4D0, sizeof(CCTK_REAL), num_active, file);
+    fwrite(particle_u4D1, sizeof(CCTK_REAL), num_active, file);
+    fwrite(particle_u4D2, sizeof(CCTK_REAL), num_active, file);
+    fwrite(particle_u4D3, sizeof(CCTK_REAL), num_active, file);
     fclose(file);
   }
   free(filename);
@@ -208,14 +208,14 @@ void particle_tracerET_file_output_binary(CCTK_ARGUMENTS) {
 void particle_tracerET_file_output(CCTK_ARGUMENTS) {
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
-  if(update_RK4_freq<=0 || !num_particles) return;
+  if(update_RK4_freq<=0 || !max_num_particles) return;
 
   if( (cctk_iteration==start_tracing_particles_iteration || cctk_iteration%(*file_output_freq)==0) ) {
 
     if( output_four_velocity_u4D || output_four_velocity_u4U ) {
       if(verbose>1) CCTK_VINFO("**** It: %d - Inteprolating four-velocities ****", cctk_iteration);
       Interpolate_four_velocities_at_particle_positions(cctkGH,
-                                                        num_particles,
+                                                        num_active,
                                                         particle_position_x,
                                                         particle_position_y,
                                                         particle_position_z,

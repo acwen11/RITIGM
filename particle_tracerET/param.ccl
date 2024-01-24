@@ -36,6 +36,11 @@ CCTK_INT update_RK4_freq "How often (in units of cctk_iteration) to perform an R
   0:4096 :: "zero (disable integration) or some other number"
 } 0
 
+CCTK_INT max_num_particles "Total number of particles"
+{
+  0:* :: "zero (disable particle generation), or some other number"
+} 0
+
 CCTK_INT num_particles[10] "Number of particles"
 {
   0:* :: "zero (disable particle generation), or some other number"
