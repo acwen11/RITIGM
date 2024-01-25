@@ -31,7 +31,7 @@ void compute_particles_four_velocities(CCTK_ARGUMENTS) {
 
   if(update_RK4_freq==0) return;
 
-  if(cctk_iteration==start_tracing_particles_iteration || cctk_iteration%(2*update_RK4_freq)==0) {
+  if(cctk_iteration==start_tracing_particles_iteration[0] || cctk_iteration%(2*update_RK4_freq)==0) {
 
     if(verbose>1) CCTK_VINFO("Computing four velocity at Ref. Lev. %d...", GetRefinementLevel(cctkGH));
 

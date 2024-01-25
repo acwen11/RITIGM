@@ -2,6 +2,8 @@
 # $Header:$
 
 STORAGE: RK4IterationCounterVar, AuxIterationCounterVars, RK4_delta_time
+STORAGE: particle_family
+STORAGE: num_active
 STORAGE: particle_position_arrays
 STORAGE: particle_velocity_arrays
 STORAGE: particle_position_aux_arrays

@@ -26,7 +26,7 @@ STRING outdir "Directory for particle tracerET output files, overrides IO::out_d
   ".+" :: "A valid directory name"
 } ""
 
-CCTK_INT start_tracing_particles_iteration[10] "Iteration at which to start tracing particles"
+CCTK_INT start_tracing_particles_iteration[10] "Iteration at which to start tracing particles. MUST BE A MULTIPLE OF update_RK4_freq + START ITERATION OF FIRST BATCH"
 {
   0:* :: "zero or some positive number."
 } 0

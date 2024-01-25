@@ -13,8 +13,8 @@ void get_random_position(double &x,double &y,double &z, const int fam) {
 
   double r=1e100;
   double theta=1e100;
-  while(r>seed_particles_inside_sphere__radius[fam]) || (r < seed_particles_outside_sphere__radius[fam]) 
-					|| (theta < seed_particles_theta_min[fam]) || (theta > seed_particles_theta_max[fam]) {
+  while((r>seed_particles_inside_sphere__radius[fam]) || (r < seed_particles_outside_sphere__radius[fam]) 
+					|| (theta < seed_particles_theta_min[fam]) || (theta > seed_particles_theta_max[fam])) {
     x = 2.0*(drand48()-0.5)*seed_particles_inside_sphere__radius[fam];
     y = 2.0*(drand48()-0.5)*seed_particles_inside_sphere__radius[fam];
     z = 2.0*(drand48()-0.5)*seed_particles_inside_sphere__radius[fam];
@@ -23,9 +23,9 @@ void get_random_position(double &x,double &y,double &z, const int fam) {
     theta = atan2(z, sqrt(x*x+y*y));
   }
 
-  x += seed_particles_inside_sphere__x_coord;
-  y += seed_particles_inside_sphere__y_coord;
-  z += seed_particles_inside_sphere__z_coord;
+  x += seed_particles_inside_sphere__x_coord[fam];
+  y += seed_particles_inside_sphere__y_coord[fam];
+  z += seed_particles_inside_sphere__z_coord[fam];
 }
 
 /*
@@ -40,10 +40,10 @@ void InitializeParticlePositions(CCTK_ARGUMENTS)
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
 
-  if(cctk_iteration!=start_tracing_particles_iteration[particle_family] || !num_particles[particle_family]) return;
+  if(cctk_iteration!=start_tracing_particles_iteration[*particle_family] || !num_particles[*particle_family]) return;
 
 	int pf = *particle_family; 
-	int np = num_particles[particle_family];
+	int np = num_particles[pf];
 
   double *particle_x_temp  = (double *)malloc(sizeof(double)*np);
   double *particle_y_temp  = (double *)malloc(sizeof(double)*np);
@@ -58,7 +58,7 @@ void InitializeParticlePositions(CCTK_ARGUMENTS)
   for(int iter=0;iter<100000;iter++) {
     for(int i=0;i<np;i++) {
       // Find all particles whose positions still need to be set:
-      get_random_position(particle_x_temp[i],particle_y_temp[i],particle_z_temp[i]);
+      get_random_position(particle_x_temp[i],particle_y_temp[i],particle_z_temp[i],pf);
     }
     Interpolate_density_many_pts(cctkGH,np,particle_x_temp,particle_y_temp,particle_z_temp, particle_density_temp);
 
@@ -75,7 +75,7 @@ void InitializeParticlePositions(CCTK_ARGUMENTS)
       if(which_particle == *num_active + np) {
         // If we've already seeded all the particles, break out of the loop!
         iter=1000000;
-        i=num_particles+100;
+        i=np+100;
         CCTK_INFO("SHOULD BE ALL DONE!");
       }
     }
@@ -90,4 +90,8 @@ void InitializeParticlePositions(CCTK_ARGUMENTS)
   free(particle_y_temp);
   free(particle_z_temp);
   free(particle_density_temp);
+
+	// Update global counting vars.
+	*particle_family += 1;
+	*num_active += np;	
 }
