@@ -368,7 +368,6 @@ CarpetLib::support_staggered_operators = "yes"
 CarpetLib::combine_sends             = "no"
 CarpetLib::check_bboxes              = "no"
 CarpetLib::interleave_communications = "yes"
-CarpetLib::combine_recompose         = "no"
 
 # Parameters of thorn CarpetReduce (implementing reduce)
 CarpetReduce::verbose = "no"
