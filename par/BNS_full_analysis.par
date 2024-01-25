@@ -10,6 +10,7 @@ AEILocalInterp
 AHFinderDirect 
 Baikal 
 BLAS 
+BNSTrackerGen
 Boundary 
 Carpet 
 CarpetInterp 
@@ -45,6 +46,7 @@ LocalReduce
 LoopControl 
 LORENE 
 Meudon_Bin_NS 
+MHD_Diagnostics
 MoL 
 MPI 
 Multipole 
@@ -136,6 +138,17 @@ Baikal::eta           = 1.0/2.67346 # M_ADM = 2.67346 (from LORENE, updated APR4
 # Parameters of thorn Boundary (implementing boundary)
 Boundary::radpower = 2
 
+#================= BNSTrackerGen =====================
+
+BNSTrackerGen::sym_pi           = "no"
+BNSTrackerGen::analysis_reflevel  = 11
+BNSTrackerGen::analyze_every    = 128
+
+BNSTrackerGen::merge_separation   = 9.0
+BNSTrackerGen::collapse_separation    = -1
+BNSTrackerGen::add_levels_post_merge    = 2
+BNSTrackerGen::add_levels_post_collapse   = 1
+
 # Parameters of thorn Cactus (implementing Cactus)
 Cactus::cctk_full_warnings = "yes"
 Cactus::cctk_itlast        = 10000000
@@ -148,6 +161,8 @@ Carpet::convergence_level        = 0
 Carpet::domain_from_coordbase    = "yes"
 Carpet::enable_all_storage       = "no"
 Carpet::ghost_size               = 3
+Carpet::grid_coordinates_filename       = "carpet_coord.asc"
+Carpet::grid_structure_filename         = "carpet_grid.asc"
 Carpet::init_3_timelevels        = "no"
 Carpet::init_fill_timelevels     = "yes"
 Carpet::max_refinement_levels    = 14
@@ -168,6 +183,7 @@ CarpetInterp::tree_search       = "yes"
 CarpetIOASCII::one_file_per_group     = "no"
 CarpetIOASCII::out0D_every            = 256
 CarpetIOASCII::out0D_vars             = "
+	BNSTrackerGen::bns_position
   Carpet::physical_time_per_hour
   QuasiLocalMeasures::qlm_scalars
   SphericalSurface::sf_active
@@ -267,6 +283,31 @@ CarpetIOHDF5::out2D_vars                    = "
   IllinoisGRMHD::grmhd_primitives_allbutBi
   IllinoisGRMHD::grmhd_primitives_Bi
   smallbPoynET::smallbPoynETGFs
+	MHD_Diagnostics::smallb2
+
+	MHD_Diagnostics::expansion_scalar
+	#
+	MHD_Diagnostics::kin_acceleration_spatial_x
+	MHD_Diagnostics::kin_acceleration_spatial_y
+	MHD_Diagnostics::kin_acceleration_spatial_z
+	#
+	MHD_Diagnostics::shear_spatial_tensor_xx
+	MHD_Diagnostics::shear_spatial_tensor_xy
+	MHD_Diagnostics::shear_spatial_tensor_xz
+	MHD_Diagnostics::shear_spatial_tensor_yy
+	MHD_Diagnostics::shear_spatial_tensor_yz
+	MHD_Diagnostics::shear_spatial_tensor_zz
+	#
+	MHD_Diagnostics::sigma4Trace
+	#
+	MHD_Diagnostics::kin_vorticity_spatial_xy
+	MHD_Diagnostics::kin_vorticity_spatial_xz
+	MHD_Diagnostics::kin_vorticity_spatial_yz
+	#
+	MHD_Diagnostics::sigma4bb
+	MHD_Diagnostics::normB
+	MHD_Diagnostics::normcurlB
+	MHD_Diagnostics::a4sq
 "
 CarpetIOHDF5::out_dir                       = "output_directory/hdf5_output_3d"
 CarpetIOHDF5::out_every                     = 2048
@@ -307,6 +348,11 @@ CarpetIOScalar::outScalar_vars       = "
   smallbPoynET::Bmag
   smallbPoynET::EMenergy
   smallbPoynET::minus_one_minus_u_0
+	MHD_Diagnostics::normB{ reductions = 'maximum' }
+	MHD_Diagnostics::normcurlB{ reductions = 'maximum' }
+	MHD_Diagnostics::smallb2{ reductions = 'maximum' }
+	MHD_Diagnostics::sigma4Trace{ reductions = 'minimum maximum' }
+	MHD_Diagnostics::sigma4bb{ reductions = 'minimum maximum' }
 "
 
 # Parameters of thorn CarpetLib (implementing CarpetLib)
@@ -314,6 +360,15 @@ CarpetLib::combine_recompose           = "no"
 CarpetLib::poison_new_memory           = "yes"
 CarpetLib::print_memstats_every        = -1
 CarpetLib::support_staggered_operators = "yes"
+
+### TODO_PLAY
+#Carpet::output_timers_every      = 6400
+#CarpetLib::print_timestats_every = 6400
+#CarpetLib::print_memstats_every  = 6400
+CarpetLib::combine_sends             = "no"
+CarpetLib::check_bboxes              = "no"
+CarpetLib::interleave_communications = "yes"
+CarpetLib::combine_recompose         = "no"
 
 # Parameters of thorn CarpetReduce (implementing reduce)
 CarpetReduce::verbose = "no"
@@ -469,6 +524,11 @@ IOUtil::recover_dir                     = "output_directory/checkpoints"
 # Parameters of thorn Meudon_Bin_NS (implementing Meudon_Bin_NS)
 Meudon_Bin_NS::eos_table = "nuc_eos"
 Meudon_Bin_NS::filename  = "resu.d"
+
+# Parameters of thorn MHD_Diagnostics
+MHD_Diagnostics::diagnostics_compute_every = 256
+MHD_Diagnostics::derivatives_compute_every = 256
+#MHD_Diagnostics::rho_cutoff = 1.e-10
 
 # Parameters of thorn MoL (implementing MethodOfLines)
 MoL::MoL_Intermediate_Steps                     = 4
@@ -627,29 +687,58 @@ Trigger::Trigger_Steered_Scalar[0]       = "CarpetRegrid2::num_levels[0]"
 Trigger::Trigger_Steered_Scalar_Value[0] = "10"
 
 # Parameters of thorn VolumeIntegrals_GRMHD (implementing VolumeIntegrals_GRMHD)
-VolumeIntegrals_GRMHD::amr_centre__tracks__volintegral_inside_sphere[2] = 1
-VolumeIntegrals_GRMHD::amr_centre__tracks__volintegral_inside_sphere[3] = 1
-VolumeIntegrals_GRMHD::amr_centre__tracks__volintegral_inside_sphere[4] = 2
-VolumeIntegrals_GRMHD::amr_centre__tracks__volintegral_inside_sphere[5] = 2
-VolumeIntegrals_GRMHD::enable_file_output                               = 1
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[1]                  = "one"
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[2]                  = "centerofmass"
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[3]                  = "one"
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[4]                  = "centerofmass"
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[5]                  = "one"
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[6]                  = "restmass"
-VolumeIntegrals_GRMHD::NumIntegrals                                     = 6
-VolumeIntegrals_GRMHD::outVolIntegral_dir                               = "output_directory/volume_integration"
-VolumeIntegrals_GRMHD::verbose                                          = 1
-VolumeIntegrals_GRMHD::volintegral_inside_sphere__radius[2]             = 10
-VolumeIntegrals_GRMHD::volintegral_inside_sphere__radius[3]             = 10
-VolumeIntegrals_GRMHD::volintegral_inside_sphere__radius[4]             = 10
-VolumeIntegrals_GRMHD::volintegral_inside_sphere__radius[5]             = 10
-VolumeIntegrals_GRMHD::VolIntegral_out_every                            = 256
-VolumeIntegrals_GRMHD::volintegral_sphere__center_x_initial[2]          = -15.237449874012108708
-VolumeIntegrals_GRMHD::volintegral_sphere__center_x_initial[3]          = -15.237449874012108708
-VolumeIntegrals_GRMHD::volintegral_sphere__center_x_initial[4]          = 15.237449874012108708
-VolumeIntegrals_GRMHD::volintegral_sphere__center_x_initial[5]          = 15.237449874012108708
+
+# VolumeIntegrals_GRMHD::amr_centre__tracks__volintegral_inside_sphere[2] = 1
+# VolumeIntegrals_GRMHD::amr_centre__tracks__volintegral_inside_sphere[3] = 1
+# VolumeIntegrals_GRMHD::amr_centre__tracks__volintegral_inside_sphere[4] = 2
+# VolumeIntegrals_GRMHD::amr_centre__tracks__volintegral_inside_sphere[5] = 2
+# VolumeIntegrals_GRMHD::enable_file_output                               = 1
+# VolumeIntegrals_GRMHD::Integration_quantity_keyword[1]                  = "one"
+# VolumeIntegrals_GRMHD::Integration_quantity_keyword[2]                  = "centerofmass"
+# VolumeIntegrals_GRMHD::Integration_quantity_keyword[3]                  = "one"
+# VolumeIntegrals_GRMHD::Integration_quantity_keyword[4]                  = "centerofmass"
+# VolumeIntegrals_GRMHD::Integration_quantity_keyword[5]                  = "one"
+# VolumeIntegrals_GRMHD::Integration_quantity_keyword[6]                  = "restmass"
+# VolumeIntegrals_GRMHD::NumIntegrals                                     = 6
+# VolumeIntegrals_GRMHD::outVolIntegral_dir                               = "output_directory/volume_integration"
+# VolumeIntegrals_GRMHD::verbose                                          = 1
+# VolumeIntegrals_GRMHD::volintegral_inside_sphere__radius[2]             = 10
+# VolumeIntegrals_GRMHD::volintegral_inside_sphere__radius[3]             = 10
+# VolumeIntegrals_GRMHD::volintegral_inside_sphere__radius[4]             = 10
+# VolumeIntegrals_GRMHD::volintegral_inside_sphere__radius[5]             = 10
+# VolumeIntegrals_GRMHD::VolIntegral_out_every                            = 256
+# VolumeIntegrals_GRMHD::volintegral_sphere__center_x_initial[2]          = -15.237449874012108708
+# VolumeIntegrals_GRMHD::volintegral_sphere__center_x_initial[3]          = -15.237449874012108708
+# VolumeIntegrals_GRMHD::volintegral_sphere__center_x_initial[4]          = 15.237449874012108708
+# VolumeIntegrals_GRMHD::volintegral_sphere__center_x_initial[5]          = 15.237449874012108708
+
+VolumeIntegrals_GRMHD::NumIntegrals = 12
+VolumeIntegrals_GRMHD::VolIntegral_out_every = 256 #768
+
+VolumeIntegrals_GRMHD::enable_file_output = 1
+VolumeIntegrals_GRMHD::outVolIntegral_dir = "volume_integration"
+VolumeIntegrals_GRMHD::verbose = 1
+
+#   The AMR centre will only track the first referenced integration quantities that track said centre.
+#   Thus, centeroflapse output will not feed back into the AMR centre positions.
+
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[1] = "thermal_energy"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[2] = "kinetic_energy"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[3] = "kinetic_energy_palenzuela"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[4] = "kinetic_energy_shibata"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[5] = "kinetic_energy_total"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[6] = "magnetic_energy_total"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[7] = "magnetic_energy_comov"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[8] = "density_weighted_norm_B_field"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[9] = "volume_average_norm_B_ab"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[10]  = "volume_average_norm_B_cd"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[11]  = "em_energy_ab"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[12]  = "em_energy_cd"
+
+VolumeIntegrals_GRMHD::dens_a = 1.6193138848638947e-08
+VolumeIntegrals_GRMHD::dens_b = 1.6193138848638947e-05
+VolumeIntegrals_GRMHD::dens_c = 1.6193138848638947e-05
+#VolumeIntegrals_GRMHD::dens_d = 10
 
 # Parameters of thorn VolumeIntegrals_vacuum (implementing VolumeIntegrals_vacuum)
 VolumeIntegrals_vacuum::enable_file_output                     = 1

@@ -12,7 +12,12 @@ STORAGE: HydroBase::rho[1],HydroBase::vel[2],HydroBase::Bvec[1],HydroBase::w_lor
 #  LANG: C
 #} "Set b^mu, b^2, and Poynting flux gridfunctions."
 
-SCHEDULE init_fields IN Margherita_ID after fix_ID 
+# SCHEDULE init_fields IN Margherita_ID after fix_ID 
+# {
+#   LANG: C
+# } "Set all diagnostic fields to zero in the beginning."
+
+SCHEDULE init_fields IN HydroBase_Initial after ID_TabEOS_HydroQuantities
 {
   LANG: C
 } "Set all diagnostic fields to zero in the beginning."
