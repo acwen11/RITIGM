@@ -40,11 +40,22 @@ void InitializeParticlePositions(CCTK_ARGUMENTS)
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
 
-  if(cctk_iteration!=start_tracing_particles_iteration[*particle_family] || !num_particles[*particle_family]) return;
+	if(verbose >= 1){
+		CCTK_VINFO("In init particle position func.");
+		CCTK_VINFO("Particle Tracer status check: particle_family = %d; num_active = %d; iteration = %d", *particle_family, *num_active, cctk_iteration);
+		CCTK_VINFO("Next init at iter %d with %d particles.", start_tracing_particles_iteration[*particle_family], num_particles[*particle_family]);
+	}
+
+  if(cctk_iteration!=start_tracing_particles_iteration[*particle_family] || !num_particles[*particle_family]){
+		if(verbose >= 1)
+			CCTK_VINFO("Skipping.");
+		return;
+	}
 
 	int pf = *particle_family; 
 	int np = num_particles[pf];
 
+	CCTK_VINFO("Allocating temp arrays. pf = %d, np = %d", pf, np);
   double *particle_x_temp  = (double *)malloc(sizeof(double)*np);
   double *particle_y_temp  = (double *)malloc(sizeof(double)*np);
   double *particle_z_temp  = (double *)malloc(sizeof(double)*np);
@@ -55,17 +66,22 @@ void InitializeParticlePositions(CCTK_ARGUMENTS)
   int which_particle = *num_active;
   int total_trials = 0;
   //Technically, this algorithm is nondeterministic. However it should complete within a few iterations.
+	CCTK_VINFO("Starting main loop.");
   for(int iter=0;iter<100000;iter++) {
+		CCTK_VINFO("Getting positions.");
     for(int i=0;i<np;i++) {
       // Find all particles whose positions still need to be set:
       get_random_position(particle_x_temp[i],particle_y_temp[i],particle_z_temp[i],pf);
     }
+		CCTK_VINFO("Interp density to positions.");
     Interpolate_density_many_pts(cctkGH,np,particle_x_temp,particle_y_temp,particle_z_temp, particle_density_temp);
 
+		CCTK_VINFO("Performing density selection.");
     for(int i=0;i<np;i++) {
       double random_number_zero_to_one = drand48();
       if(random_number_zero_to_one < pow(particle_density_temp[i]/density_max,central_condensation_parameter)) {
         // Accept particle!
+				CCTK_VINFO("which particle = %d selected.", which_particle);
         particle_position_x[which_particle] = particle_x_temp[i];
         particle_position_y[which_particle] = particle_y_temp[i];
         particle_position_z[which_particle] = particle_z_temp[i];

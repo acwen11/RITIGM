@@ -31,6 +31,9 @@ void DoOneRK4StepForParticleTracerET(CCTK_ARGUMENTS)
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
 
+	if (verbose >= 1)
+		CCTK_VINFO("In RK4 function.");
+
   if(update_RK4_freq<=0 || !max_num_particles) return;
   if( *initial_number_of_active_refinement_levels > GetRefinementLevels(cctkGH) ) {
     // If this is ever triggered then it means
@@ -45,6 +48,7 @@ void DoOneRK4StepForParticleTracerET(CCTK_ARGUMENTS)
   }
 
   if(cctk_iteration%update_RK4_freq==0 && cctk_iteration>=start_tracing_particles_iteration[0]) {
+
 
     const double dt = *RK4_delta_time;
 

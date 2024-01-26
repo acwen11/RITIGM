@@ -116,6 +116,9 @@ void particle_tracerET_file_output_ascii(CCTK_ARGUMENTS) {
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
 
+	if(verbose >= 1)
+		CCTK_VINFO("In file output func.");
+
   char *actual_dir;
   OUTDIR_NAME(CCTK_PASS_CTOC,outdir,actual_dir);
 

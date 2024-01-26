@@ -60,6 +60,7 @@ void InitializeAllParticleTracerETHelperVars(CCTK_ARGUMENTS)
 
   *RK4IterationCounter = 1;
   *particle_family = 0;
+  *num_active = 0;
 
   // Get number of maximum and active refinement levels
   const int mrl = GetMaxRefinementLevels(cctkGH);
