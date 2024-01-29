@@ -30,6 +30,8 @@ void compute_mhd_diagnostics(CCTK_ARGUMENTS) {
                                                { 0,0,1,0 },
                                                { 0,0,0,1 } };
 
+
+	//CCTK_VINFO("At arbitrary pt: vel_px = %e; vel_py = %e; vel_pz = %e", vel_p[CCTK_GFINDEX4D(cctkGH,50,50,50,0)],vel_p[CCTK_GFINDEX4D(cctkGH,50,50,50,1)],vel_p[CCTK_GFINDEX4D(cctkGH,50,50,50,2)]);
 #pragma omp parallel for
   for(int k=cctk_nghostzones[2];k<(cctk_lsh[2]-cctk_nghostzones[2]);k++) 
    for(int j=cctk_nghostzones[1];j<(cctk_lsh[1]-cctk_nghostzones[1]);j++) 

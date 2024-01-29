@@ -22,7 +22,7 @@ SCHEDULE init_fields IN HydroBase_Initial after ID_TabEOS_HydroQuantities
   LANG: C
 } "Set all diagnostic fields to zero in the beginning."
 
-SCHEDULE compute_mhd_diagnostics AT CCTK_ANALYSIS BEFORE VI_GRMHD_InitializeIntegralCounter
+SCHEDULE compute_mhd_diagnostics AT CCTK_ANALYSIS AFTER Convert_to_HydroBase BEFORE VI_GRMHD_InitializeIntegralCounter
 {
   LANG: C
   OPTIONS: GLOBAL-EARLY,LOOP-LOCAL

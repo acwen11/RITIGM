@@ -273,7 +273,7 @@ CarpetIOHDF5::compression_level             = 0
 CarpetIOHDF5::one_file_per_group            = "yes"
 CarpetIOHDF5::open_one_input_file_at_a_time = "yes"
 CarpetIOHDF5::out2D_dir                     = "output_directory/hdf5_output_2d"
-CarpetIOHDF5::out2D_every                   = 128
+CarpetIOHDF5::out2D_every                   = 1024
 CarpetIOHDF5::out2D_vars                    = "
   ADMBase::metric
   ADMBase::curv
@@ -470,7 +470,7 @@ HydroBase::initial_entropy     = "ID_TabEOS_HydroQuantities"
 HydroBase::initial_hydro       = "Meudon_Bin_NS"
 HydroBase::initial_temperature = "ID_TabEOS_HydroQuantities"
 HydroBase::initial_Y_e         = "ID_TabEOS_HydroQuantities"
-HydroBase::timelevels          = 1
+HydroBase::timelevels          = 3
 
 # Parameters of thorn ID_TabEOS_HydroQuantities (implementing ID_tabEOS_HydroQuantities)
 ID_TabEOS_HydroQuantities::atmo_falloff        = "yes"
@@ -712,10 +712,10 @@ Trigger::Trigger_Steered_Scalar_Value[0] = "10"
 # VolumeIntegrals_GRMHD::volintegral_sphere__center_x_initial[5]          = 15.237449874012108708
 
 VolumeIntegrals_GRMHD::NumIntegrals = 12
-VolumeIntegrals_GRMHD::VolIntegral_out_every = 256 #768
+VolumeIntegrals_GRMHD::VolIntegral_out_every = 256
 
 VolumeIntegrals_GRMHD::enable_file_output = 1
-VolumeIntegrals_GRMHD::outVolIntegral_dir = "volume_integration"
+VolumeIntegrals_GRMHD::outVolIntegral_dir = "output_directory/volume_integration"
 VolumeIntegrals_GRMHD::verbose = 1
 
 #   The AMR centre will only track the first referenced integration quantities that track said centre.
@@ -781,7 +781,6 @@ VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[13] = 300
 WeylScal4::fd_order = "4th"
 
 # TimerReport ################################################
-ActiveThorns = "TimerReport"
 
 TimerReport::out_every                  = 256
 TimerReport::out_filename               = "TimerReport"
