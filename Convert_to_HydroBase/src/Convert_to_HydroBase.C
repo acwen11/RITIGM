@@ -150,9 +150,9 @@ void Convert_to_HydroBase(CCTK_ARGUMENTS) {
 
 				// If requested, calculate previous timelevel HydroBase velocity
 				if(Need_vel_p && cctk_iteration != 0){
-					CCTK_REAL vxLp = vx_p[index];
-					CCTK_REAL vyLp = vy_p[index];
-					CCTK_REAL vzLp = vz_p[index];
+					CCTK_REAL vxLp = prev_vx[index];
+					CCTK_REAL vyLp = prev_vy[index];
+					CCTK_REAL vzLp = prev_vz[index];
 					CCTK_REAL lapseLp = alp_p[index];
 					CCTK_REAL lapseL_invp = 1.0/lapseLp;
 					vel_p[CCTK_GFINDEX4D(cctkGH,i,j,k,0)] = (vxLp + betax_p[index])*lapseL_invp;
