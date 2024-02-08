@@ -542,22 +542,34 @@ WVUThorns/Baikal
 !REPO_PATH= $2
 !CHECKOUT =
 WVUThorns_Diagnostics/Seed_Magnetic_Fields_BNS
-WVUThorns_Diagnostics/VolumeIntegrals_GRMHD
+#WVUThorns_Diagnostics/VolumeIntegrals_GRMHD
 WVUThorns_Diagnostics/VolumeIntegrals_vacuum
 WVUThorns_Diagnostics/particle_tracerET
+
+# Tabulated EOS and Leakage Thorns
+!TARGET   = $ARR
+!TYPE     = git
+!URL      = git@github.com:RITnumrel/RITIGM_BNS.git
+!REPO_PATH= $2
+!CHECKOUT =
+RITIGM_BNS/Convert_to_HydroBase
+RITIGM_BNS/EOS_Omni
+RITIGM_BNS/ID_converter_ILGRMHD
+RITIGM_BNS/ID_TabEOS_HydroQuantities
+RITIGM_BNS/IllinoisGRMHD
+RITIGM_BNS/MHD_Diagnostics
+RITIGM_BNS/NRPyLeakageET
+RITIGM_BNS/SimpleID
+RITIGM_BNS/smallbPoynET
+RITIGM_BNS/VolumeIntegrals_GRMHD
+RITIGM_BNS/WVU_EOS
+
+THCExtra/BNSTrackerGen
+THCExtra/PizzaBase
+THCExtra/PizzaNumUtils
 
 # Private thorns
 !TARGET   = $ARR
 !TYPE     = ignore
 !CHECKOUT =
 
-# Tabulated EOS and Leakage Thorns
-RITIGM_BNS/Convert_to_HydroBase
-RITIGM_BNS/EOS_Omni
-RITIGM_BNS/ID_converter_ILGRMHD
-RITIGM_BNS/ID_TabEOS_HydroQuantities
-RITIGM_BNS/IllinoisGRMHD
-RITIGM_BNS/NRPyLeakageET
-RITIGM_BNS/SimpleID
-RITIGM_BNS/smallbPoynET
-RITIGM_BNS/WVU_EOS
