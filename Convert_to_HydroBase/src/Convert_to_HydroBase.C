@@ -68,6 +68,7 @@ void Convert_to_HydroBase(CCTK_ARGUMENTS) {
          * .------------------------------------------------------.
          */
         /* Compute P_cold and eps_cold */
+				eps[index] = 0.0;
         if( eos.is_Hybrid ) {
           CCTK_REAL P_cold, eps_cold;
           compute_P_cold__eps_cold(eos,PRIMS[RHOB], P_cold,eps_cold); /* <- This function is defined in inlined_functions.C */
@@ -146,6 +147,49 @@ void Convert_to_HydroBase(CCTK_ARGUMENTS) {
         if(std::isnan(alpha_u0*lapseL_inv)) printf("BAD FOUND NAN ALPHAU0 CALC: %.15e %.15e %.15e\n",alpha_u0,lapseL_inv,one_minus_one_over_alpha_u0_squared);
 
         w_lorentz[index] = alpha_u0;
+
+				// If requested, calculate previous timelevel HydroBase velocity
+				if(Need_vel_p && cctk_iteration != 0){
+					CCTK_REAL vxLp = prev_vx[index];
+					CCTK_REAL vyLp = prev_vy[index];
+					CCTK_REAL vzLp = prev_vz[index];
+					CCTK_REAL lapseLp = alp_p[index];
+					CCTK_REAL lapseL_invp = 1.0/lapseLp;
+					vel_p[CCTK_GFINDEX4D(cctkGH,i,j,k,0)] = (vxLp + betax_p[index])*lapseL_invp;
+					vel_p[CCTK_GFINDEX4D(cctkGH,i,j,k,1)] = (vyLp + betay_p[index])*lapseL_invp;
+					vel_p[CCTK_GFINDEX4D(cctkGH,i,j,k,2)] = (vzLp + betaz_p[index])*lapseL_invp;
+
+					CCTK_REAL shiftxLp = betax_p[index];
+					CCTK_REAL shiftyLp = betay_p[index];
+					CCTK_REAL shiftzLp = betaz_p[index];
+
+					CCTK_REAL gxxLp = gxx_p[index];
+					CCTK_REAL gxyLp = gxy_p[index];
+					CCTK_REAL gxzLp = gxz_p[index];
+					CCTK_REAL gyyLp = gyy_p[index];
+					CCTK_REAL gyzLp = gyz_p[index];
+					CCTK_REAL gzzLp = gzz_p[index];
+
+					CCTK_REAL one_minus_one_over_alpha_u0_squaredp = (gxxLp* SQR(vxLp + shiftxLp) +
+																													 2.0*gxyLp*(vxLp + shiftxLp)*(vyLp + shiftyLp) +
+																													 2.0*gxzLp*(vxLp + shiftxLp)*(vzLp + shiftzLp) +
+																													 gyyLp* SQR(vyLp + shiftyLp) +
+																													 2.0*gyzLp*(vyLp + shiftyLp)*(vzLp + shiftzLp) +
+																													 gzzLp* SQR(vzLp + shiftzLp) )*SQR(lapseL_invp);
+					/*** Check for superluminal velocity ***/
+					//FIXME: Instead of >1.0, should be one_minus_one_over_alpha_u0_squared > ONE_MINUS_ONE_OVER_GAMMA_SPEED_LIMIT_SQUARED, for consistency with conserv_to_prims routines
+
+					if(one_minus_one_over_alpha_u0_squaredp > 1.0) {
+						CCTK_VInfo(CCTK_THORNSTRING,"Convert_to_HydroBase WARNING: Found superluminal velocity in vel_p. This should have been caught by IllinoisGRMHD.");
+					}
+
+					// A = 1.0-one_minus_one_over_alpha_u0_squared = 1-(1-1/(al u0)^2) = 1/(al u0)^2
+					// 1/sqrt(A) = al u0
+					CCTK_REAL alpha_u0p = 1.0/sqrt(1.0-one_minus_one_over_alpha_u0_squaredp);
+					if(std::isnan(alpha_u0p*lapseL_invp)) printf("BAD FOUND NAN ALPHAU0 CALC IN PAST TIMELEVEL: %.15e %.15e %.15e\n",alpha_u0p,lapseL_invp,one_minus_one_over_alpha_u0_squaredp);
+
+					w_lorentz_p[index] = alpha_u0p;
+				}
 
         Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,0)] = PRIMS[BX_CENTER];
         Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,1)] = PRIMS[BY_CENTER];
