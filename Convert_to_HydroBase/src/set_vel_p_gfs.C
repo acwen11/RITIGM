@@ -33,7 +33,7 @@ void set_vel_p_gfs(CCTK_ARGUMENTS)
    DECLARE_CCTK_ARGUMENTS;  // Declare all grid functions from interface.ccl
    DECLARE_CCTK_PARAMETERS; // Declare all parameters from param.ccl
 
-	if(Convert_to_HydroBase_every==0 || cctk_iteration%Convert_to_HydroBase_every!=0) return;
+	if(Convert_to_HydroBase_every==0 || cctk_iteration%Convert_to_HydroBase_every!=0 || !Need_vel_p) return;
 
    CCTK_INFO ("Setting vel_p to IGM vel.");
 #pragma omp parallel for
