@@ -11,17 +11,26 @@ extern void Interpolate_density_many_pts(cGH *cctkGH,int interp_num_points,doubl
 void get_random_position(double &x,double &y,double &z, const int fam) {
   DECLARE_CCTK_PARAMETERS;
 
-  double r=1e100;
-  double theta=1e100;
-  while((r>seed_particles_inside_sphere__radius[fam]) || (r < seed_particles_outside_sphere__radius[fam]) 
-					|| (theta < seed_particles_theta_min[fam]) || (theta > seed_particles_theta_max[fam])) {
-    x = 2.0*(drand48()-0.5)*seed_particles_inside_sphere__radius[fam];
-    y = 2.0*(drand48()-0.5)*seed_particles_inside_sphere__radius[fam];
-    z = 2.0*(drand48()-0.5)*seed_particles_inside_sphere__radius[fam];
+	const double rmin = seed_particles_outside_sphere__radius[fam];
+	const double rmax = seed_particles_inside_sphere__radius[fam];
+	const double thmin = seed_particles_theta_min[fam];
+	const double thmax = seed_particles_theta_max[fam];
+  // double r=1e100;
+  // double theta=1e100;
+  // while((r>seed_particles_inside_sphere__radius[fam]) || (r < seed_particles_outside_sphere__radius[fam]) 
+	// 				|| (theta < seed_particles_theta_min[fam]) || (theta > seed_particles_theta_max[fam])) {
 
-    r = sqrt(x*x+y*y+z*z);
-    theta = atan2(z, sqrt(x*x+y*y));
-  }
+	// 	r = drand48() * (rmax - rmin) + rmin;
+	// 	theta = drand48() * (thmax - thmin) + thmin;
+  // }
+
+	double r = drand48() * (rmax - rmin) + rmin;
+	double theta = (drand48() * (thmax - thmin) + thmin) * M_PI / 180; // convert to radians
+	double phi = drand48() * 2 * M_PI;
+
+	x = r * sin(theta) * cos(phi);
+	y = r * sin(theta) * sin(phi);
+	z = r * cos(theta);
 
   x += seed_particles_inside_sphere__x_coord[fam];
   y += seed_particles_inside_sphere__y_coord[fam];
