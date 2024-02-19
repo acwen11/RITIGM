@@ -40,6 +40,10 @@ BOOLEAN update_Tmunu "Update Tmunu, for RHS of Einstein's equations?" STEERABLE=
 {
 } "yes"
 
+BOOLEAN update_HydroBase "Convert to HydroBase at every C2P?" STEERABLE=ALWAYS
+{
+} "yes"
+
 ###########################
 # Radial-falloff atmosphere
 CCTK_BOOLEAN atmo_falloff "If true, rho_atmo(r) = rho_b_atm_max*r^r_power outside a radius 'r_atmo_min' (see below)" STEERABLE=ALWAYS
@@ -63,7 +67,7 @@ REAL tau_atm_hybrid "TODO: FOR HYBRID EOS ONLY??? Floor value on the energy vari
  *:* :: "Anything goes"
 } 1e100
 
-REAL rho_b_atm_max "Floor value on the baryonic rest mass density rho_b (atmosphere) that will decrease with radius. Given the variety of systems this code may encounter, there *is no reasonable default*. Your run will die unless you override this default value in your initial data thorn." STEERABLE=ALWAYS
+REAL rho_b_atm_max "Atmospheric density for r < r_atmo_min that will then decrease with radius. Your run will die unless you override this default value in your initial data thorn." STEERABLE=ALWAYS
 {
  *:* :: "Allow for negative values.  This enables us to debug the code and verify if rho_b_atm is properly set."
 } 1e200
