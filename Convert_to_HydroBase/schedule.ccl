@@ -1,7 +1,7 @@
 # Schedule definitions for thorn Convert_to_HydroBase
 # $Header:$
 
-SCHEDULE Convert_to_HydroBase AT CCTK_INITIAL AFTER SetTmunu
+SCHEDULE Convert_to_HydroBase AT CCTK_INITIAL AFTER IllinoisGRMHD_ID_Converter AFTER SetTmunu
 {
   LANG: C
 } "Convert IllinoisGRMHD-native variables to HydroBase"
