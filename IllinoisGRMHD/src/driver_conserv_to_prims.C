@@ -546,17 +546,17 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 								 	temperature[index]  = PRIMS[TEMPERATURE];
 								 }
 
-								if(robust_isnan(rho[index]*press[index]*eps[index]*entropy[index]*
-										Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,0)]*Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,1)]*Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,2)]
-										*vel[CCTK_GFINDEX4D(cctkGH,i,j,k,0)]*vel[CCTK_GFINDEX4D(cctkGH,i,j,k,1)]*vel[CCTK_GFINDEX4D(cctkGH,i,j,k,2)]
-										*Y_e[index]*temperature[index])) {
+								// if(robust_isnan(rho[index]*press[index]*eps[index]*entropy[index]*
+								// 		Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,0)]*Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,1)]*Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,2)]
+								// 		*vel[CCTK_GFINDEX4D(cctkGH,i,j,k,0)]*vel[CCTK_GFINDEX4D(cctkGH,i,j,k,1)]*vel[CCTK_GFINDEX4D(cctkGH,i,j,k,2)]
+								// 		*Y_e[index]*temperature[index])) {
 
-										CCTK_VWARN(CCTK_WARN_ALERT,"NAN FOUND IN C2P2H: i,j,k = %d %d %d, x,y,z = %e %e %e , index = %d , rho = %e, press = %e, eps = %e, S = %e, B^i = %e %e %e, v^i = %e %e %e, Y_e = %e, Temp = %e",
-											i,j,k,x[index],y[index],z[index],index,rho[index],press[index],eps[index],entropy[index],
-											Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,0)],Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,1)],Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,2)],
-											vel[CCTK_GFINDEX4D(cctkGH,i,j,k,0)],vel[CCTK_GFINDEX4D(cctkGH,i,j,k,1)],vel[CCTK_GFINDEX4D(cctkGH,i,j,k,2)],
-											Y_e[index],temperature[index]);
-								}
+								// 		CCTK_VWARN(CCTK_WARN_ALERT,"NAN FOUND IN C2P2H: i,j,k = %d %d %d, x,y,z = %e %e %e , index = %d , rho = %e, press = %e, eps = %e, S = %e, B^i = %e %e %e, v^i = %e %e %e, Y_e = %e, Temp = %e",
+								// 			i,j,k,x[index],y[index],z[index],index,rho[index],press[index],eps[index],entropy[index],
+								// 			Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,0)],Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,1)],Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,2)],
+								// 			vel[CCTK_GFINDEX4D(cctkGH,i,j,k,0)],vel[CCTK_GFINDEX4D(cctkGH,i,j,k,1)],vel[CCTK_GFINDEX4D(cctkGH,i,j,k,2)],
+								// 			Y_e[index],temperature[index]);
+								// }
 
 							} // Copy to HydroBase
 
