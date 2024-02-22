@@ -46,6 +46,11 @@
 #include "inlined_functions.h"
 #include "apply_tau_floor__enforce_limits_on_primitives_and_recompute_conservs.C"
 
+
+#define velx (&vel[0*cctk_lsh[0]*cctk_lsh[1]*cctk_lsh[2]])
+#define vely (&vel[1*cctk_lsh[0]*cctk_lsh[1]*cctk_lsh[2]])
+#define velz (&vel[2*cctk_lsh[0]*cctk_lsh[1]*cctk_lsh[2]])
+
 extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 	DECLARE_CCTK_ARGUMENTS;
 	DECLARE_CCTK_PARAMETERS;
@@ -524,22 +529,35 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 								/*** Check for superluminal velocity ***/
 								//FIXME: Instead of >1.0, should be one_minus_one_over_alpha_u0_squared > ONE_MINUS_ONE_OVER_GAMMA_SPEED_LIMIT_SQUARED, for consistency with conserv_to_prims routines
 
-								if(one_minus_one_over_alpha_u0_squared > 1.0) {
-									CCTK_VInfo(CCTK_THORNSTRING,"WARNING: Found superluminal velocity. This should have been caught by IllinoisGRMHD.");
-								}
+								 if(one_minus_one_over_alpha_u0_squared > 1.0) {
+								 	CCTK_VInfo(CCTK_THORNSTRING,"WARNING: Found superluminal velocity. This should have been caught by IllinoisGRMHD.");
+								 }
 
-								// A = 1.0-one_minus_one_over_alpha_u0_squared = 1-(1-1/(al u0)^2) = 1/(al u0)^2
-								// 1/sqrt(A) = al u0
-								CCTK_REAL alpha_u0 = 1.0/sqrt(1.0-one_minus_one_over_alpha_u0_squared);
-								if(std::isnan(alpha_u0*lapseL_inv)) printf("BAD FOUND NAN ALPHAU0 CALC: %.15e %.15e %.15e\n",alpha_u0,lapseL_inv,one_minus_one_over_alpha_u0_squared);
+								 // A = 1.0-one_minus_one_over_alpha_u0_squared = 1-(1-1/(al u0)^2) = 1/(al u0)^2
+								 // 1/sqrt(A) = al u0
+								 CCTK_REAL alpha_u0 = 1.0/sqrt(1.0-one_minus_one_over_alpha_u0_squared);
+								 if(std::isnan(alpha_u0*lapseL_inv)) printf("BAD FOUND NAN ALPHAU0 CALC: %.15e %.15e %.15e\n",alpha_u0,lapseL_inv,one_minus_one_over_alpha_u0_squared);
 
-								w_lorentz[index] = alpha_u0;
+								 w_lorentz[index] = alpha_u0;
 
-								// Tabulated EOS quantities
-								if( eos.is_Tabulated ) {
-									Y_e[index]          = PRIMS[YEPRIM     ];
-									temperature[index]  = PRIMS[TEMPERATURE];
-								}
+								 // Tabulated EOS quantities
+								 if( eos.is_Tabulated ) {
+								 	Y_e[index]          = PRIMS[YEPRIM     ];
+								 	temperature[index]  = PRIMS[TEMPERATURE];
+								 }
+
+								// if(robust_isnan(rho[index]*press[index]*eps[index]*entropy[index]*
+								// 		Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,0)]*Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,1)]*Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,2)]
+								// 		*vel[CCTK_GFINDEX4D(cctkGH,i,j,k,0)]*vel[CCTK_GFINDEX4D(cctkGH,i,j,k,1)]*vel[CCTK_GFINDEX4D(cctkGH,i,j,k,2)]
+								// 		*Y_e[index]*temperature[index])) {
+
+								// 		CCTK_VWARN(CCTK_WARN_ALERT,"NAN FOUND IN C2P2H: i,j,k = %d %d %d, x,y,z = %e %e %e , index = %d , rho = %e, press = %e, eps = %e, S = %e, B^i = %e %e %e, v^i = %e %e %e, Y_e = %e, Temp = %e",
+								// 			i,j,k,x[index],y[index],z[index],index,rho[index],press[index],eps[index],entropy[index],
+								// 			Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,0)],Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,1)],Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,2)],
+								// 			vel[CCTK_GFINDEX4D(cctkGH,i,j,k,0)],vel[CCTK_GFINDEX4D(cctkGH,i,j,k,1)],vel[CCTK_GFINDEX4D(cctkGH,i,j,k,2)],
+								// 			Y_e[index],temperature[index]);
+								// }
+
 							} // Copy to HydroBase
 
 							//Now we compute the difference between original & new conservatives, for diagnostic purposes:
