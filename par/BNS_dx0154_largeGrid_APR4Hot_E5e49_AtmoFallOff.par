@@ -9,7 +9,6 @@ ADMMacros
 AEILocalInterp 
 AHFinderDirect 
 Baikal 
-BNSAnalysis
 BLAS 
 BNSTrackerGen
 Boundary 
@@ -25,7 +24,6 @@ CarpetReduce
 CarpetRegrid2 
 CarpetSlab 
 CartGrid3D 
-Convert_to_HydroBase 
 CoordBase 
 CoordGauge 
 CycleClock 
@@ -37,7 +35,6 @@ GSL
 HDF5 
 hwloc 
 HydroBase
-Hydro_Analysis 
 ID_converter_ILGRMHD 
 ID_TabEOS_HydroQuantities 
 IllinoisGRMHD 
@@ -61,7 +58,6 @@ particle_tracerET
 QuasiLocalMeasures 
 Seed_Magnetic_Fields_BNS 
 Slab 
-smallbPoynET 
 SpaceMask 
 SphericalSurface 
 StaticConformal 
@@ -142,6 +138,9 @@ Baikal::eta           = 1.0/2.67346 # M_ADM = 2.67346 (from LORENE, updated APR4
 Boundary::radpower = 2
 
 #================= BNSTrackerGen =====================
+ActiveThorns="PizzaBase PizzaNumUtils"
+
+PizzaBase::length_unit    = 1476.7161818921163
 
 BNSTrackerGen::sym_pi           = "no"
 BNSTrackerGen::analysis_reflevel  = 11
@@ -154,34 +153,6 @@ BNSTrackerGen::index_region1 = 1
 BNSTrackerGen::index_region2 = 2
 BNSTrackerGen::index_region3 = 0
 #BNSTrackerGen::add_levels_post_collapse   = 0
-
-# BNSAnalysis
-
-bnsanalysis::compute_every               = 512
-bnsanalysis::set_dens_unbnd              = yes
-bnsanalysis::set_u_t                     = yes
-bnsanalysis::rho_cut                     = 1.44e-15 
-bnsanalysis::set_dens_noatmo             = yes
-bnsanalysis::set_ye_unbnd                = no
-bnsanalysis::set_s_phi                   = yes
-bnsanalysis::set_entropy_unbnd           = no
-bnsanalysis::set_cons_entropy            = no
-
-bnsanalysis::hist_out_every              = 512
-bnsanalysis::hist_rho_min                = 1.44e-14 
-bnsanalysis::hist_rho_max                = 1e-2  #1 order of magnitude above maximum
-bnsanalysis::hist_nbins                  = 500
-bnsanalysis::hist_rc_max                 = 10200
-bnsanalysis::hist_rscale                 = 30
-bnsanalysis::hist_nbins_r                = 6000
-
-bnsanalysis::hist_vars_cv_rho            = "
-  bnsanalysis::s_phi
-"
-
-bnsanalysis::hist_vars_cv_rc             = "
-  bnsanalysis::s_phi
-"
 
 # Parameters of thorn Cactus (implementing Cactus)
 Cactus::cctk_full_warnings = "yes"
@@ -218,12 +189,6 @@ CarpetIOASCII::out0D_vars             = "
   Carpet::physical_time_per_hour
   carpet::timing
   carpetregrid2::positions
-  hydro_analysis::total_rest_mass
-  hydro_analysis::Hydro_Analysis_rho_max_loc
-  hydro_analysis::Hydro_Analysis_core_rho_sum
-  hydro_analysis::Hydro_Analysis_core_rho_centroid
-  hydro_analysis::Hydro_Analysis_masses
-  hydro_analysis::Hydro_Analysis_masses_fractions
   outflow::outflow_flux[0]
   outflow::outflow_flux[1]
   outflow::outflow_flux[2]
@@ -237,7 +202,6 @@ CarpetIOASCII::out0D_vars             = "
   outflow::outflow_flux[10]
   QuasiLocalMeasures::qlm_scalars
   SphericalSurface::sf_active
-  smallbPoynET::Total_Energy
 "
 
 CarpetIOASCII::out3D_ghosts           = "no"
@@ -251,7 +215,6 @@ CarpetIOBasic::outInfo_vars       = "
   Baikal::trKGF
   Baikal::cfGF
   IllinoisGRMHD::rho_b
-  smallbPoynET::smallb2
   IllinoisGRMHD::failure_checker
 "
 
@@ -286,9 +249,33 @@ CarpetIOHDF5::out2D_vars                    = "
   Baikal::MU0GF
   Baikal::MU1GF
   Baikal::MU2GF
+	MHD_Diagnostics::smallb2
+
+	MHD_Diagnostics::expansion_scalar
+	#
+	MHD_Diagnostics::kin_acceleration_spatial_x
+	MHD_Diagnostics::kin_acceleration_spatial_y
+	MHD_Diagnostics::kin_acceleration_spatial_z
+	#
+	MHD_Diagnostics::shear_spatial_tensor_xx
+	MHD_Diagnostics::shear_spatial_tensor_xy
+	MHD_Diagnostics::shear_spatial_tensor_xz
+	MHD_Diagnostics::shear_spatial_tensor_yy
+	MHD_Diagnostics::shear_spatial_tensor_yz
+	MHD_Diagnostics::shear_spatial_tensor_zz
+	#
+	MHD_Diagnostics::sigma4Trace
+	#
+	MHD_Diagnostics::kin_vorticity_spatial_xy
+	MHD_Diagnostics::kin_vorticity_spatial_xz
+	MHD_Diagnostics::kin_vorticity_spatial_yz
+	#
+	MHD_Diagnostics::sigma4bb
+	MHD_Diagnostics::normB
+	MHD_Diagnostics::normcurlB
+	MHD_Diagnostics::a4sq
   NRPyLeakageET::NRPyLeakageET_optical_depths
   NRPyLeakageET::NRPyLeakageET_opacities
-  smallbPoynET::smallbPoynETGFs
   WeylScal4::psi4r
 "
 CarpetIOHDF5::out_dir                       = "output_directory/hdf5_output_3d"
@@ -301,7 +288,6 @@ CarpetIOHDF5::out_vars                      = "
   Baikal::aux_variables
   IllinoisGRMHD::grmhd_primitives_allbutBi
   IllinoisGRMHD::grmhd_primitives_Bi
-  smallbPoynET::smallbPoynETGFs
 "
 
 # Parameters of thorn CarpetIOScalar (implementing IOScalar)
@@ -309,12 +295,12 @@ CarpetIOScalar::one_file_per_group   = "no"
 CarpetIOScalar::outScalar_every      = 512
 CarpetIOScalar::outScalar_reductions = "minimum maximum average norm1 norm2"
 CarpetIOScalar::outScalar_vars       = "
-  bnsanalysis::u_t{reductions='minimum maximum'}
-  bnsanalysis::dens_noatmo{reductions='norm1'}
-  bnsanalysis::dens_unbnd{reductions='maximum norm1'}
-  bnsanalysis::dens_unbnd_bernoulli{reductions='norm1'}
-  bnsanalysis::rflux_unbnd{reductions='maximum'}
-  bnsanalysis::s_phi{reductions='average'}
+  # bnsanalysis::u_t{reductions='minimum maximum'}
+  # bnsanalysis::dens_noatmo{reductions='norm1'}
+  # bnsanalysis::dens_unbnd{reductions='maximum norm1'}
+  # bnsanalysis::dens_unbnd_bernoulli{reductions='norm1'}
+  # bnsanalysis::rflux_unbnd{reductions='maximum'}
+  # bnsanalysis::s_phi{reductions='average'}
   IllinoisGRMHD::rho_b
   IllinoisGRMHD::igm_Ye
   IllinoisGRMHD::igm_temperature
@@ -418,10 +404,6 @@ carpetregrid2::verbose                   = no
 CartGrid3D::type = "CoordBase"
 CartGrid3D::avoid_origin = "no"
 
-# Parameters of thorn Convert_to_HydroBase (implementing Convert_to_HydroBase)
-Convert_to_HydroBase::Convert_to_HydroBase_every = 16
-Convert_to_HydroBase::Need_vel_p = true
-
 # Parameters of thorn CoordBase (implementing CoordBase)
 CoordBase::boundary_size_x_lower = 3
 CoordBase::boundary_size_y_lower = 3
@@ -444,7 +426,7 @@ CoordBase::zmax                  = CoordBase::xmax
 # Parameters of thorn EOS_Omni (implementing EOS_Omni)
 EOS_Omni::do_energy_shift   = "yes"
 EOS_Omni::nuceos_read_table = "yes"
-EOS_Omni::nuceos_table_name = "APR_3335_rho393_temp133_ye66_gitM180edd5_20190225_adjusted.h5"
+EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APR_rho600_temp133_ye66_gitMf0fc21f_20240215_adjusted.h5"
 
 # Parameters of thorn HydroBase (implementing HydroBase)
 HydroBase::initial_Aphi        = "zero"
@@ -455,18 +437,13 @@ HydroBase::initial_temperature = "ID_TabEOS_HydroQuantities"
 HydroBase::initial_Y_e         = "ID_TabEOS_HydroQuantities"
 HydroBase::timelevels          = 3
 
-#-------Hydro_Analysis-----------------------
-Hydro_Analysis::restmass_rho_min        = 1.001e-20 #1.001e-13 #this should be equal to rho_abs_min+atmo_tolerance
-Hydro_Analysis::restmass_masses_nr      = 0 #zero means compute only the total baryonic mass
-Hydro_Analysis::restmass_compute_masses = yes
-
 # Parameters of thorn ID_TabEOS_HydroQuantities (implementing ID_tabEOS_HydroQuantities)
 ID_TabEOS_HydroQuantities::atmo_falloff        = "yes"
 ID_TabEOS_HydroQuantities::r_atmo_min          = 200
-ID_TabEOS_HydroQuantities::r_power             = -2
+ID_TabEOS_HydroQuantities::r_power             = -6
 ID_TabEOS_HydroQuantities::id_temperature_type = "constant"
 ID_TabEOS_HydroQuantities::id_entropy_type     = "from table"
-ID_TabEOS_HydroQuantities::Y_e_filename        = "Ye_of_rho-APR.txt"
+ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_lowdens2.txt"
 ID_TabEOS_HydroQuantities::id_temperature      = 1e-2
 ID_TabEOS_HydroQuantities::id_rho_atm_max      = 1e-13
 ID_TabEOS_HydroQuantities::id_Y_e_atm          = 0.5
@@ -484,16 +461,19 @@ IllinoisGRMHD::igm_evolve_temperature         = "yes"
 IllinoisGRMHD::igm_evolve_entropy             = "yes"
 IllinoisGRMHD::atmo_falloff                   = ID_TabEOS_HydroQuantities::atmo_falloff
 IllinoisGRMHD::r_atmo_min                     = ID_TabEOS_HydroQuantities::r_atmo_min
+IllinoisGRMHD::r_power 			                  = ID_TabEOS_HydroQuantities::r_power
 IllinoisGRMHD::rho_b_atm_max                  = ID_TabEOS_HydroQuantities::id_rho_atm_max
 IllinoisGRMHD::igm_Ye_atm                     = ID_TabEOS_HydroQuantities::id_Y_e_atm
 IllinoisGRMHD::igm_T_atm                      = ID_TabEOS_HydroQuantities::id_temperature_atm
 IllinoisGRMHD::conserv_to_prims_debug         = 0
-IllinoisGRMHD::Psi6threshold                  = 60
+IllinoisGRMHD::Psi6threshold                  = 60 # This value should only be reached far inside the horizon! Verify this!
 IllinoisGRMHD::damp_lorenz                    = 0.217416512059369 #1.5/(dtfac*dx_coarsest)=1.5/(0.021875*315.392)
 
 #0.279017857142857 #1.5/(dtfac*dx_coarsest)=1.5/(0.021875*245.76)
 IllinoisGRMHD::palenzuela_depsdT_threshold    = 1e-100 # Set to 1e100/1e-100 to only use entropy/energy equation
 IllinoisGRMHD::tau_atm_hybrid                 = 1e-20
+
+IllinoisGRMHD::update_HydroBase               = yes
 
 # Parameters of thorn InitBase (implementing InitBase)
 InitBase::initial_data_setup_method = "init_all_levels"
@@ -512,7 +492,7 @@ IOUtil::recover_dir                     = "output_directory/checkpoints"
 
 # Parameters of thorn Meudon_Bin_NS (implementing Meudon_Bin_NS)
 Meudon_Bin_NS::eos_table = "nuc_eos"
-Meudon_Bin_NS::filename  = "resu.d"
+Meudon_Bin_NS::filename  = "/work2/09319/acw6923/frontera/EOS/resu.d"
 
 # Parameters of thorn MHD_Diagnostics
 MHD_Diagnostics::diagnostics_compute_every = 256
@@ -563,12 +543,13 @@ NaNChecker::verbose         = "all"
 # Parameters of thorn NRPyLeakageET (implementing NRPyLeakageET)
 NRPyLeakageET::maxInitRefLevel              = 11
 NRPyLeakageET::minInitRefLevel              = 11
-NRPyLeakageET::numberOfIterations           = 1024
+NRPyLeakageET::numberOfIterations           = 2048
 NRPyLeakageET::optical_depth_evolution_type = "PathOfLeastResistance"
 NRPyLeakageET::psi6_threshold               = 60
 NRPyLeakageET::rho_max_threshold            = 0.0040000000000000000833
-NRPyLeakageET::rho_min_threshold            = 1.4e-15 #1.0000000000999999767e-12
+NRPyLeakageET::rho_min_threshold            = 1.4e-20 #1.0000000000999999767e-12
 NRPyLeakageET::verbosity_level              = 1
+NRPyLeakageET::compute_luminosities_every   = 512
 
 
 # Outflow
@@ -623,14 +604,11 @@ quasilocalmeasures::surface_index[8]     = 11
 quasilocalmeasures::surface_index[9]     = 12
 
 # Parameters of thorn Seed_Magnetic_Fields_BNS (implementing Seed_Magnetic_Fields_Privt)
-Seed_Magnetic_Fields_BNS::A_b                                     = 40894827.256033 #10890510.9
+Seed_Magnetic_Fields_BNS::A_b                                     = 289170096.6819339 # E_mag = 5e49
 Seed_Magnetic_Fields_BNS::enable_IllinoisGRMHD_staggered_A_fields = "yes"
 Seed_Magnetic_Fields_BNS::have_two_NSs_along_x_axis               = "yes"
 Seed_Magnetic_Fields_BNS::n_s                                     = 3
 Seed_Magnetic_Fields_BNS::P_cut                                   = 9.9428609615036393006e-06
-
-# Parameters of thorn smallbPoynET (implementing smallbPoynET)
-smallbPoynET::smallbPoynET_compute_every = 256
 
 # Parameters of thorn SpaceMask (implementing SpaceMask)
 SpaceMask::use_mask = "yes"
@@ -751,7 +729,7 @@ TmunuBase::stress_energy_storage = "yes"
 TmunuBase::timelevels            = 1
 
 # Parameters of thorn VolumeIntegrals_GRMHD (implementing VolumeIntegrals_GRMHD)
-VolumeIntegrals_GRMHD::NumIntegrals = 12
+VolumeIntegrals_GRMHD::NumIntegrals = 14
 VolumeIntegrals_GRMHD::VolIntegral_out_every = 256
 
 VolumeIntegrals_GRMHD::enable_file_output = 1
@@ -773,6 +751,8 @@ VolumeIntegrals_GRMHD::Integration_quantity_keyword[9] = "volume_average_norm_B_
 VolumeIntegrals_GRMHD::Integration_quantity_keyword[10]  = "volume_average_norm_B_cd"
 VolumeIntegrals_GRMHD::Integration_quantity_keyword[11]  = "em_energy_ab"
 VolumeIntegrals_GRMHD::Integration_quantity_keyword[12]  = "em_energy_cd"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[13]  = "centerofmass"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[14]  = "restmass"
 
 VolumeIntegrals_GRMHD::dens_a = 1.6193138848638947e-08
 VolumeIntegrals_GRMHD::dens_b = 1.6193138848638947e-05
@@ -822,7 +802,7 @@ WeylScal4::fd_order = "4th"
 
 # TimerReport ################################################
 
-TimerReport::out_every                  = 256
+TimerReport::out_every                  = 1024
 TimerReport::out_filename               = "TimerReport"
 TimerReport::output_all_timers_together = yes
 TimerReport::output_all_timers_readable = yes

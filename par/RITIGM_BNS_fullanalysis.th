@@ -214,7 +214,6 @@ CactusUtils/NaNChecker
 CactusUtils/SystemStatistics
 CactusUtils/TerminationTrigger
 CactusUtils/TimerReport
-CactusUtils/Trigger
 CactusUtils/Vectors
 
 # CactusWave thorns
@@ -240,6 +239,7 @@ Carpet/CarpetIOHDF5
 Carpet/CarpetIOScalar
 Carpet/CarpetInterp
 Carpet/CarpetLib
+Carpet/CarpetMask
 Carpet/CarpetReduce
 Carpet/CarpetRegrid2
 Carpet/CarpetSlab
@@ -320,7 +320,6 @@ EinsteinEvolve/NewRad
 !REPO_PATH= $2
 !CHECKOUT =
 EinsteinInitialData/Meudon_Bin_NS
-EinsteinInitialData/ID_NrotStar
 
 # FLRW cosmological initial data
 !TARGET   = $ARR
@@ -542,7 +541,6 @@ WVUThorns/Baikal
 !REPO_PATH= $2
 !CHECKOUT =
 WVUThorns_Diagnostics/Seed_Magnetic_Fields_BNS
-#WVUThorns_Diagnostics/VolumeIntegrals_GRMHD
 WVUThorns_Diagnostics/VolumeIntegrals_vacuum
 WVUThorns_Diagnostics/particle_tracerET
 
@@ -559,7 +557,6 @@ RITIGM_BNS/ID_TabEOS_HydroQuantities
 RITIGM_BNS/IllinoisGRMHD
 RITIGM_BNS/MHD_Diagnostics
 RITIGM_BNS/NRPyLeakageET
-RITIGM_BNS/SimpleID
 RITIGM_BNS/smallbPoynET
 RITIGM_BNS/VolumeIntegrals_GRMHD
 RITIGM_BNS/WVU_EOS
