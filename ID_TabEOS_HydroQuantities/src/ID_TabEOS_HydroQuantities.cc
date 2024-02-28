@@ -57,7 +57,6 @@ extern "C" void ID_TabEOS_HydroQuantities__initial_temperature( const cGH *cctkG
 																																const CCTK_INT imax,
 																																const CCTK_INT jmax,
 																																const CCTK_INT kmax,
-																																const CCTK_INT  npoints,
 																																CCTK_REAL *restrict r,
                                                                 CCTK_REAL *restrict temperature ) {
 
@@ -83,6 +82,7 @@ extern "C" void ID_TabEOS_HydroQuantities__initial_temperature( const cGH *cctkG
 				else {
 					temperature[index] = id_T_atm;
 				}
+				CCTK_VINFO("Init temp: T set to %e",temperature[index]);
     }
 }
 
@@ -200,6 +200,7 @@ extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const 
 					vel[          index] = 0.0;
 					vel[npoints  +index] = 0.0; //TODO: Check if this is right
 					vel[2*npoints+index] = 0.0;
+					CCTK_VINFO("Recompute temp: T set to %e",temperature[index]);
 					if( initialize_entropy )
 						entropy[    index] = id_ent_atm;
 				}
@@ -232,7 +233,7 @@ extern "C" void ID_TabEOS_HydroQuantities(CCTK_ARGUMENTS) {
     CCTK_VInfo(CCTK_THORNSTRING,"temperature initialization is ENABLED!");
     // Initialize the temperature
     ID_TabEOS_HydroQuantities__initial_temperature( cctkGH, cctk_lsh[0], cctk_lsh[1], cctk_lsh[2], 
-																										npoints, r, temperature );
+																										r, temperature );
   }
   else {
     CCTK_VInfo(CCTK_THORNSTRING,"temperature initialization is DISABLED!");
