@@ -349,11 +349,12 @@ extern "C" void set_IllinoisGRMHD_metric_GRMHD_variables_based_on_HydroBase_and_
 
         int ww;
 
-				// Set floor, find scaled atmospheric density
-				const CCTK_REAL r_pow         = atmo_falloff ? r_power : 0.;
+				// Set floor, find scaled atmospheric density and temperature.
 				const CCTK_REAL r_atmo        = MAX(r_atmo_min, r[index]);
+				const CCTK_REAL r_pow         = atmo_falloff ? r_power : 0.;
+				const CCTK_REAL r_pow_T       = atmo_falloff_T ? r_power_T : 0.;
 				const CCTK_REAL rho_b_atm     = MAX(rho_b_atm_max*std::pow(r_atmo / r_atmo_min, r_pow), eos.rho_min);
-				// CCTK_VINFO("For debug: r_pow = %g; r = %g; r_atmo = %g; rho_min = %e; rho_b_atm = %e.", r_pow, r[index], r_atmo, eos.rho_min, rho_b_atm);
+				const CCTK_REAL T_atm					= MAX(igm_T_atm*std::pow(r_atmo / r_atmo_min, r_pow_T), eos.T_min);
 
         CCTK_REAL PRIMS[MAXNUMVARS];
         PRIMS[RHOB         ] = rho_b[index];
@@ -403,7 +404,7 @@ extern "C" void set_IllinoisGRMHD_metric_GRMHD_variables_based_on_HydroBase_and_
 
         struct output_stats stats; stats.failure_checker=0;
         IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(zero_int,PRIMS,stats,eos,
-                                                                          METRIC,g4dn,g4up,TUPMUNU,TDNMUNU,CONSERVS,rho_b_atm, r[index]);
+                                                                          METRIC,g4dn,g4up,TUPMUNU,TDNMUNU,CONSERVS,rho_b_atm, T_atm);
 
         rho_b      [index] = PRIMS[RHOB        ];
         P          [index] = PRIMS[PRESSURE    ];

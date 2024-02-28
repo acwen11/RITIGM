@@ -70,7 +70,7 @@ typedef struct _igm_eos_parameters_ {
   // Electron fraction parameters
   CCTK_REAL Ye_atm , Ye_min , Ye_max ;
   // Temperature parameters
-  CCTK_REAL T_atm  , T_min  , T_max  ;
+  CCTK_REAL T_atm_max  , T_min  , T_max  ;
   // Pressure parameters
   CCTK_REAL P_atm_max  , P_min  , P_max  ;
   // Specific internal energy parameters
@@ -87,7 +87,7 @@ typedef struct _igm_eos_parameters_ {
 //------------------------------------------------
 
 void initialize_igm_eos_parameters_from_input( const CCTK_INT* igm_eos_key, const CCTK_REAL cctk_time, igm_eos_parameters &eos );
-void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_parameters eos, const CCTK_REAL *restrict METRIC_LAP_PSI4, CCTK_REAL *restrict PRIMS, const CCTK_REAL rho_b_atm, const CCTK_REAL r_test );
+void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_parameters eos, const CCTK_REAL *restrict METRIC_LAP_PSI4, CCTK_REAL *restrict PRIMS, const CCTK_REAL rho_b_atm, const CCTK_REAL T_atm );
 
 //----------- Hybrid Equation of State -----------
 void print_EOS_Hybrid( igm_eos_parameters eos );
@@ -106,6 +106,7 @@ void compute_entropy_function( const igm_eos_parameters eos,
 
 void reset_prims_to_atmosphere( const igm_eos_parameters eos, 
 																const CCTK_REAL rho_atm,
+																const CCTK_REAL T_atm,
                                 const CCTK_REAL P_atm,
                                 const CCTK_REAL eps_atm,
                                 const CCTK_REAL S_atm,

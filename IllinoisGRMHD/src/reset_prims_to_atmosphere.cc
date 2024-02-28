@@ -4,6 +4,7 @@
 
 void reset_prims_to_atmosphere( const igm_eos_parameters eos,
 																const CCTK_REAL rho_atm,
+																const CCTK_REAL T_atm,
 																const CCTK_REAL P_atm,
 																const CCTK_REAL eps_atm,
 																const CCTK_REAL S_atm,
@@ -19,10 +20,10 @@ void reset_prims_to_atmosphere( const igm_eos_parameters eos,
   PRIMS[EPSILON      ] = eps_atm;
   PRIMS[ENTROPY      ] = S_atm;
 
-	// These values are still assumed constant.
+	// Y_e is still assumed constant.
   if( eos.is_Tabulated ) {
     PRIMS[YEPRIM     ] = eos.Ye_atm;
-    PRIMS[TEMPERATURE] = eos.T_atm;
+    PRIMS[TEMPERATURE] = T_atm;
   }
   PRIMS[VX           ] = 0;
   PRIMS[VY           ] = 0;

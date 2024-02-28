@@ -102,13 +102,15 @@ static void add_fluxes_and_source_terms_to_hydro_rhss( const igm_eos_parameters 
 	CCTK_REAL Ul[MAXNUMVARS]; for(int ii=0;ii<MAXNUMVARS;ii++) Ul[ii] = out_prims_l[ii].gf[index];
 
 	// Find scaled atmospheric density
-	const CCTK_REAL r_pow         = atmo_falloff ? r_power : 0.;
 	const CCTK_REAL r_atmo        = MAX(r_atmo_min, r[index]);
+	const CCTK_REAL r_pow         = atmo_falloff ? r_power : 0.;
+	const CCTK_REAL r_pow_T       = atmo_falloff_T ? r_power_T : 0.;
 	const CCTK_REAL rho_b_atm     = MAX(rho_b_atm_max*std::pow(r_atmo / r_atmo_min, r_pow), eos.rho_min);
+	const CCTK_REAL T_atm         = MAX(igm_T_atm*std::pow(r_atmo / r_atmo_min, r_pow_T), eos.T_min);
 
 	if( eos.evolve_entropy ) {
-		apply_floors_and_ceilings_to_prims__recompute_prims(eos,METRIC_LAP_PSI4,Ur,rho_b_atm, r[index]);
-		apply_floors_and_ceilings_to_prims__recompute_prims(eos,METRIC_LAP_PSI4,Ul,rho_b_atm, r[index]);
+		apply_floors_and_ceilings_to_prims__recompute_prims(eos,METRIC_LAP_PSI4,Ur,rho_b_atm, T_atm);
+		apply_floors_and_ceilings_to_prims__recompute_prims(eos,METRIC_LAP_PSI4,Ul,rho_b_atm, T_atm);
 	}
 
 	// Read the T^{\mu \nu} gridfunction from memory, since computing T^{\mu \nu} is expensive

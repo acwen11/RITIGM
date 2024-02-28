@@ -155,7 +155,7 @@ int con2prim( const igm_eos_parameters eos,
               const CCTK_REAL *restrict METRIC,const CCTK_REAL *restrict METRIC_PHYS,const CCTK_REAL *restrict METRIC_LAP_PSI4,
               const CCTK_REAL g4dn[NDIM][NDIM],const CCTK_REAL g4up[NDIM][NDIM],
               CCTK_REAL *restrict CONSERVS,CCTK_REAL *restrict PRIMS,
-              const CCTK_REAL tau_atm, const CCTK_REAL rho_atm,
+              const CCTK_REAL tau_atm, const CCTK_REAL rho_atm, const CCTK_REAL T_atm,
               output_stats& stats ) ;
 
 int con2prim_select( const igm_eos_parameters eos,
@@ -165,6 +165,8 @@ int con2prim_select( const igm_eos_parameters eos,
                      const CCTK_REAL g4up[4][4],
                      const CCTK_REAL *restrict cons,
                      CCTK_REAL *restrict prim,
+                     const CCTK_REAL rho_atm,
+                     const CCTK_REAL T_atm,
                      output_stats& stats);
 
 int con2prim_CerdaDuran2D( const igm_eos_parameters eos,
@@ -177,6 +179,7 @@ int con2prim_CerdaDuran3D( const igm_eos_parameters eos,
                            const CCTK_REAL *restrict adm_quantities,
                            const CCTK_REAL *restrict con,
                            CCTK_REAL *restrict prim,
+                           const CCTK_REAL T_atm,
                            output_stats& stats );
 
 int con2prim_Noble2D( const igm_eos_parameters eos,
@@ -191,6 +194,7 @@ int con2prim_Noble1D( const igm_eos_parameters eos,
                       const CCTK_REAL g4up[4][4],
                       const CCTK_REAL *restrict cons,
                       CCTK_REAL *restrict prim,
+                      const CCTK_REAL T_atm,
                       output_stats& stats );
 
 int con2prim_Noble1D_entropy( const igm_eos_parameters eos,
@@ -217,6 +221,7 @@ int con2prim_Newman1D( const igm_eos_parameters eos,
                        const CCTK_REAL *restrict adm_quantities,
                        const CCTK_REAL *restrict con,
                        CCTK_REAL *restrict prim,
+                       const CCTK_REAL T_atm,
                        output_stats& stats );
 
 int font_fix__hybrid_EOS( const igm_eos_parameters eos,
@@ -243,6 +248,7 @@ void set_prim_from_PRIMS_and_CONSERVS( const igm_eos_parameters eos,
                                        const CCTK_REAL *restrict PRIMS,
                                        const CCTK_REAL *restrict CONSERVS,
                                        const CCTK_REAL rho_atm,
+                                       const CCTK_REAL T_atm,
                                        const CCTK_REAL *restrict cons,
                                        CCTK_REAL *restrict prim );
 

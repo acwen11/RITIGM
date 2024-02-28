@@ -352,20 +352,22 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 						stats.dx[2]          = CCTK_DELTA_SPACE(2);
 						stats.nan_found      = 0;
 
-						// Set floor, find scaled atmospheric density
-						const CCTK_REAL r_pow         = atmo_falloff ? r_power : 0.;
+						// Set floor, find scaled atmospheric density and temperature
 						const CCTK_REAL r_atmo        = MAX(r_atmo_min, r[index]);
+						const CCTK_REAL r_pow         = atmo_falloff ? r_power : 0.;
+						const CCTK_REAL r_pow_T       = atmo_falloff_T ? r_power_T : 0.;
 						const CCTK_REAL rho_b_atm     = MAX(rho_b_atm_max*std::pow(r_atmo / r_atmo_min, r_pow), eos.rho_min);
+						const CCTK_REAL T_atm         = MAX(igm_T_atm*std::pow(r_atmo / r_atmo_min, r_pow_T), eos.T_min);
 						CCTK_REAL P_atm;
 						CCTK_REAL eps_atm;
 						CCTK_REAL S_atm = eos.S_atm_max;
 
 						if( eos.evolve_entropy ) {
-							WVU_EOS_P_eps_and_S_from_rho_Ye_T( rho_b_atm,eos.Ye_atm,eos.T_atm,
+							WVU_EOS_P_eps_and_S_from_rho_Ye_T( rho_b_atm,eos.Ye_atm,T_atm,
 																								 &P_atm,&eps_atm,&S_atm );
 						}
 						else {
-							WVU_EOS_P_and_eps_from_rho_Ye_T( rho_b_atm,eos.Ye_atm,eos.T_atm,
+							WVU_EOS_P_and_eps_from_rho_Ye_T( rho_b_atm,eos.Ye_atm,T_atm,
 																							 &P_atm,&eps_atm );
 						}
 
@@ -383,14 +385,14 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 										index,i,j,k,x,y,z,
 										METRIC,METRIC_PHYS,METRIC_LAP_PSI4,g4dn,g4up,
 										CONSERVS,PRIMS,
-										tau_atm, rho_b_atm,
+										tau_atm, rho_b_atm, T_atm,
 										stats);
 								if(check==0) ii=4;
 								else stats.failure_checker+=100000;
 							}
 						} else {
 							stats.failure_checker+=1;
-							reset_prims_to_atmosphere( eos, rho_b_atm, P_atm, eps_atm, S_atm, PRIMS );
+							reset_prims_to_atmosphere( eos, rho_b_atm, T_atm, P_atm, eps_atm, S_atm, PRIMS );
 							rho_star_fix_applied++;
 						}
 
@@ -402,7 +404,7 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 							con2prim_failed_flag[index] += 1;
 							if( con2prim_failed_flag[index] > 4 ) {
 								// Sigh, reset to atmosphere
-								reset_prims_to_atmosphere( eos, rho_b_atm, P_atm, eps_atm, S_atm, PRIMS );
+								reset_prims_to_atmosphere( eos, rho_b_atm, T_atm, P_atm, eps_atm, S_atm, PRIMS );
 								atm_resets++;
 								// Then flag this point as a "success"
 								check = 0;
@@ -429,7 +431,7 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 							// Enforce limits on primitive variables and recompute conservatives.
 							static const int already_computed_physical_metric_and_inverse=1;
 							CCTK_REAL TUPMUNU[10],TDNMUNU[10];
-							IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(already_computed_physical_metric_and_inverse,PRIMS,stats,eos,METRIC,g4dn,g4up,TUPMUNU,TDNMUNU,CONSERVS,rho_b_atm, r[index]);
+							IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(already_computed_physical_metric_and_inverse,PRIMS,stats,eos,METRIC,g4dn,g4up,TUPMUNU,TDNMUNU,CONSERVS,rho_b_atm, T_atm);
 
 							rho_star   [index] = CONSERVS[RHOSTAR  ];
 							mhd_st_x   [index] = CONSERVS[STILDEX  ];

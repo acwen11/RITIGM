@@ -70,7 +70,8 @@ int Utoprim_new_body_1d( const igm_eos_parameters eos,
                          const CCTK_REAL *restrict U,
                          const CCTK_REAL gcov[NDIM][NDIM],
                          const CCTK_REAL gcon[NDIM][NDIM],
-                         CCTK_REAL *restrict prim );
+                         CCTK_REAL *restrict prim,
+												 const CCTK_REAL T_atm );
 
 int newton_raphson_1d( CCTK_REAL x[], int n, igm_eos_parameters eos, harm_aux_vars_struct& harm_aux, CCTK_REAL indep_var_in,
                        void (*funcd) (CCTK_REAL [], CCTK_REAL [], CCTK_REAL [],
@@ -133,9 +134,10 @@ int con2prim_Noble1D( const igm_eos_parameters eos,
                       const CCTK_REAL g4up[4][4],
                       const CCTK_REAL *restrict cons,
                       CCTK_REAL *restrict prim,
+											const CCTK_REAL T_atm,
                       output_stats& stats ) {
 
-  return( Utoprim_new_body_1d(eos, cons, g4dn, g4up, prim) );
+  return( Utoprim_new_body_1d(eos, cons, g4dn, g4up, prim, T_atm) );
 
 }
 
@@ -183,7 +185,8 @@ int Utoprim_new_body_1d( const igm_eos_parameters eos,
                          const CCTK_REAL *restrict U,
                          const CCTK_REAL gcov[NDIM][NDIM],
                          const CCTK_REAL gcon[NDIM][NDIM],
-                         CCTK_REAL *restrict prim ) {
+                         CCTK_REAL *restrict prim,
+												 const CCTK_REAL T_atm ) {
 
   // Assume ok initially:
   int retval = 0;
@@ -364,7 +367,7 @@ int Utoprim_new_body_1d( const igm_eos_parameters eos,
     // Update P and T in the prim array
     prim[RHO  ] = xrho;
     prim[YE   ] = harm_aux.ye;
-    prim[TEMP ] = MIN(MAX(xtemp,eos.T_atm),eos.T_max);
+    prim[TEMP ] = MIN(MAX(xtemp,T_atm),eos.T_max);
     prim[PRESS] = xprs;
     prim[EPS  ] = xeps;
     prim[ENT  ] = xent;
