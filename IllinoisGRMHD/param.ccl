@@ -50,7 +50,21 @@ CCTK_BOOLEAN atmo_falloff "If true, rho_atmo(r) = rho_b_atm_max*r^r_power outsid
 {
 } false
 
+CCTK_REAL rho_b_atm_max "Atmospheric density for r < r_atmo_min that will then decrease with radius. Your run will die unless you override this default value in your initial data thorn." STEERABLE=ALWAYS
+{
+ *:* :: "Allow for negative values.  This enables us to debug the code and verify if rho_b_atm is properly set."
+} 1e200
+
+CCTK_BOOLEAN atmo_falloff_T "If true, T_atmo(r) = T_atm_max*r^r_power_T outside a radius 'r_atmo_min' (see below)" STEERABLE=ALWAYS
+{
+} false
+
 CCTK_REAL r_power "Exponent of atmospheric density falloff." STEERABLE=ALWAYS
+{
+  *:0.] :: "Any non-positive number"
+} -1.5
+
+CCTK_REAL r_power_T "Exponent of atmospheric density falloff." STEERABLE=ALWAYS
 {
   *:0.] :: "Any non-positive number"
 } -1.5
@@ -66,11 +80,6 @@ REAL tau_atm_hybrid "TODO: FOR HYBRID EOS ONLY??? Floor value on the energy vari
 {
  *:* :: "Anything goes"
 } 1e100
-
-REAL rho_b_atm_max "Atmospheric density for r < r_atmo_min that will then decrease with radius. Your run will die unless you override this default value in your initial data thorn." STEERABLE=ALWAYS
-{
- *:* :: "Allow for negative values.  This enables us to debug the code and verify if rho_b_atm is properly set."
-} 1e200
 
 REAL rho_b_max "Ceiling value on the baryonic rest mass density rho_b. The enormous value effectively disables this ceiling by default. It can be quite useful after a black hole has accreted a lot of mass, leading to enormous densities inside the BH. To enable this trick, set rho_b_max in your initial data thorn! You are welcome to change this parameter mid-run (after restarting from a checkpoint)." STEERABLE=ALWAYS
 {
@@ -181,7 +190,7 @@ CCTK_REAL igm_Ye_atm "Atmospheric electron fraction"
 restricted:
 CCTK_REAL igm_T_atm "Atmospheric temperature"
 {
- 0.0:* :: "Positive. Should be within table limits (preferably at least 10% above the minimum)."
+ 0.0:* :: "Positive. Should be within table limits"
 } 0.1
 
 restricted:

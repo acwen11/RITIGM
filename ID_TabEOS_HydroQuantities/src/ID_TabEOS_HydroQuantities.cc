@@ -38,7 +38,7 @@ extern "C" void ID_TabEOS_HydroQuantities__initial_Y_e( const CCTK_INT  npoints,
     const CCTK_INT interp_stencil_size = 5;
 #pragma omp parallel for
     for(int i=0;i<npoints;i++) {
-      if( rho[i] > id_rho_atm_max ) {
+      if( rho[i] > rho_b_atm_max ) {
         // Interpolate Y_e(rho_i) at gridpoint i
         CCTK_REAL Y_eL;
         interpolate_1d_quantity_as_function_of_rho(interp_stencil_size,nrho,rho_arr,Y_e_of_rho_arr,rho[i],&Y_eL);
@@ -46,7 +46,7 @@ extern "C" void ID_TabEOS_HydroQuantities__initial_Y_e( const CCTK_INT  npoints,
         Y_e[i] = MIN(MAX(Y_eL,nuc_eos::eos_yemin),nuc_eos::eos_yemax);
       }
       else {
-        Y_e[i] = id_Y_e_atm;
+        Y_e[i] = igm_Ye_atm; 
       }
     }
   }
@@ -58,10 +58,10 @@ extern "C" void ID_TabEOS_HydroQuantities__initial_temperature( const CCTK_INT  
 
   DECLARE_CCTK_PARAMETERS;
 
-  // Loop over the grid, initializing the temperature
-  for(int i=0;i<npoints;i++) temperature[i] = id_temperature;
+  // Loop over the grid, initializing the temperature. Messy, this will be overwritten later.
+  for(int i=0;i<npoints;i++) temperature[i] = igm_T_atm;
 }
-
+  
 // Now recompute all HydroQuantities, to ensure consistent initial data
 extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const cGH *cctkGH,
 																																					const CCTK_INT imax,
@@ -107,16 +107,18 @@ extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const 
 
 				// Find Atmospheric Density
 				CCTK_REAL xrho    = rho[index];
-				const CCTK_REAL r_pow					= atmo_falloff ? r_power : 0.;
 				const CCTK_REAL r_atmo        = std::max(r_atmo_min, r[index]);
-				const CCTK_REAL id_rho_atm    = std::max(id_rho_atm_max*std::pow(r_atmo / r_atmo_min, r_pow), nuc_eos::eos_rhomin);
+				const CCTK_REAL r_pow					= atmo_falloff ? r_power : 0.;
+				const CCTK_REAL r_pow_T				= atmo_falloff_T ? r_power_T : 0.;
+				const CCTK_REAL id_rho_atm    = std::max(rho_b_atm_max*std::pow(r_atmo / r_atmo_min, r_pow), nuc_eos::eos_rhomin);
+				const CCTK_REAL id_T_atm      = std::max(igm_T_atm*std::pow(r_atmo / r_atmo_min, r_pow_T), nuc_eos::eos_tempmin);
 
 				// Prepare for EoS function calls
 				CCTK_REAL dummy        = 0.0;
 				CCTK_INT  keyerr       = 0;
 				CCTK_INT  anyerr       = 0;
 
-				if( xrho > id_rho_atm_max ) {
+				if( xrho > rho_b_atm_max) {
 					CCTK_REAL xye     = Y_e[index];
 					CCTK_REAL xtemp   = temperature[index];
 					CCTK_REAL xpress  = 0.0;
@@ -144,8 +146,9 @@ extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const 
 						entropy[index] = xent;
 				}
 				else {
-					// Reset to atmosphere
-					CCTK_REAL id_temp_atm  = id_temperature_atm;
+					// Reset to atmosphere (Ye_atm set by IGM. T_atm set by radial falloff.)
+					CCTK_REAL id_Y_e_atm   = igm_Ye_atm;
+					CCTK_REAL id_temp_atm  = id_T_atm;
 					CCTK_REAL id_press_atm = 0.0;
 					CCTK_REAL id_eps_atm   = 0.0;
 					CCTK_REAL id_ent_atm   = 0.0;
@@ -169,7 +172,7 @@ extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const 
 
 					rho[          index] = id_rho_atm;
 					Y_e[          index] = id_Y_e_atm;
-					temperature[  index] = id_temperature_atm;
+					temperature[  index] = id_temp_atm;
 					press[        index] = id_press_atm;
 					eps[          index] = id_eps_atm;
 					vel[          index] = 0.0;

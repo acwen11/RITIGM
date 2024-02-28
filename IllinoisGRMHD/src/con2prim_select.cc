@@ -12,6 +12,8 @@ int con2prim_select( const igm_eos_parameters eos,
                      const CCTK_REAL g4up[4][4],
                      const CCTK_REAL *restrict cons,
                      CCTK_REAL *restrict prim,
+                     const CCTK_REAL rho_atm,
+                     const CCTK_REAL T_atm,
                      output_stats& stats ) {
 
   switch( c2p_key ) {
@@ -23,7 +25,7 @@ int con2prim_select( const igm_eos_parameters eos,
 
     // Noble1D routine (see https://arxiv.org/pdf/astro-ph/0512420.pdf)
     case Noble1D:
-      return( con2prim_Noble1D(eos,g4dn,g4up,cons,prim,stats) );
+      return( con2prim_Noble1D(eos,g4dn,g4up,cons,prim,T_atm,stats) );
       break;
 
     // Noble1D entropy routine (see https://arxiv.org/pdf/0808.3140.pdf)
@@ -42,7 +44,7 @@ int con2prim_select( const igm_eos_parameters eos,
 
     // Cerda-Duran et al. 3D routine (see https://arxiv.org/pdf/0804.4572.pdf)
     case CerdaDuran3D:
-      return( con2prim_CerdaDuran3D(eos,adm_quantities,cons,prim,stats) );
+      return( con2prim_CerdaDuran3D(eos,adm_quantities,cons,prim,T_atm,stats) );
 
     // Palenzuela 1D routine (see https://arxiv.org/pdf/1712.07538.pdf)
     case Palenzuela1D:
@@ -51,7 +53,7 @@ int con2prim_select( const igm_eos_parameters eos,
 
     // Newman 1D routine (see https://escholarship.org/content/qt0s53f84b/qt0s53f84b.pdf)
     case Newman1D:
-      return( con2prim_Newman1D(eos,adm_quantities,cons,prim,stats) );
+      return( con2prim_Newman1D(eos,adm_quantities,cons,prim,T_atm,stats) );
       break;
 
     default:

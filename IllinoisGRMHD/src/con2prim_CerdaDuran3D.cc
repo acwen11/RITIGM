@@ -26,6 +26,7 @@ void NR_3D_WZT( const igm_eos_parameters eos,
                 const CCTK_REAL *restrict S_con,
                 const CCTK_REAL *restrict con,
                 CCTK_REAL *restrict prim,
+                const CCTK_REAL T_atm,
                 bool *restrict c2p_failed );
 
 static inline CCTK_REAL compute_W_from_cons( const igm_eos_parameters eos,
@@ -64,6 +65,7 @@ int con2prim_CerdaDuran3D( const igm_eos_parameters eos,
                            const CCTK_REAL *restrict adm_quantities,
                            const CCTK_REAL *restrict con,
                            CCTK_REAL *restrict prim,
+                           const CCTK_REAL T_atm,
                            output_stats& stats ) {
 
   // Set gamma_{ij} and gamma^{ij}
@@ -117,7 +119,7 @@ int con2prim_CerdaDuran3D( const igm_eos_parameters eos,
 
   bool c2p_failed  = false;
   CCTK_REAL tol_x    = 5e-9;
-  NR_3D_WZT( eos, tol_x, S_squared,BdotS,B_squared, SU,con,prim, &c2p_failed );
+  NR_3D_WZT( eos, tol_x, S_squared,BdotS,B_squared,SU,con,prim,T_atm,&c2p_failed );
 
   return c2p_failed;
 
@@ -334,6 +336,7 @@ void NR_3D_WZT( const igm_eos_parameters eos,
                 const CCTK_REAL *restrict S_con,
                 const CCTK_REAL *restrict con,
                 CCTK_REAL *restrict prim,
+                const CCTK_REAL T_atm,
                 bool *restrict c2p_failed ) {
 
   // 2D Newton-Raphson scheme, using state vector x = (W, T) and 2D function
@@ -354,7 +357,7 @@ void NR_3D_WZT( const igm_eos_parameters eos,
 
   x_lowlim[0] = 1.0;
   x_lowlim[1] = eos.rho_min;
-  x_lowlim[2] = eos.T_atm;//exp( ( log(eos.T_max)+log(eos.T_min) )/2.0 );
+  x_lowlim[2] = T_atm; //exp( ( log(eos.T_max)+log(eos.T_min) )/2.0 );
 
   // set initial guess for Newton-Raphson state vector x = (W, T)
   calc_WZT_guesses(eos,S_squared,B_squared,BdotS,con,x);
