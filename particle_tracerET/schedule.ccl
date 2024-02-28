@@ -22,6 +22,11 @@ if( output_four_velocity_u4U )
   STORAGE: particle_four_velocity_u4U_arrays, particle_four_velocity_u4U_gridfunctions
 }
 
+if( output_hydro )
+{
+	STORAGE: particle_hydro_arrays
+	STORAGE: HydroBase::temperature[1], HydroBase::Y_e[1], HydroBase::w_lorentz[1]
+} 
 ###################################
 ##### INITIALIZATION ROUTINES #####
 ###################################

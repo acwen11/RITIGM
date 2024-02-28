@@ -24,6 +24,17 @@ void Interpolate_four_velocities_at_particle_positions(
       double *particle_u4D2,
       double *particle_u4D3 );
 
+void Interpolate_hydro_vars_at_particle_positions(
+      cGH *cctkGH,
+      int interp_num_points,
+      double *particle_x,
+      double *particle_y,
+      double *particle_z,
+      double *particle_rho,
+      double *particle_T,
+      double *particle_Ye,
+      double *particle_W);
+
 /********************************************************************
  ********************    Macro Definitions   ************************
  ********************************************************************/
@@ -159,6 +170,17 @@ void particle_tracerET_file_output_ascii(CCTK_ARGUMENTS) {
     fprintf(file, "%s\n", buffer);
     fclose(file);
   }
+  if( output_hydro ) {
+    sprintf(filename, "%sparticles_hydro.asc", actual_dir);
+    if(!(file = fopen(filename, "a+"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
+    add_header_if_file_is_empty(file, "# Col. 1: Time (cctk_time). Subsequent columns: rho, T, Ye, W of particle i\n");
+    sprintf(buffer,"%e",cctk_time);
+    for(int which_particle=0;which_particle<*num_active;which_particle++) {
+      sprintf(buffer, "%s %e %e %e %e", buffer, particle_rho[which_particle], particle_T[which_particle], particle_Ye[which_particle], particle_W[which_particle]);
+    }
+    fprintf(file, "%s\n", buffer);
+    fclose(file);
+  }
   free(buffer);
   free(filename);
 }
@@ -205,6 +227,17 @@ void particle_tracerET_file_output_binary(CCTK_ARGUMENTS) {
     fwrite(particle_u4D3, sizeof(CCTK_REAL), *num_active, file);
     fclose(file);
   }
+  if( output_hydro ) {
+    sprintf(filename, "%sparticles_hydro.bin", actual_dir);
+    if(!(file = fopen(filename, "a+b"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
+    add_number_of_particles_and_quantities_if_file_is_empty(file, *num_active, num_quantities);
+    fwrite(&cctk_time   , sizeof(CCTK_REAL), 1            , file);
+    fwrite(particle_rho,  sizeof(CCTK_REAL), *num_active, file);
+    fwrite(particle_T,    sizeof(CCTK_REAL), *num_active, file);
+    fwrite(particle_Ye,   sizeof(CCTK_REAL), *num_active, file);
+    fwrite(particle_W,    sizeof(CCTK_REAL), *num_active, file);
+    fclose(file);
+  }
   free(filename);
 }
 
@@ -216,7 +249,7 @@ void particle_tracerET_file_output(CCTK_ARGUMENTS) {
   if( (cctk_iteration==start_tracing_particles_iteration[0] || cctk_iteration%(*file_output_freq)==0) ) {
 
     if( output_four_velocity_u4D || output_four_velocity_u4U ) {
-      if(verbose>1) CCTK_VINFO("**** It: %d - Inteprolating four-velocities ****", cctk_iteration);
+      if(verbose>1) CCTK_VINFO("**** It: %d - Interpolating four-velocities ****", cctk_iteration);
       Interpolate_four_velocities_at_particle_positions(cctkGH,
                                                         *num_active,
                                                         particle_position_x,
@@ -231,6 +264,20 @@ void particle_tracerET_file_output(CCTK_ARGUMENTS) {
                                                         particle_u4D2,
                                                         particle_u4D3);
     }
+
+		if ( output_hydro ) {
+      if(verbose>1) CCTK_VINFO("**** It: %d - Interpolating hydro vars ****", cctk_iteration);
+			Interpolate_hydro_vars_at_particle_positions(
+						cctkGH,
+						*num_active,
+						particle_position_x,
+						particle_position_y,
+						particle_position_z,
+						particle_rho,
+						particle_T,
+						particle_Ye,
+						particle_W);
+		}
 
     if(verbose>0) CCTK_VINFO("**** It: %d - Outputting to file ****", cctk_iteration);
 
