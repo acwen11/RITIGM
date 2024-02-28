@@ -1,21 +1,25 @@
 # Schedule definitions for thorn Convert_to_HydroBase
 # $Header:$
-STORAGE: prev_vels
 
-SCHEDULE Convert_to_HydroBase AT CCTK_INITIAL AFTER SetTmunu
+SCHEDULE Convert_to_HydroBase AT CCTK_INITIAL AFTER IllinoisGRMHD_ID_Converter AFTER SetTmunu
 {
   LANG: C
 } "Convert IllinoisGRMHD-native variables to HydroBase"
 
-SCHEDULE init_vel_p_gfs AT CCTK_INITIAL BEFORE Convert_to_HydroBase
+if (Need_vel_p)
 {
-  LANG: C
-} "Set vel_p gfs to zero"
+	STORAGE: prev_vels
+	SCHEDULE init_vel_p_gfs AT CCTK_INITIAL BEFORE Convert_to_HydroBase
+	{
+		LANG: C
+	} "Set vel_p gfs to zero"
 
-SCHEDULE set_vel_p_gfs AT CCTK_PRESTEP
-{
-  LANG: C
-} "Set vel_p gfs to IGM velocity"
+	SCHEDULE set_vel_p_gfs AT CCTK_PRESTEP
+	{
+		OPTIONS: GLOBAL-EARLY,LOOP-LOCAL
+		LANG: C
+	} "Set vel_p gfs to IGM velocity"
+}
 
 SCHEDULE Convert_to_HydroBase AT CCTK_ANALYSIS BEFORE compute_bi_b2_Poyn_fluxET BEFORE particle_tracerET BEFORE VolumeIntegralGroup BEFORE convert_to_MHD_3velocity AFTER ML_BSSN_evolCalcGroup
 {
