@@ -87,6 +87,7 @@ extern "C" void set_IllinoisGRMHD_metric_GRMHD_variables_based_on_HydroBase_and_
         if( eos.is_Tabulated ) {
           igm_Ye[index]          = Y_e[index];
           igm_temperature[index] = temperature[index];
+					//CCTK_VINFO("Copied T = %e from HB to %e in IGM", temperature[index], igm_temperature[index]);
         }
         if( eos.evolve_entropy ) {
           // In this case we expect another thorn,

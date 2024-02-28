@@ -53,39 +53,15 @@ extern "C" void ID_TabEOS_HydroQuantities__initial_Y_e( const CCTK_INT  npoints,
 }
 
 // Set initial temperature to be constant everywhere (TODO: add other options)
-extern "C" void ID_TabEOS_HydroQuantities__initial_temperature( const cGH *cctkGH, 
-																																const CCTK_INT imax,
-																																const CCTK_INT jmax,
-																																const CCTK_INT kmax,
-																																CCTK_REAL *restrict r,
+extern "C" void ID_TabEOS_HydroQuantities__initial_temperature( const CCTK_INT  npoints,
                                                                 CCTK_REAL *restrict temperature ) {
 
   DECLARE_CCTK_PARAMETERS;
 
-  CCTK_VInfo(CCTK_THORNSTRING,"eos_tempmin = %e", nuc_eos::eos_tempmin);
-
-  // Loop over the grid, initializing the temperature
-#pragma omp parallel for
-	for(int k=0;k<kmax;k++)
-		for(int j=0;j<jmax;j++)
-			for(int i=0;i<imax;i++) {
-				int index = CCTK_GFINDEX3D(cctkGH,i,j,k);
-
-				const CCTK_REAL r_pow_T			= atmo_falloff_T ? r_power_T : 0.;
-				const CCTK_REAL r_atmo      = std::max(r_atmo_min, r[index]);
-				const CCTK_REAL id_T_atm    = std::max(igm_T_atm*std::pow(r_atmo / r_atmo_min, r_pow_T), nuc_eos::eos_tempmin);
-				// Constant in inner atmosphere.
-				if( r[index] < r_atmo_min) {
-					temperature[index] = igm_T_atm;
-				}
-				// Radial Falloff in outer atmosphere.
-				else {
-					temperature[index] = id_T_atm;
-				}
-				CCTK_VINFO("Init temp: T set to %e",temperature[index]);
-    }
+  // Loop over the grid, initializing the temperature. Messy, this will be overwritten later.
+  for(int i=0;i<npoints;i++) temperature[i] = igm_T_atm;
 }
-
+  
 // Now recompute all HydroQuantities, to ensure consistent initial data
 extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const cGH *cctkGH,
 																																					const CCTK_INT imax,
@@ -131,9 +107,11 @@ extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const 
 
 				// Find Atmospheric Density
 				CCTK_REAL xrho    = rho[index];
-				const CCTK_REAL r_pow					= atmo_falloff ? r_power : 0.;
 				const CCTK_REAL r_atmo        = std::max(r_atmo_min, r[index]);
+				const CCTK_REAL r_pow					= atmo_falloff ? r_power : 0.;
+				const CCTK_REAL r_pow_T				= atmo_falloff_T ? r_power_T : 0.;
 				const CCTK_REAL id_rho_atm    = std::max(rho_b_atm_max*std::pow(r_atmo / r_atmo_min, r_pow), nuc_eos::eos_rhomin);
+				const CCTK_REAL id_T_atm      = std::max(igm_T_atm*std::pow(r_atmo / r_atmo_min, r_pow_T), nuc_eos::eos_tempmin);
 
 				// Prepare for EoS function calls
 				CCTK_REAL dummy        = 0.0;
@@ -169,8 +147,8 @@ extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const 
 				}
 				else {
 					// Reset to atmosphere (Ye_atm set by IGM. T_atm set by radial falloff.)
-					CCTK_REAL id_Y_e_atm    = igm_Ye_atm;
-					CCTK_REAL id_temp_atm  = temperature[index];
+					CCTK_REAL id_Y_e_atm   = igm_Ye_atm;
+					CCTK_REAL id_temp_atm  = id_T_atm;
 					CCTK_REAL id_press_atm = 0.0;
 					CCTK_REAL id_eps_atm   = 0.0;
 					CCTK_REAL id_ent_atm   = 0.0;
@@ -200,7 +178,6 @@ extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const 
 					vel[          index] = 0.0;
 					vel[npoints  +index] = 0.0; //TODO: Check if this is right
 					vel[2*npoints+index] = 0.0;
-					CCTK_VINFO("Recompute temp: T set to %e",temperature[index]);
 					if( initialize_entropy )
 						entropy[    index] = id_ent_atm;
 				}
@@ -232,8 +209,7 @@ extern "C" void ID_TabEOS_HydroQuantities(CCTK_ARGUMENTS) {
   if( CCTK_EQUALS( initial_temperature,"ID_TabEOS_HydroQuantities") ) {
     CCTK_VInfo(CCTK_THORNSTRING,"temperature initialization is ENABLED!");
     // Initialize the temperature
-    ID_TabEOS_HydroQuantities__initial_temperature( cctkGH, cctk_lsh[0], cctk_lsh[1], cctk_lsh[2], 
-																										r, temperature );
+    ID_TabEOS_HydroQuantities__initial_temperature( npoints, temperature );
   }
   else {
     CCTK_VInfo(CCTK_THORNSTRING,"temperature initialization is DISABLED!");
