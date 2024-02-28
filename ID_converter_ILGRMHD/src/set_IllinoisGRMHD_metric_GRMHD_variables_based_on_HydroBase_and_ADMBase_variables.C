@@ -338,7 +338,7 @@ extern "C" void set_IllinoisGRMHD_metric_GRMHD_variables_based_on_HydroBase_and_
         Bz[actual_index] = 0.5 * ( Bz_stagger[index] + Bz_stagger[indexkm1] );
       }
 
-	// CCTK_VINFO("Enforcing limits on prims in ID_converter.");
+	CCTK_VINFO("Enforcing limits on prims in ID_converter.");
   // Finally, enforce limits on primitives & compute conservative variables.
 #pragma omp parallel for
   for(int k=0;k<cctk_lsh[2];k++)
