@@ -18,6 +18,7 @@ void newman( const igm_eos_parameters eos,
              const CCTK_REAL *restrict SU,
              const CCTK_REAL *restrict con,
              CCTK_REAL *restrict prim,
+             const CCTK_REAL T_atm,
              CCTK_INT& got_temp_from,
              bool& c2p_failed );
 
@@ -25,6 +26,7 @@ int con2prim_Newman1D( const igm_eos_parameters eos,
                        const CCTK_REAL *restrict adm_quantities,
                        const CCTK_REAL *restrict con,
                        CCTK_REAL *restrict prim,
+                       const CCTK_REAL T_atm,
                        output_stats& stats ) {
 
   // Set gamma_{ij} and gamma^{ij}
@@ -79,13 +81,13 @@ int con2prim_Newman1D( const igm_eos_parameters eos,
   const CCTK_REAL tol_x = 1e-10;
   bool c2p_failed = false;
   CCTK_INT got_temp_from = None;
-  newman(eos,tol_x,S_squared,BdotS,B_squared,SU,con,prim,got_temp_from,c2p_failed);
+  newman(eos,tol_x,S_squared,BdotS,B_squared,SU,con,prim,T_atm,got_temp_from,c2p_failed);
 
   if( c2p_failed && ( got_temp_from == entropyvar ) ) {
     // If the recovery failed when using the entropy, try
     // again using the specific internal energy.
     got_temp_from = senergyvar;
-    newman(eos,tol_x,S_squared,BdotS,B_squared,SU,con,prim,got_temp_from,c2p_failed);
+    newman(eos,tol_x,S_squared,BdotS,B_squared,SU,con,prim,T_atm,got_temp_from,c2p_failed);
   }
 
   return( c2p_failed );
@@ -99,6 +101,7 @@ void newman( const igm_eos_parameters eos,
              const CCTK_REAL *restrict SU,
              const CCTK_REAL *restrict con,
              CCTK_REAL *restrict prim,
+             const CCTK_REAL T_atm,
              CCTK_INT& got_temp_from,
              bool& c2p_failed ) {
 
@@ -111,7 +114,7 @@ void newman( const igm_eos_parameters eos,
   // guess for them
   CCTK_REAL xrho   = con[DD];
   CCTK_REAL xye    = con[YE]/con[DD];
-  CCTK_REAL xtemp  = eos.T_atm;
+  CCTK_REAL xtemp  = T_atm;
   CCTK_REAL xprs   = 0.0;
   CCTK_REAL xeps   = 0.0;
   CCTK_REAL xent   = 0.0;
@@ -319,7 +322,7 @@ void newman( const igm_eos_parameters eos,
     // eps = - 1.0 + x(1-W^{2})/W + W( 1 + q - s + 0.5*( s/W^{2} + t^{2}/x^{2} ) )
     prim[EPS] = - 1.0 + (1.0-W*W)*x/W + W*( 1.0 + q - s + 0.5*( s/(W*W) + (t*t)/(x*x) ) );
     // Then compute P, S, and T using (rho,Ye,eps)
-    prim[TEMP] = eos.T_atm;
+    prim[TEMP] = T_atm;
     enforce_table_bounds_rho_Ye_eps( eos,&prim[RHO],&prim[YE],&prim[EPS] );
     WVU_EOS_P_S_and_T_from_rho_Ye_eps( prim[RHO],prim[YE],prim[EPS],
                                        &prim[PRESS],&prim[ENT],&prim[TEMP] );

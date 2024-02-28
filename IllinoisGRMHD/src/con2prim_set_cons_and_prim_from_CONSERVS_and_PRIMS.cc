@@ -113,6 +113,7 @@ void set_prim_from_PRIMS_and_CONSERVS( const igm_eos_parameters eos,
                                        const CCTK_REAL *restrict PRIMS,
                                        const CCTK_REAL *restrict CONSERVS,
                                        const CCTK_REAL rho_atm,
+                                       const CCTK_REAL T_atm,
                                        const CCTK_REAL *restrict cons,
                                        CCTK_REAL *restrict prim ) {
 
@@ -208,7 +209,7 @@ void set_prim_from_PRIMS_and_CONSERVS( const igm_eos_parameters eos,
   if( eos.is_Tabulated ) {
     // This one is very simple! The only guess required is the temperature
     if( which_guess == 1 ) {
-      prim[TEMP  ] = eos.T_atm;
+      prim[TEMP  ] = T_atm;
     }
     else {
       prim[TEMP  ] = eos.T_max;
