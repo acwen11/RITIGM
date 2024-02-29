@@ -23,6 +23,7 @@ Rest mass density:
  
 Magnetic field (B): 
 1 CU = 8.3519664583273021e+19 Gauss 
+1 CU (IGM)  = 2.35537+19 Gauss (see HydroBase documentation)
 1 Gauss  = 1.1973228161170991e-20 CU 
  
  
