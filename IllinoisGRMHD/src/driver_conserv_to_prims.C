@@ -431,7 +431,7 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 							// Enforce limits on primitive variables and recompute conservatives.
 							static const int already_computed_physical_metric_and_inverse=1;
 							CCTK_REAL TUPMUNU[10],TDNMUNU[10];
-							IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(already_computed_physical_metric_and_inverse,PRIMS,stats,eos,METRIC,g4dn,g4up,TUPMUNU,TDNMUNU,CONSERVS);
+							IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(already_computed_physical_metric_and_inverse,PRIMS,stats,eos,METRIC,g4dn,g4up,TUPMUNU,TDNMUNU,CONSERVS,rho_b_atm, T_atm);
 
 							rho_star   [index] = CONSERVS[RHOSTAR  ];
 							mhd_st_x   [index] = CONSERVS[STILDEX  ];

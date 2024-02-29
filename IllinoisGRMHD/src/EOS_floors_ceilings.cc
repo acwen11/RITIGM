@@ -11,7 +11,9 @@
 
 void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_parameters eos,
                                                           const CCTK_REAL *restrict METRIC_LAP_PSI4,
-                                                          CCTK_REAL *restrict PRIMS) {
+                                                          CCTK_REAL *restrict PRIMS,
+																													const CCTK_REAL rho_b_atm,
+																													const CCTK_REAL T_atm) {
 
   DECLARE_CCTK_PARAMETERS;
 

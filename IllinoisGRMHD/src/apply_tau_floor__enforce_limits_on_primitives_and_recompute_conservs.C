@@ -143,7 +143,7 @@ static inline int apply_tau_floor(const int index,const CCTK_REAL Psi6threshold,
 
 
 void IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(const int already_computed_physical_metric_and_inverse,CCTK_REAL *PRIMS,struct output_stats &stats,igm_eos_parameters &eos,
-                                                                       CCTK_REAL *METRIC,CCTK_REAL g4dn[4][4],CCTK_REAL g4up[4][4], CCTK_REAL *TUPMUNU,CCTK_REAL *TDNMUNU,CCTK_REAL *CONSERVS) {
+                                                                       CCTK_REAL *METRIC,CCTK_REAL g4dn[4][4],CCTK_REAL g4up[4][4], CCTK_REAL *TUPMUNU,CCTK_REAL *TDNMUNU,CCTK_REAL *CONSERVS, const CCTK_REAL rho_b_atm, const CCTK_REAL T_atm) {
 
 #ifndef ENABLE_STANDALONE_IGM_C2P_SOLVER
   DECLARE_CCTK_PARAMETERS;
@@ -164,7 +164,7 @@ void IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(const int
   // S  (if evolving the entropy)
   // Ye (if tabulated EOS is enabled)
   // T  (if tabulated EOS is enabled)
-  apply_floors_and_ceilings_to_prims__recompute_prims(eos, METRIC_LAP_PSI4, PRIMS);
+  apply_floors_and_ceilings_to_prims__recompute_prims(eos, METRIC_LAP_PSI4, PRIMS, rho_b_atm, T_atm);
 
   // Now compute the enthalpy
   const CCTK_REAL h_enthalpy = 1.0 + PRIMS[EPSILON] + PRIMS[PRESSURE]/PRIMS[RHOB];
