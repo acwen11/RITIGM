@@ -12,10 +12,27 @@
 void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_parameters eos,
                                                           const CCTK_REAL *restrict METRIC_LAP_PSI4,
                                                           CCTK_REAL *restrict PRIMS,
+																													const CCTK_REAL shiftx,
+																													const CCTK_REAL shifty,
+																													const CCTK_REAL shiftz,
 																													const CCTK_REAL rho_b_atm,
 																													const CCTK_REAL T_atm) {
 
   DECLARE_CCTK_PARAMETERS;
+
+	// Alert if density is below floor
+	if (PRIMS[RHOB] <= rho_b_atm) {
+		// For now, set IGM velocity to zero
+		// PRIMS[VX] = 0;
+		// PRIMS[VY] = 0;
+		// PRIMS[VZ] = 0;
+
+		// Or, set HydroBase vels to zero
+		PRIMS[VX] = -shiftx;
+		PRIMS[VY] = -shifty;
+		PRIMS[VZ] = -shiftz;
+
+	}
 
   // The density floor and ceiling is always applied
   PRIMS[RHOB] = MIN(MAX(PRIMS[RHOB], rho_b_atm),eos.rho_max);
@@ -48,7 +65,7 @@ void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_paramete
 
   // Tabulated EOS specific floors and ceilings
   else if( eos.is_Tabulated ) {
-    // Apply floors and ceilings to Y_e and T; TODO: This will need to be changed for non-constant T, Y_e
+    // Apply floors and ceilings to Y_e and T
     const CCTK_REAL xye   = MIN(MAX(PRIMS[YEPRIM     ],eos.Ye_min),eos.Ye_atm);
     const CCTK_REAL xtemp = MIN(MAX(PRIMS[TEMPERATURE],T_atm ),eos.T_max );
 
