@@ -72,7 +72,7 @@ const int kronecker_delta[4][3] = { { 0,0,0 },
 
 /* PUBLIC FUNCTIONS, USED OUTSIDE IllinoisGRMHD AS WELL */
 void IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(const int already_computed_physical_metric_and_inverse,CCTK_REAL *U,struct output_stats &stats,igm_eos_parameters &eos,
-                                                                       CCTK_REAL *METRIC,CCTK_REAL g4dn[4][4],CCTK_REAL g4up[4][4], CCTK_REAL *TUPMUNU,CCTK_REAL *TDNMUNU,CCTK_REAL *CONSERVS, const CCTK_REAL rho_b_atm, const CCTK_REAL T_atm);
+                                                                       CCTK_REAL *METRIC,CCTK_REAL g4dn[4][4],CCTK_REAL g4up[4][4], CCTK_REAL *TUPMUNU,CCTK_REAL *TDNMUNU,CCTK_REAL *CONSERVS, const CCTK_REAL radius, const CCTK_REAL rho_b_atm, const CCTK_REAL T_atm);
 
 void IllinoisGRMHD_convert_ADM_to_BSSN__enforce_detgtij_eq_1__and_compute_gtupij(
     const cGH *restrict cctkGH,

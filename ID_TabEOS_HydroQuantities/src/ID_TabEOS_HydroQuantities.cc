@@ -64,7 +64,6 @@ extern "C" void ID_TabEOS_HydroQuantities__initial_temperature( const cGH *cctkG
   DECLARE_CCTK_PARAMETERS;
 
   // Loop over the grid, initializing the temperature
-#pragma omp parallel for
 	for(int k=0;k<kmax;k++)
 		for(int j=0;j<jmax;j++)
 			for(int i=0;i<imax;i++) {

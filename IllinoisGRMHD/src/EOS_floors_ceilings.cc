@@ -12,6 +12,7 @@
 void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_parameters eos,
                                                           const CCTK_REAL *restrict METRIC_LAP_PSI4,
                                                           CCTK_REAL *restrict PRIMS,
+																													const CCTK_REAL radius,
 																													const CCTK_REAL shiftx,
 																													const CCTK_REAL shifty,
 																													const CCTK_REAL shiftz,
@@ -20,7 +21,9 @@ void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_paramete
 
   DECLARE_CCTK_PARAMETERS;
 
-	// Alert if density is below floor
+	// Nuclear Option:
+	// if (radius >= r_atmo_min) {
+	//
 	if (PRIMS[RHOB] <= rho_b_atm) {
 		// For now, set IGM velocity to zero
 		// PRIMS[VX] = 0;
@@ -31,7 +34,6 @@ void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_paramete
 		PRIMS[VX] = -shiftx;
 		PRIMS[VY] = -shifty;
 		PRIMS[VZ] = -shiftz;
-
 	}
 
   // The density floor and ceiling is always applied

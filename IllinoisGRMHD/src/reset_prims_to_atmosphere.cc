@@ -8,6 +8,9 @@ void reset_prims_to_atmosphere( const igm_eos_parameters eos,
 																const CCTK_REAL P_atm,
 																const CCTK_REAL eps_atm,
 																const CCTK_REAL S_atm,
+																const CCTK_REAL shiftx,
+																const CCTK_REAL shifty,
+																const CCTK_REAL shiftz,
                                 CCTK_REAL *restrict PRIMS ) {
 
   // Just a simple reset to atmospheric values.
@@ -25,8 +28,9 @@ void reset_prims_to_atmosphere( const igm_eos_parameters eos,
     PRIMS[YEPRIM     ] = eos.Ye_atm;
     PRIMS[TEMPERATURE] = T_atm;
   }
-  PRIMS[VX           ] = 0;
-  PRIMS[VY           ] = 0;
-  PRIMS[VZ           ] = 0;  
-  
+
+	// Set Eulerian velocity to zero.
+  PRIMS[VX           ] = shiftx;
+  PRIMS[VY           ] = shifty;
+  PRIMS[VZ           ] = shiftz;  
 }

@@ -405,7 +405,7 @@ extern "C" void set_IllinoisGRMHD_metric_GRMHD_variables_based_on_HydroBase_and_
 
         struct output_stats stats; stats.failure_checker=0;
         IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(zero_int,PRIMS,stats,eos,
-                                                                          METRIC,g4dn,g4up,TUPMUNU,TDNMUNU,CONSERVS,rho_b_atm, T_atm);
+                                                                          METRIC,g4dn,g4up,TUPMUNU,TDNMUNU,CONSERVS,r[index],rho_b_atm, T_atm);
 
         rho_b      [index] = PRIMS[RHOB        ];
         P          [index] = PRIMS[PRESSURE    ];
