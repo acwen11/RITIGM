@@ -141,7 +141,7 @@ void initialize_Tabulated_EOS_parameters_from_input( const CCTK_REAL cctk_time,i
   // --------------------------------------
 
   // --------------- Floors ---------------
-  // Get the minimum pressure. Remember that the alltables
+  // Get the miniimum pressure. Remember that the alltables
   // array actually constains ln(press), so we must adjust
   // appropriately.
   const CCTK_REAL eos_prsmin = exp(get_EOS_table_min( table_key_pressure ));

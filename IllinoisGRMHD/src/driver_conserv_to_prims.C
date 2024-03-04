@@ -374,7 +374,19 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 						// Atmospheric tau
 						const CCTK_REAL tau_atm = rho_b_atm * eps_atm;
 
-						if(CONSERVS[RHOSTAR]>0.0) {
+						// Check if undensitized rhostar is in the atmosphere
+						const CCTK_REAL undens_rhostar = CONSERVS[RHOSTAR] / METRIC_LAP_PSI4[PSI6]; // det(gamma) = psi^6
+
+						if(CONSERVS[RHOSTAR] < 0.0) {
+							stats.failure_checker+=1;
+							reset_prims_to_atmosphere( eos, rho_b_atm, T_atm, P_atm, eps_atm, S_atm, METRIC[SHIFTX], METRIC[SHIFTY], METRIC[SHIFTZ], PRIMS );
+							rho_star_fix_applied++;
+						}
+						else if (undens_rhostar <= rho_b_atm * (1 + atmo_tol)) {
+							// Reset to atm mostly to force velocity to be zero, without recording it as a C2P fix.
+							reset_prims_to_atmosphere( eos, rho_b_atm, T_atm, P_atm, eps_atm, S_atm, METRIC[SHIFTX], METRIC[SHIFTY], METRIC[SHIFTZ], PRIMS );
+						}
+						else { //Actually perform the C2P
 							// Apply the tau floor (Does not consider tabulated EoS or atmosphere falloff)
 							if( eos.is_Hybrid ) {
 								apply_tau_floor(index,Psi6threshold,PRIMS,METRIC,METRIC_PHYS,METRIC_LAP_PSI4,stats,eos,  CONSERVS);
@@ -390,10 +402,6 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 								if(check==0) ii=4;
 								else stats.failure_checker+=100000;
 							}
-						} else {
-							stats.failure_checker+=1;
-							reset_prims_to_atmosphere( eos, rho_b_atm, T_atm, P_atm, eps_atm, S_atm, PRIMS );
-							rho_star_fix_applied++;
 						}
 
 						if( check != 0 ) {
@@ -404,7 +412,7 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 							con2prim_failed_flag[index] += 1;
 							if( con2prim_failed_flag[index] > 4 ) {
 								// Sigh, reset to atmosphere
-								reset_prims_to_atmosphere( eos, rho_b_atm, T_atm, P_atm, eps_atm, S_atm, PRIMS );
+								reset_prims_to_atmosphere( eos, rho_b_atm, T_atm, P_atm, eps_atm, S_atm, METRIC[SHIFTX], METRIC[SHIFTY], METRIC[SHIFTZ], PRIMS );
 								atm_resets++;
 								// Then flag this point as a "success"
 								check = 0;
@@ -431,7 +439,7 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 							// Enforce limits on primitive variables and recompute conservatives.
 							static const int already_computed_physical_metric_and_inverse=1;
 							CCTK_REAL TUPMUNU[10],TDNMUNU[10];
-							IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(already_computed_physical_metric_and_inverse,PRIMS,stats,eos,METRIC,g4dn,g4up,TUPMUNU,TDNMUNU,CONSERVS);
+							IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(already_computed_physical_metric_and_inverse,PRIMS,stats,eos,METRIC,g4dn,g4up,TUPMUNU,TDNMUNU,CONSERVS,r[index],rho_b_atm, T_atm);
 
 							rho_star   [index] = CONSERVS[RHOSTAR  ];
 							mhd_st_x   [index] = CONSERVS[STILDEX  ];

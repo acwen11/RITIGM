@@ -74,6 +74,10 @@ CCTK_REAL r_atmo_min "The falloff in the atmosphere is only applied outside a sp
   [0.:* :: "Any non-negative number"
 } 0.
 
+CCTK_REAL atmo_tol "Densities below rho_b_atm(r) * (1 + atmo_tol) will be reset to atmospheric values." STEERABLE=ALWAYS
+{
+  [0.:* :: "Any non-negative number"
+} 1e-3
 ############################
 # Limiters on tau and rho_b:
 REAL tau_atm_hybrid "TODO: FOR HYBRID EOS ONLY??? Floor value on the energy variable tau (cf. tau_stildefix_enable). Given the variety of systems this code may encounter, there *is no reasonable default*. Effectively the current (enormous) value should disable the tau_atm floor. Please set this in your initial data thorn, and reset at will during evolutions." STEERABLE=ALWAYS

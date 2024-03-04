@@ -109,8 +109,8 @@ static void add_fluxes_and_source_terms_to_hydro_rhss( const igm_eos_parameters 
 	const CCTK_REAL T_atm         = MAX(igm_T_atm*std::pow(r_atmo / r_atmo_min, r_pow_T), eos.T_min);
 
 	if( eos.evolve_entropy ) {
-		apply_floors_and_ceilings_to_prims__recompute_prims(eos,METRIC_LAP_PSI4,Ur);
-		apply_floors_and_ceilings_to_prims__recompute_prims(eos,METRIC_LAP_PSI4,Ul);
+		apply_floors_and_ceilings_to_prims__recompute_prims(eos,METRIC_LAP_PSI4,Ur,r[index],METRIC[SHIFTX],METRIC[SHIFTY],METRIC[SHIFTZ],rho_b_atm, T_atm);
+		apply_floors_and_ceilings_to_prims__recompute_prims(eos,METRIC_LAP_PSI4,Ul,r[index],METRIC[SHIFTX],METRIC[SHIFTY],METRIC[SHIFTZ],rho_b_atm, T_atm);
 	}
 
 	// Read the T^{\mu \nu} gridfunction from memory, since computing T^{\mu \nu} is expensive

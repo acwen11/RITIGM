@@ -87,7 +87,7 @@ typedef struct _igm_eos_parameters_ {
 //------------------------------------------------
 
 void initialize_igm_eos_parameters_from_input( const CCTK_INT* igm_eos_key, const CCTK_REAL cctk_time, igm_eos_parameters &eos );
-void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_parameters eos, const CCTK_REAL *restrict METRIC_LAP_PSI4, CCTK_REAL *restrict PRIMS);
+void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_parameters eos, const CCTK_REAL *restrict METRIC_LAP_PSI4, CCTK_REAL *restrict PRIMS, const CCTK_REAL radius, const CCTK_REAL shiftx,const CCTK_REAL shifty,const CCTK_REAL shiftz,const CCTK_REAL rho_b_atm, const CCTK_REAL T_atm );
 
 //----------- Hybrid Equation of State -----------
 void print_EOS_Hybrid( igm_eos_parameters eos );
@@ -110,6 +110,9 @@ void reset_prims_to_atmosphere( const igm_eos_parameters eos,
                                 const CCTK_REAL P_atm,
                                 const CCTK_REAL eps_atm,
                                 const CCTK_REAL S_atm,
+                                const CCTK_REAL shiftx,
+                                const CCTK_REAL shifty,
+                                const CCTK_REAL shiftz,
 																CCTK_REAL *restrict PRIMS );
 //------------------------------------------------
 
