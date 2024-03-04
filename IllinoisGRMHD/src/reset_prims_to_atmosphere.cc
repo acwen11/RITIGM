@@ -30,7 +30,12 @@ void reset_prims_to_atmosphere( const igm_eos_parameters eos,
   }
 
 	// Set Eulerian velocity to zero.
-  PRIMS[VX           ] = shiftx;
-  PRIMS[VY           ] = shifty;
-  PRIMS[VZ           ] = shiftz;  
+  PRIMS[VX           ] = -shiftx;
+  PRIMS[VY           ] = -shifty;
+  PRIMS[VZ           ] = -shiftz;  
+  
+  // Set IGM velocity to zero.
+  // PRIMS[VX           ] = 0.0;
+  // PRIMS[VY           ] = 0.0;
+  // PRIMS[VZ           ] = 0.0;
 }

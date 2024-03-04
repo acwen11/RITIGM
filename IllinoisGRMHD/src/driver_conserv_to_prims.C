@@ -382,7 +382,7 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 							reset_prims_to_atmosphere( eos, rho_b_atm, T_atm, P_atm, eps_atm, S_atm, METRIC[SHIFTX], METRIC[SHIFTY], METRIC[SHIFTZ], PRIMS );
 							rho_star_fix_applied++;
 						}
-						else if (undens_rhostar <= rho_b_atm) {
+						else if (undens_rhostar <= rho_b_atm * (1 + atmo_tol)) {
 							// Reset to atm mostly to force velocity to be zero, without recording it as a C2P fix.
 							reset_prims_to_atmosphere( eos, rho_b_atm, T_atm, P_atm, eps_atm, S_atm, METRIC[SHIFTX], METRIC[SHIFTY], METRIC[SHIFTZ], PRIMS );
 						}

@@ -24,17 +24,17 @@ void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_paramete
 	// Nuclear Option:
 	// if (radius >= r_atmo_min) {
 	//
-	if (PRIMS[RHOB] <= rho_b_atm) {
-		// For now, set IGM velocity to zero
-		// PRIMS[VX] = 0;
-		// PRIMS[VY] = 0;
-		// PRIMS[VZ] = 0;
+	// if (PRIMS[RHOB] <= rho_b_atm) {
+	// 	// For now, set IGM velocity to zero
+	// 	// PRIMS[VX] = 0;
+	// 	// PRIMS[VY] = 0;
+	// 	// PRIMS[VZ] = 0;
 
-		// Or, set HydroBase vels to zero
-		PRIMS[VX] = -shiftx;
-		PRIMS[VY] = -shifty;
-		PRIMS[VZ] = -shiftz;
-	}
+	// 	// Or, set HydroBase vels to zero
+	// 	PRIMS[VX] = -shiftx;
+	// 	PRIMS[VY] = -shifty;
+	// 	PRIMS[VZ] = -shiftz;
+	// }
 
   // The density floor and ceiling is always applied
   PRIMS[RHOB] = MIN(MAX(PRIMS[RHOB], rho_b_atm),eos.rho_max);
