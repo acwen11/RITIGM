@@ -131,7 +131,7 @@ void particle_tracerET_file_output_ascii(CCTK_ARGUMENTS) {
   OUTDIR_NAME(CCTK_PASS_CTOC,outdir,actual_dir);
 
 	int np_tot = 0;
-	for (int pf=0; pf<*particle_family+1; pf++) {
+	for (int pf=0; pf<*particle_family; pf++) {
 		const int np = num_particles[pf];
 
 		char *filename = (char *)malloc(strlen(actual_dir)+strlen("particles_batch10_u4D.asc")+10);
@@ -197,7 +197,7 @@ void particle_tracerET_file_output_binary(CCTK_ARGUMENTS) {
   OUTDIR_NAME(CCTK_PASS_CTOC, outdir, actual_dir);
 
 	int np_tot = 0;
-	for (int pf=0; pf<*particle_family+1; pf++) {
+	for (int pf=0; pf<*particle_family; pf++) {
 		const int np = num_particles[pf];
 
 		char *filename = (char *)malloc(strlen(actual_dir)+strlen("particles_batch10_u4D.bin")+10);

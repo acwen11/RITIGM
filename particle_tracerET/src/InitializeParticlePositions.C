@@ -85,7 +85,6 @@ void InitializeParticlePositions(CCTK_ARGUMENTS)
         particle_position_x[which_particle] = particle_x_temp[i];
         particle_position_y[which_particle] = particle_y_temp[i];
         particle_position_z[which_particle] = particle_z_temp[i];
-        CCTK_VINFO("Accepted particle %d coords (x, y, z) = %e %e %e", which_particle, particle_position_x[which_particle], particle_position_y[which_particle], particle_position_z[which_particle]);
         which_particle++;
       }
       total_trials++;
@@ -111,5 +110,4 @@ void InitializeParticlePositions(CCTK_ARGUMENTS)
 	// Update global counting vars.
 	*particle_family += 1;
 	*num_active += np;	
-	CCTK_VINFO("Updated global counting vars: particle_family = %d, num_active = %d", *particle_family, *num_active);
 }

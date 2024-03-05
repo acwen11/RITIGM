@@ -68,6 +68,15 @@ void InitializeAllParticleTracerETHelperVars(CCTK_ARGUMENTS)
   *initial_number_of_active_refinement_levels = arl;
 
   // Check if user input is sane
+  
+  for (int pf=1; pf<=10; pf++) {
+		if (num_particles[pf] != 0) {
+			if (start_tracing_particles_iteration[pf] - start_tracing_particles_iteration[0] % (2 * update_RK4_freq) != 0) {
+				CCTK_VERROR("Batch %d initialization does not line up with RK4 steps!");
+			}
+		}
+	}
+
   const int update_freq_min_granularity = 1<<(mrl-arl);
   const int output_freq_min_granularity = 2*update_freq_min_granularity;
   if( update_RK4_freq%update_freq_min_granularity != 0 )
