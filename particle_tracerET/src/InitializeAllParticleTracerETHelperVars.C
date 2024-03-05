@@ -58,9 +58,7 @@ void InitializeAllParticleTracerETHelperVars(CCTK_ARGUMENTS)
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
 
-	for(int fam=0; fam<10; fam++) {
-		RK4IterationCounter[fam] = 1;
-	}
+  *RK4IterationCounter = 1;
   *particle_family = 0;
   *num_active = 0;
 
@@ -117,7 +115,7 @@ void InitializeAllParticleTracerETHelperVars(CCTK_ARGUMENTS)
   const CCTK_REAL dtmin = cctk_delta_time/(1<<(mrl-1-duplicates));
   *RK4_delta_time = 2*update_RK4_freq*dtmin;
 
-  CCTK_VINFO("Initialized RK4IterationCounter[0] to %d",RK4IterationCounter[0]);
+  CCTK_VINFO("Initialized RK4IterationCounter to %d",*RK4IterationCounter);
   CCTK_VINFO("Number of requested refinement levels          : %d", mrl);
   CCTK_VINFO("Number of *active*  refinement levels          : %d", arl);
   CCTK_VINFO("Number of duplicates in time_refinement_factors: %d", duplicates);
