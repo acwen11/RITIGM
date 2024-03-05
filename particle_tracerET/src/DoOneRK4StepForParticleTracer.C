@@ -61,7 +61,7 @@ void DoOneRK4StepForParticleTracerET(CCTK_ARGUMENTS)
        y' = f(y_n,t_n)
     */
 
-		for (int pf=0; pf<*particle_family; pf++) {
+		for (int pf=0; pf<*particle_family+1; pf++) {
 			const int np = num_particles[pf];
 
 			if(RK4IterationCounter[pf]==1) {

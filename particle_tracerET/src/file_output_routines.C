@@ -127,62 +127,66 @@ void particle_tracerET_file_output_ascii(CCTK_ARGUMENTS) {
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
 
-	if(verbose >= 1)
-		CCTK_VINFO("In file output func.");
-
   char *actual_dir;
   OUTDIR_NAME(CCTK_PASS_CTOC,outdir,actual_dir);
 
-  char *filename = (char *)malloc(strlen(actual_dir)+strlen("particles_u4D.asc")+10);
-  sprintf (filename, "%sparticles.asc", actual_dir);
-  FILE *file = fopen(filename,"a+");
-  if(!file) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
-  add_header_if_file_is_empty(file, "# Col. 1: Time (cctk_time). Subsequent columns: x,y,z coordinate of particle i\n");
+	int np_tot = 0;
+	for (int pf=0; pf<*particle_family+1; pf++) {
+		const int np = num_particles[pf];
 
-  /* Next print one line of data, corresponding to a single point in time. */
-  char *buffer = (char *) malloc(sizeof(char)*5000000); // <- Allocate 5MB; sizeof(char) is 1.
-  sprintf(buffer,"%e",cctk_time);
-  for(int which_particle=0;which_particle<*num_active;which_particle++) {
-    sprintf(buffer, "%s %e %e %e", buffer, particle_position_x[which_particle], particle_position_y[which_particle], particle_position_z[which_particle]);
-  }
-  fprintf(file,"%s\n",buffer);
-  fclose(file);
+		char *filename = (char *)malloc(strlen(actual_dir)+strlen("particles_batch10_u4D.asc")+10);
+		sprintf (filename, "%sparticles_batch%d.asc", actual_dir,pf);
+		FILE *file = fopen(filename,"a+");
+		if(!file) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
+		add_header_if_file_is_empty(file, "# Col. 1: Time (cctk_time). Subsequent columns: x,y,z coordinate of particle i\n");
 
-  if( output_four_velocity_u4U ) {
-    sprintf(filename, "%sparticles_u4U.asc", actual_dir);
-    if(!(file = fopen(filename, "a+"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
-    add_header_if_file_is_empty(file, "# Col. 1: Time (cctk_time). Subsequent columns: u^{t},u^{x},u^{y},u^{z} of particle i\n");
-    sprintf(buffer,"%e",cctk_time);
-    for(int which_particle=0;which_particle<*num_active;which_particle++) {
-      sprintf(buffer, "%s %e %e %e %e", buffer, particle_u4U0[which_particle], particle_u4U1[which_particle], particle_u4U2[which_particle], particle_u4U3[which_particle]);
-    }
-    fprintf(file, "%s\n", buffer);
-    fclose(file);
-  }
-  if( output_four_velocity_u4D ) {
-    sprintf(filename, "%sparticles_u4D.asc", actual_dir);
-    if(!(file = fopen(filename, "a+"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
-    add_header_if_file_is_empty(file, "# Col. 1: Time (cctk_time). Subsequent columns: u_{t},u_{x},u_{y},u_{z} of particle i\n");
-    sprintf(buffer,"%e",cctk_time);
-    for(int which_particle=0;which_particle<*num_active;which_particle++) {
-      sprintf(buffer, "%s %e %e %e %e", buffer, particle_u4D0[which_particle], particle_u4D1[which_particle], particle_u4D2[which_particle], particle_u4D3[which_particle]);
-    }
-    fprintf(file, "%s\n", buffer);
-    fclose(file);
-  }
-  if( output_hydro ) {
-    sprintf(filename, "%sparticles_hydro.asc", actual_dir);
-    if(!(file = fopen(filename, "a+"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
-    add_header_if_file_is_empty(file, "# Col. 1: Time (cctk_time). Subsequent columns: rho, T, Ye, W of particle i\n");
-    sprintf(buffer,"%e",cctk_time);
-    for(int which_particle=0;which_particle<*num_active;which_particle++) {
-      sprintf(buffer, "%s %e %e %e %e", buffer, particle_rho[which_particle], particle_T[which_particle], particle_Ye[which_particle], particle_W[which_particle]);
-    }
-    fprintf(file, "%s\n", buffer);
-    fclose(file);
-  }
-  free(buffer);
-  free(filename);
+		/* Next print one line of data, corresponding to a single point in time. */
+		char *buffer = (char *) malloc(sizeof(char)*5000000); // <- Allocate 5MB; sizeof(char) is 1.
+		sprintf(buffer,"%e",cctk_time);
+		for(int which_particle=np_tot;which_particle<np_tot+np;which_particle++) {
+			sprintf(buffer, "%s %e %e %e", buffer, particle_position_x[which_particle], particle_position_y[which_particle], particle_position_z[which_particle]);
+		}
+		fprintf(file,"%s\n",buffer);
+		fclose(file);
+
+		if( output_four_velocity_u4U ) {
+			sprintf(filename, "%sparticles_batch%d_u4U.asc", actual_dir,pf);
+			if(!(file = fopen(filename, "a+"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
+			add_header_if_file_is_empty(file, "# Col. 1: Time (cctk_time). Subsequent columns: u^{t},u^{x},u^{y},u^{z} of particle i\n");
+			sprintf(buffer,"%e",cctk_time);
+			for(int which_particle=np_tot;which_particle<np_tot+np;which_particle++) {
+				sprintf(buffer, "%s %e %e %e %e", buffer, particle_u4U0[which_particle], particle_u4U1[which_particle], particle_u4U2[which_particle], particle_u4U3[which_particle]);
+			}
+			fprintf(file, "%s\n", buffer);
+			fclose(file);
+		}
+		if( output_four_velocity_u4D ) {
+			sprintf(filename, "%sparticles_batch%d_u4D.asc", actual_dir,pf);
+			if(!(file = fopen(filename, "a+"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
+			add_header_if_file_is_empty(file, "# Col. 1: Time (cctk_time). Subsequent columns: u_{t},u_{x},u_{y},u_{z} of particle i\n");
+			sprintf(buffer,"%e",cctk_time);
+			for(int which_particle=np_tot;which_particle<np_tot+np;which_particle++) {
+				sprintf(buffer, "%s %e %e %e %e", buffer, particle_u4D0[which_particle], particle_u4D1[which_particle], particle_u4D2[which_particle], particle_u4D3[which_particle]);
+			}
+			fprintf(file, "%s\n", buffer);
+			fclose(file);
+		}
+		if( output_hydro ) {
+			sprintf(filename, "%sparticles_batch%d_hydro.asc", actual_dir,pf);
+			if(!(file = fopen(filename, "a+"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
+			add_header_if_file_is_empty(file, "# Col. 1: Time (cctk_time). Subsequent columns: rho, T, Ye, W of particle i\n");
+			sprintf(buffer,"%e",cctk_time);
+			for(int which_particle=np_tot;which_particle<np_tot+np;which_particle++) {
+				sprintf(buffer, "%s %e %e %e %e", buffer, particle_rho[which_particle], particle_T[which_particle], particle_Ye[which_particle], particle_W[which_particle]);
+			}
+			fprintf(file, "%s\n", buffer);
+			fclose(file);
+		}
+
+		free(buffer);
+		free(filename);
+		np_tot += np;
+	}
 }
 
 void particle_tracerET_file_output_binary(CCTK_ARGUMENTS) {
@@ -192,53 +196,59 @@ void particle_tracerET_file_output_binary(CCTK_ARGUMENTS) {
   char *actual_dir;
   OUTDIR_NAME(CCTK_PASS_CTOC, outdir, actual_dir);
 
-  char *filename = (char *)malloc(strlen(actual_dir)+strlen("particles_u4D.bin")+10);
-  sprintf (filename, "%sparticles.bin", actual_dir);
-  FILE *file = fopen(filename,"a+b");
-  if(!file) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
-  int num_quantities = 3;
-  add_number_of_particles_and_quantities_if_file_is_empty(file, *num_active, num_quantities);
-  fwrite(&cctk_time         , sizeof(CCTK_REAL), 1            , file);
-  fwrite(particle_position_x, sizeof(CCTK_REAL), *num_active, file);
-  fwrite(particle_position_y, sizeof(CCTK_REAL), *num_active, file);
-  fwrite(particle_position_z, sizeof(CCTK_REAL), *num_active, file);
-  fclose(file);
+	int np_tot = 0;
+	for (int pf=0; pf<*particle_family+1; pf++) {
+		const int np = num_particles[pf];
 
-  if( output_four_velocity_u4U ) {
-    num_quantities = 4;
-    sprintf(filename, "%sparticles_u4U.bin", actual_dir);
-    if(!(file = fopen(filename, "a+b"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
-    add_number_of_particles_and_quantities_if_file_is_empty(file, *num_active, num_quantities);
-    fwrite(&cctk_time   , sizeof(CCTK_REAL), 1            , file);
-    fwrite(particle_u4U0, sizeof(CCTK_REAL), *num_active, file);
-    fwrite(particle_u4U1, sizeof(CCTK_REAL), *num_active, file);
-    fwrite(particle_u4U2, sizeof(CCTK_REAL), *num_active, file);
-    fwrite(particle_u4U3, sizeof(CCTK_REAL), *num_active, file);
-    fclose(file);
-  }
-  if( output_four_velocity_u4D ) {
-    sprintf(filename, "%sparticles_u4D.bin", actual_dir);
-    if(!(file = fopen(filename, "a+b"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
-    add_number_of_particles_and_quantities_if_file_is_empty(file, *num_active, num_quantities);
-    fwrite(&cctk_time   , sizeof(CCTK_REAL), 1            , file);
-    fwrite(particle_u4D0, sizeof(CCTK_REAL), *num_active, file);
-    fwrite(particle_u4D1, sizeof(CCTK_REAL), *num_active, file);
-    fwrite(particle_u4D2, sizeof(CCTK_REAL), *num_active, file);
-    fwrite(particle_u4D3, sizeof(CCTK_REAL), *num_active, file);
-    fclose(file);
-  }
-  if( output_hydro ) {
-    sprintf(filename, "%sparticles_hydro.bin", actual_dir);
-    if(!(file = fopen(filename, "a+b"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
-    add_number_of_particles_and_quantities_if_file_is_empty(file, *num_active, num_quantities);
-    fwrite(&cctk_time   , sizeof(CCTK_REAL), 1            , file);
-    fwrite(particle_rho,  sizeof(CCTK_REAL), *num_active, file);
-    fwrite(particle_T,    sizeof(CCTK_REAL), *num_active, file);
-    fwrite(particle_Ye,   sizeof(CCTK_REAL), *num_active, file);
-    fwrite(particle_W,    sizeof(CCTK_REAL), *num_active, file);
-    fclose(file);
-  }
-  free(filename);
+		char *filename = (char *)malloc(strlen(actual_dir)+strlen("particles_batch10_u4D.bin")+10);
+		sprintf (filename, "%sparticles_batch%d.bin", actual_dir,pf);
+		FILE *file = fopen(filename,"a+b");
+		if(!file) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
+		int num_quantities = 3;
+		add_number_of_particles_and_quantities_if_file_is_empty(file, np, num_quantities);
+		fwrite(&cctk_time         				 , sizeof(CCTK_REAL), 1            , file);
+		fwrite(particle_position_x + np_tot, sizeof(CCTK_REAL), np, file);
+		fwrite(particle_position_y + np_tot, sizeof(CCTK_REAL), np, file);
+		fwrite(particle_position_z + np_tot, sizeof(CCTK_REAL), np, file);
+		fclose(file);
+
+		if( output_four_velocity_u4U ) {
+			num_quantities = 4;
+			sprintf(filename, "%sparticles_batch%d_u4U.bin",actual_dir,pf);
+			if(!(file = fopen(filename, "a+b"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
+			add_number_of_particles_and_quantities_if_file_is_empty(file, np, num_quantities);
+			fwrite(&cctk_time   , sizeof(CCTK_REAL), 1 , file);
+			fwrite(particle_u4U0 + np_tot, sizeof(CCTK_REAL), np, file);
+			fwrite(particle_u4U1 + np_tot, sizeof(CCTK_REAL), np, file);
+			fwrite(particle_u4U2 + np_tot, sizeof(CCTK_REAL), np, file);
+			fwrite(particle_u4U3 + np_tot, sizeof(CCTK_REAL), np, file);
+			fclose(file);
+		}
+		if( output_four_velocity_u4D ) {
+			sprintf(filename, "%sparticles_batch%d_u4D.bin", actual_dir,pf);
+			if(!(file = fopen(filename, "a+b"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
+			add_number_of_particles_and_quantities_if_file_is_empty(file, np, num_quantities);
+			fwrite(&cctk_time   , sizeof(CCTK_REAL), 1 , file);
+			fwrite(particle_u4D0 + np_tot, sizeof(CCTK_REAL), np, file);
+			fwrite(particle_u4D1 + np_tot, sizeof(CCTK_REAL), np, file);
+			fwrite(particle_u4D2 + np_tot, sizeof(CCTK_REAL), np, file);
+			fwrite(particle_u4D3 + np_tot, sizeof(CCTK_REAL), np, file);
+			fclose(file);
+		}
+		if( output_hydro ) {
+			sprintf(filename, "%sparticles_batch%d_hydro.bin", actual_dir,pf);
+			if(!(file = fopen(filename, "a+b"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
+			add_number_of_particles_and_quantities_if_file_is_empty(file, np, num_quantities);
+			fwrite(&cctk_time   , sizeof(CCTK_REAL), 1 , file);
+			fwrite(particle_rho + np_tot, sizeof(CCTK_REAL), np, file);
+			fwrite(particle_T   + np_tot, sizeof(CCTK_REAL), np, file);
+			fwrite(particle_Ye  + np_tot, sizeof(CCTK_REAL), np, file);
+			fwrite(particle_W   + np_tot, sizeof(CCTK_REAL), np, file);
+			fclose(file);
+		}
+		free(filename);
+		np_tot += np;
+	}
 }
 
 void particle_tracerET_file_output(CCTK_ARGUMENTS) {
