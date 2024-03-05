@@ -72,7 +72,7 @@ void InitializeAllParticleTracerETHelperVars(CCTK_ARGUMENTS)
   for (int pf=1; pf<=10; pf++) {
 		if (num_particles[pf] != 0) {
 			if (start_tracing_particles_iteration[pf] - start_tracing_particles_iteration[0] % (2 * update_RK4_freq) != 0) {
-				CCTK_VERROR("Batch %d initialization does not line up with RK4 steps!");
+				CCTK_VERROR("Batch %d initialization does not line up with RK4 steps!", pf);
 			}
 		}
 	}
