@@ -8,10 +8,10 @@ CCTK_INT particle_family type=SCALAR DISTRIB=CONSTANT
 
 CCTK_INT num_active type=SCALAR DISTRIB=CONSTANT
 
-CCTK_INT RK4IterationCounterVar type=SCALAR DISTRIB=CONSTANT
+CCTK_INT RK4IterationCounterVar type=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=10
 {
   RK4IterationCounter
-} "Counter that keeps track of which RK4 iteration we are on."
+} "Counter that keeps track of which RK4 iteration we are on. There is one counter for every batch of tracers."
 
 CCTK_INT AuxIterationCounterVars type=SCALAR DISTRIB=CONSTANT
 {
