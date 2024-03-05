@@ -1,0 +1,5 @@
+TEST magnetized_explosionTOV
+{
+  RELTOL 5e-3
+  ABSTOL 5e-3
+}
