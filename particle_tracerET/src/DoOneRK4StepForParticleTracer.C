@@ -45,10 +45,6 @@ void DoOneRK4StepForParticleTracerET(CCTK_ARGUMENTS)
   }
 
 	CCTK_VINFO("Performing RK4 step %d at iter %d", *RK4IterationCounter, cctk_iteration);
-  //if(cctk_iteration==start_tracing_particles_iteration[*particle_family]) {
-	//	CCTK_VINFO("Performing RK4 step %d at iter %d", *RK4IterationCounter, cctk_iteration);
-	//	// assert((*RK4IterationCounter==4) && "Batch initialization does not line up with RK4 initialization!");
-	//}
 
   if(cctk_iteration%update_RK4_freq==0 && cctk_iteration>=start_tracing_particles_iteration[0]) {
 
