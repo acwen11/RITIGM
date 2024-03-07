@@ -33,7 +33,9 @@ void Interpolate_hydro_vars_at_particle_positions(
       double *particle_rho,
       double *particle_T,
       double *particle_Ye,
-      double *particle_W);
+      double *particle_W,
+      double *particle_eps,
+      double *particle_P);
 
 /********************************************************************
  ********************    Macro Definitions   ************************
@@ -174,10 +176,10 @@ void particle_tracerET_file_output_ascii(CCTK_ARGUMENTS) {
 		if( output_hydro ) {
 			sprintf(filename, "%sparticles_batch%d_hydro.asc", actual_dir,pf);
 			if(!(file = fopen(filename, "a+"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
-			add_header_if_file_is_empty(file, "# Col. 1: Time (cctk_time). Subsequent columns: rho, T, Ye, W of particle i\n");
+			add_header_if_file_is_empty(file, "# Col. 1: Time (cctk_time). Subsequent columns: rho, T, Ye, W, eps, P of particle i\n");
 			sprintf(buffer,"%e",cctk_time);
 			for(int which_particle=np_tot;which_particle<np_tot+np;which_particle++) {
-				sprintf(buffer, "%s %e %e %e %e", buffer, particle_rho[which_particle], particle_T[which_particle], particle_Ye[which_particle], particle_W[which_particle]);
+				sprintf(buffer, "%s %e %e %e %e %e %e", buffer, particle_rho[which_particle], particle_T[which_particle], particle_Ye[which_particle], particle_W[which_particle], particle_eps[which_particle], particle_P[which_particle]);
 			}
 			fprintf(file, "%s\n", buffer);
 			fclose(file);
@@ -244,6 +246,8 @@ void particle_tracerET_file_output_binary(CCTK_ARGUMENTS) {
 			fwrite(particle_T   + np_tot, sizeof(CCTK_REAL), np, file);
 			fwrite(particle_Ye  + np_tot, sizeof(CCTK_REAL), np, file);
 			fwrite(particle_W   + np_tot, sizeof(CCTK_REAL), np, file);
+			fwrite(particle_eps + np_tot, sizeof(CCTK_REAL), np, file);
+			fwrite(particle_P   + np_tot, sizeof(CCTK_REAL), np, file);
 			fclose(file);
 		}
 		free(filename);
@@ -286,7 +290,9 @@ void particle_tracerET_file_output(CCTK_ARGUMENTS) {
 						particle_rho,
 						particle_T,
 						particle_Ye,
-						particle_W);
+						particle_W,
+						particle_eps,
+						particle_P);
 		}
 
     if(verbose>0) CCTK_VINFO("**** It: %d - Outputting to file ****", cctk_iteration);
