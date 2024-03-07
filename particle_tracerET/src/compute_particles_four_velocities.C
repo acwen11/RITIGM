@@ -29,9 +29,6 @@ void compute_particles_four_velocities(CCTK_ARGUMENTS) {
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
 	
-	if(verbose >= 1)
-		CCTK_VINFO("In compute 4 vel func.");
-
   if(update_RK4_freq==0) return;
 
   if(cctk_iteration==start_tracing_particles_iteration[0] || cctk_iteration%(2*update_RK4_freq)==0) {

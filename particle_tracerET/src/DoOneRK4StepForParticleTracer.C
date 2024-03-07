@@ -44,8 +44,6 @@ void DoOneRK4StepForParticleTracerET(CCTK_ARGUMENTS)
                 *initial_number_of_active_refinement_levels);
   }
 
-	CCTK_VINFO("Performing RK4 step %d at iter %d", *RK4IterationCounter, cctk_iteration);
-
   if(cctk_iteration%update_RK4_freq==0 && cctk_iteration>=start_tracing_particles_iteration[0]) {
 
 
@@ -158,13 +156,11 @@ void DoOneRK4StepForParticleTracerET(CCTK_ARGUMENTS)
 
       CCTK_VINFO("**** It: %d, t: %e  - RK4 Substeps 4 & 1 (dt_RK4 = %e, dt_sim = %e) ****", cctk_iteration, cctk_time, dt, CCTK_DELTA_TIME);
 
-      CCTK_VINFO("np_step4 = %d", np_step4);
       /*
 	RK4 step 4:
 	k_4 = dt f(y_n + k_3,t_n + dt) = dt f(y_n + k_3) <- no explicit time dependence in f
       */
 
-      CCTK_VINFO("Interpolating velocities for step 4");
       for(int i=0;i<np_step4;i++) {
 	shifted_x_posn[i] = particle_position_x[i] + particle_position_x_k3[i];
 	shifted_y_posn[i] = particle_position_y[i] + particle_position_y_k3[i];
@@ -184,7 +180,6 @@ void DoOneRK4StepForParticleTracerET(CCTK_ARGUMENTS)
 	particle_position_z_k4[i] = dt*particle_velz[i];
       }
 
-      CCTK_VINFO("NaN check: pos_k4 = %e", particle_position_x_k4[22]*particle_position_y_k4[22]*particle_position_z_k4[22]);
       /******************************/
       /* DEBUG MODE: compute errors */
       if(debug) {
@@ -229,8 +224,6 @@ void DoOneRK4StepForParticleTracerET(CCTK_ARGUMENTS)
 	particle_position_z[i] += (1.0/6.0)*(particle_position_z_k1[i] + 2.0*particle_position_z_k2[i] + 2.0*particle_position_z_k3[i] + particle_position_z_k4[i]);
 
       }
-
-      CCTK_VINFO("NaN check: pos = %e", particle_position_x[22]*particle_position_y[22]*particle_position_z[22]);
 
       free(shifted_x_posn);
       free(shifted_y_posn);
