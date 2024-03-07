@@ -78,8 +78,8 @@ CCTK_REAL particle_four_velocity_u4D_gridfunctions TYPE=GF TAGS='InterpNumTimele
 # Four-velocity at particles' positions
 CCTK_REAL particle_hydro_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=max_num_particles
 {
-  particle_rho,particle_T,particle_Ye,particle_W
-} "Particle contravariant four-velocity arrays"
+  particle_rho,particle_T,particle_Ye,particle_W,particle_eps,particle_P
+} "Particle hydrodynamics quantities arrays"
 
 #########################################
 ###  Aliased functions from Carpet    ###
