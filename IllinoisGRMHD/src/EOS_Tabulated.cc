@@ -135,9 +135,11 @@ void initialize_Tabulated_EOS_parameters_from_input( const CCTK_REAL cctk_time,i
   eos.rho_max = MIN(rho_b_max,eos_rhomax  * igm_eos_table_ceiling_safety_factor);
   eos.Ye_max  = eos_yemax   * igm_eos_table_ceiling_safety_factor;
   eos.T_max   = MIN(igm_T_max,eos_tempmax * igm_eos_table_ceiling_safety_factor);
-  eos.P_max   = eos_prsmax  * igm_eos_table_ceiling_safety_factor;
-  eos.eps_max = eos_epsmax  * igm_eos_table_ceiling_safety_factor;
-  eos.S_max   = eos_entmax  * igm_eos_table_ceiling_safety_factor;
+
+	// Hard code limits to match extended table
+  eos.P_max   = -0.24370109365641213; // eos_prsmax  * igm_eos_table_ceiling_safety_factor;
+  eos.eps_max = 44.21765622206253; // eos_epsmax  * igm_eos_table_ceiling_safety_factor;
+  eos.S_max   = 6.44271211648396e+27; // eos_entmax  * igm_eos_table_ceiling_safety_factor;
   // --------------------------------------
 
   // --------------- Floors ---------------
@@ -155,9 +157,11 @@ void initialize_Tabulated_EOS_parameters_from_input( const CCTK_REAL cctk_time,i
   eos.rho_min = eos_rhomin  * igm_eos_table_floor_safety_factor;
   eos.Ye_min  = eos_yemin   * igm_eos_table_floor_safety_factor;
   eos.T_min   = eos_tempmin * igm_eos_table_floor_safety_factor;
-  eos.P_min   = eos_prsmin  * igm_eos_table_floor_safety_factor;
-  eos.eps_min = eos_epsmin  * igm_eos_table_floor_safety_factor;
-  eos.S_min   = eos_entmin  * igm_eos_table_floor_safety_factor;
+
+	// Hard code limits to match extended table
+  eos.P_min   = -57.35957192780013; // eos_prsmin  * igm_eos_table_floor_safety_factor;
+  eos.eps_min = -4.462083823106504; // eos_epsmin  * igm_eos_table_floor_safety_factor;
+  eos.S_min   = -596666071.9200315; // eos_entmin  * igm_eos_table_floor_safety_factor;
   // --------------------------------------
 
   // ----- con2prim threshold values ------

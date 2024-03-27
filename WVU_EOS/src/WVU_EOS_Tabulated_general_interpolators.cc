@@ -115,6 +115,7 @@ extern "C" void WVU_EOS_from_rho_Ye_aux_find_T_and_interpolate_n_quantities( con
     aux += nuc_eos::energy_shift;
     // At this point, aux *must* be positive. If not, error out.
     if( aux < 0.0 ) {
+			CCTK_VINFO("eps is negative! Energy shift = %e; Requested rho = %e; Ye = %e; eps = %e", nuc_eos::energy_shift, rho, Ye, aux); 
       CCTK_VError(__LINE__, __FILE__, CCTK_THORNSTRING,
                   "WVU_EOS::from_rho_Ye_aux_find_T_and_interpolate_n_quantities: found eps+energy_shift < 0.0 (%e). ABORTING.",
                   aux);

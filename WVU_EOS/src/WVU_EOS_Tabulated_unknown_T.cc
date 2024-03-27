@@ -74,6 +74,10 @@ extern "C" void WVU_EOS_P_S_and_T_from_rho_Ye_eps_impl( const CCTK_REAL rho,
   WVU_EOS_from_rho_Ye_aux_find_T_and_interpolate_n_quantities( n,root_finding_precision,
                                                                rho,Ye,aux,auxkey, keys,outvars,T, &report );
 
+	if( *T < 1e-2){
+		CCTK_VINFO("T from rho, Ye, eps below atm!!! rho = %e; Ye = %e; eps = %e", rho, Ye, eps);
+	}
+
   // Error handling
   if( report.error ) {
     CCTK_VInfo(CCTK_THORNSTRING,"Inside WVU_EOS_P_S_and_T_from_rho_Ye_eps. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
