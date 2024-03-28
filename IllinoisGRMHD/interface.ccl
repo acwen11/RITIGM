@@ -255,6 +255,7 @@ USES FUNCTION WVU_EOS_P_eps_dPdrho_dPdT_depsdrho_and_depsdT_from_rho_Ye_T
 void FUNCTION WVU_EOS_P_and_T_from_rho_Ye_eps( CCTK_REAL IN rho, \
                                                CCTK_REAL IN Ye,  \
                                                CCTK_REAL IN eps, \
+                                               CCTK_REAL IN T_atm, \
                                                CCTK_REAL OUT P,  \
                                                CCTK_REAL OUT T )
 
@@ -263,6 +264,7 @@ USES FUNCTION WVU_EOS_P_and_T_from_rho_Ye_eps
 void FUNCTION WVU_EOS_P_S_and_T_from_rho_Ye_eps( CCTK_REAL IN rho, \
                                                  CCTK_REAL IN Ye,  \
                                                  CCTK_REAL IN eps, \
+                                                 CCTK_REAL IN T_atm, \
                                                  CCTK_REAL OUT P,  \
                                                  CCTK_REAL OUT S,  \
                                                  CCTK_REAL OUT T )
@@ -272,6 +274,7 @@ USES FUNCTION WVU_EOS_P_S_and_T_from_rho_Ye_eps
 void FUNCTION WVU_EOS_P_S_T_and_depsdT_from_rho_Ye_eps( CCTK_REAL IN rho,     \
                                                         CCTK_REAL IN Ye,      \
                                                         CCTK_REAL IN eps,     \
+                                                        CCTK_REAL IN T_atm,     \
                                                         CCTK_REAL OUT P,      \
                                                         CCTK_REAL OUT S,      \
                                                         CCTK_REAL OUT depsdT, \
@@ -282,6 +285,7 @@ USES FUNCTION WVU_EOS_P_S_T_and_depsdT_from_rho_Ye_eps
 void FUNCTION WVU_EOS_eps_S_and_T_from_rho_Ye_P( CCTK_REAL IN rho,  \
                                                  CCTK_REAL IN Ye,   \
                                                  CCTK_REAL IN P,    \
+                                                 CCTK_REAL IN T_atm,    \
                                                  CCTK_REAL OUT eps, \
                                                  CCTK_REAL OUT S,   \
                                                  CCTK_REAL OUT T )
@@ -291,6 +295,7 @@ USES FUNCTION WVU_EOS_eps_S_and_T_from_rho_Ye_P
 void FUNCTION WVU_EOS_P_eps_and_T_from_rho_Ye_S( CCTK_REAL IN rho,  \
                                                  CCTK_REAL IN Ye,   \
                                                  CCTK_REAL IN S,    \
+                                                 CCTK_REAL IN T_atm,    \
                                                  CCTK_REAL OUT P,   \
                                                  CCTK_REAL OUT eps, \
                                                  CCTK_REAL OUT T )

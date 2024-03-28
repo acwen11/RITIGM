@@ -68,6 +68,7 @@ void WVU_EOS_from_rho_Ye_aux_find_T_and_interpolate_n_quantities( const CCTK_INT
                                                                   const CCTK_REAL& prec,
                                                                   const CCTK_REAL& rho,
                                                                   const CCTK_REAL& Ye,
+                                                                  const CCTK_REAL& T_atm,
                                                                   const CCTK_REAL& tablevar_in,
                                                                   const CCTK_INT& tablevar_in_key,
                                                                   const CCTK_INT *restrict tablevars_keys,
@@ -137,12 +138,14 @@ void WVU_EOS_mue_mup_mun_muhat_Xn_and_Xp_from_rho_Ye_T_impl( const CCTK_REAL rho
 void WVU_EOS_P_and_T_from_rho_Ye_eps_impl( const CCTK_REAL rho,
                                            const CCTK_REAL Ye,
                                            const CCTK_REAL eps,
+                                           const CCTK_REAL T_atm,
                                            CCTK_REAL *restrict P,
                                            CCTK_REAL *restrict T );
 
 void WVU_EOS_P_S_and_T_from_rho_Ye_eps_impl( const CCTK_REAL rho,
                                              const CCTK_REAL Ye,
                                              const CCTK_REAL eps,
+                                             const CCTK_REAL T_atm,
                                              CCTK_REAL *restrict P,
                                              CCTK_REAL *restrict S,
                                              CCTK_REAL *restrict T );
@@ -150,6 +153,7 @@ void WVU_EOS_P_S_and_T_from_rho_Ye_eps_impl( const CCTK_REAL rho,
 void WVU_EOS_eps_S_and_T_from_rho_Ye_P_impl( const CCTK_REAL rho,
                                              const CCTK_REAL Ye,
                                              const CCTK_REAL P,
+                                             const CCTK_REAL T_atm,
                                              CCTK_REAL *restrict eps,
                                              CCTK_REAL *restrict S,
                                              CCTK_REAL *restrict T );
@@ -157,6 +161,7 @@ void WVU_EOS_eps_S_and_T_from_rho_Ye_P_impl( const CCTK_REAL rho,
 void WVU_EOS_P_eps_and_T_from_rho_Ye_S_impl( const CCTK_REAL rho,
                                              const CCTK_REAL Ye,
                                              const CCTK_REAL S,
+                                             const CCTK_REAL T_atm,
                                              CCTK_REAL *restrict P,
                                              CCTK_REAL *restrict eps,
                                              CCTK_REAL *restrict T );

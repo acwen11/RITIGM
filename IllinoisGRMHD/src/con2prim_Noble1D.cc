@@ -355,13 +355,13 @@ int Utoprim_new_body_1d( const igm_eos_parameters eos,
     CCTK_REAL xuu   = 0.0;
     CCTK_REAL xeps  = 0.0;
     if( harm_aux.use_entropy ) {
-      WVU_EOS_P_eps_and_T_from_rho_Ye_S( xrho,xye,xent, &xprs,&xeps,&xtemp );
+      WVU_EOS_P_eps_and_T_from_rho_Ye_S( xrho,xye,xent,T_atm, &xprs,&xeps,&xtemp );
     }
     else {
       xprs  = -0.5*harm_aux.Bsq/(harm_aux.gamma*harm_aux.gamma)+harm_aux.Qdotn+W+harm_aux.Bsq-0.5*harm_aux.QdotBsq/(W*W);;
       xuu   = (W-harm_aux.D*harm_aux.gamma-xprs*harm_aux.gamma*harm_aux.gamma)/(harm_aux.D*harm_aux.gamma) * rho0;
       xeps  = xuu/xrho;
-      WVU_EOS_P_S_and_T_from_rho_Ye_eps( xrho,xye,xeps, &xprs,&xent,&xtemp );
+      WVU_EOS_P_S_and_T_from_rho_Ye_eps( xrho,xye,xeps,T_atm, &xprs,&xent,&xtemp );
     }
 
     // Update P and T in the prim array

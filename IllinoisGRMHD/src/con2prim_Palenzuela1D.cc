@@ -22,14 +22,16 @@ void palenzuela( const igm_eos_parameters eos,
                  const double S_squared,
                  const double BdotS,
                  const double B_squared,
+                 const double T_atm,
                  const double *restrict con,
                  double *restrict prim,
                  const double *restrict SU,
                  const double tol_x,
                  output_stats& stats );
 
-double zbrent( double (*func)(const igm_eos_parameters, double, double *restrict, double *restrict, output_stats&),
+double zbrent( double (*func)(const igm_eos_parameters, const double, double, double *restrict, double *restrict, output_stats&),
                const igm_eos_parameters eos,
+               const double T_atm,
                double *restrict param,
                double *restrict temp_guess,
                double x1,
@@ -46,10 +48,12 @@ void calc_prim( const igm_eos_parameters eos,
                 const double S_squared,
                 const double BdotS,
                 const double B_squared,
+                const double T_atm,
                 const double *restrict SU,
                 output_stats& stats );
 
 double func_root( const igm_eos_parameters eos,
+									const double T_atm,
                   double x,
                   double *restrict param,
                   double *restrict temp_guess,
@@ -58,6 +62,7 @@ double func_root( const igm_eos_parameters eos,
 inline int check_depsdT_condition( const igm_eos_parameters eos,
                                    const CCTK_REAL *restrict param,
                                    const CCTK_REAL T_guess,
+                                   const CCTK_REAL T_atm,
                                    const CCTK_REAL x ) {
   // Now check whether or not to use the entropy equation
   double q       = param[par_q];
@@ -81,7 +86,7 @@ inline int check_depsdT_condition( const igm_eos_parameters eos,
   // deps/dT, which should allow us to select the appropriate
   // variable that we will use to recover the temperature.
   enforce_table_bounds_rho_Ye_eps( eos,&rho,&ye,&eps );
-  WVU_EOS_P_S_T_and_depsdT_from_rho_Ye_eps( rho,ye,eps, &press,&ent,&temp,&depsdT );
+  WVU_EOS_P_S_T_and_depsdT_from_rho_Ye_eps( rho,ye,eps,T_atm, &press,&ent,&temp,&depsdT );
 
   // printf("depsdT = %e (%e)\n",depsdT,eos.depsdT_threshold);
 
@@ -114,6 +119,7 @@ int con2prim_Palenzuela1D( const igm_eos_parameters eos,
                            const CCTK_REAL *restrict adm_quantities,
                            const CCTK_REAL *restrict con,
                            CCTK_REAL *restrict prim,
+                           const CCTK_REAL T_atm,
                            output_stats& stats ) {
 
   // Set gamma_{ij} and gamma^{ij}
@@ -170,14 +176,14 @@ int con2prim_Palenzuela1D( const igm_eos_parameters eos,
   const CCTK_REAL tolerance = 1e-10;
   stats.which_routine       = None;
   stats.c2p_failed          = true;
-  palenzuela( eos, S_squared,BdotS,B_squared, con, prim, SU, tolerance, stats );
+  palenzuela( eos, S_squared,BdotS,B_squared, T_atm, con, prim, SU, tolerance, stats );
 
   if( (stats.c2p_failed == true) && (stats.which_routine == Palenzuela1D_entropy) ) {
     printf("Entropy routine failed\n");
     // If the entropy con2prim failed, then try again
     // using the standard Palenzuela1D con2prim
     stats.which_routine = Palenzuela1D;
-    palenzuela( eos, S_squared,BdotS,B_squared, con, prim, SU, tolerance, stats );
+    palenzuela( eos, S_squared,BdotS,B_squared, T_atm, con, prim, SU, tolerance, stats );
   }
 
   return stats.c2p_failed;
@@ -191,6 +197,7 @@ void palenzuela( const igm_eos_parameters eos,
                  const double S_squared,
                  const double BdotS,
                  const double B_squared,
+                 const double T_atm,
                  const double * con,
                  double *restrict prim,
                  const CCTK_REAL *restrict SU,
@@ -226,8 +233,8 @@ void palenzuela( const igm_eos_parameters eos,
 
   if( stats.which_routine == None ) {
     // Now check if we will need the entropy equation
-    const int xlow_entropy_key = check_depsdT_condition(eos,param,temp_guess,xlow);
-    const int xup_entropy_key  = check_depsdT_condition(eos,param,temp_guess,xup);
+    const int xlow_entropy_key = check_depsdT_condition(eos,param,temp_guess,T_atm,xlow);
+    const int xup_entropy_key  = check_depsdT_condition(eos,param,temp_guess,T_atm,xup);
 
     if( (xlow_entropy_key == Palenzuela1D_entropy) ||
         (xup_entropy_key  == Palenzuela1D_entropy) ) {
@@ -241,10 +248,10 @@ void palenzuela( const igm_eos_parameters eos,
   }
 
   // find x, this is the recovery process
-  double x = zbrent(*func_root, eos, param, &temp_guess, xlow, xup, tol_x, stats);
+  double x = zbrent(*func_root, eos, T_atm, param, &temp_guess, xlow, xup, tol_x, stats);
 
   // calculate final set of primitives
-  calc_prim(eos, x, con, param, temp_guess, prim, S_squared, BdotS, B_squared, SU, stats);
+  calc_prim(eos, x, con, param, temp_guess, prim, S_squared, BdotS, B_squared, T_atm, SU, stats);
 
 }
 
@@ -257,6 +264,7 @@ void calc_prim( const igm_eos_parameters eos,
                 const double S_squared,
                 const double BdotS,
                 const double B_squared,
+                const double T_atm,
                 const double *restrict SU,
                 output_stats& stats ) {
 
@@ -282,13 +290,13 @@ void calc_prim( const igm_eos_parameters eos,
       // Default Palenzuela con2prim: get Hydro quantities from (rho,Ye,eps)
       eps = W - 1.0 + (1.0-W*W)*x/W + W*(q - s + t*t/(2*x*x) + s/(2*W*W)  );
       enforce_table_bounds_rho_Ye_eps( eos,&rho,&ye,&eps );
-      WVU_EOS_P_S_and_T_from_rho_Ye_eps( rho,ye,eps, &press,&ent,&temp );
+      WVU_EOS_P_S_and_T_from_rho_Ye_eps( rho,ye,eps,T_atm, &press,&ent,&temp );
     }
     else {
       // Modified Palenzuela con2prim: get Hydro quantities from (rho,Ye,S)
       ent = con[WS]/W;
       enforce_table_bounds_rho_Ye_S( eos,&rho,&ye,&ent );
-      WVU_EOS_P_eps_and_T_from_rho_Ye_S( rho,ye,ent, &press,&eps,&temp );
+      WVU_EOS_P_eps_and_T_from_rho_Ye_S( rho,ye,ent,T_atm, &press,&eps,&temp );
     }
   }
   else {
@@ -318,6 +326,7 @@ void calc_prim( const igm_eos_parameters eos,
 }
 
 double func_root( const igm_eos_parameters eos,
+                  const double T_atm,
                   double x,
                   double *restrict param,
                   double *restrict temp_guess,
@@ -348,13 +357,13 @@ double func_root( const igm_eos_parameters eos,
       // Default Palenzuela con2prim: get Hydro quantities from (rho,Ye,eps)
       eps = W - 1.0 + (1.0-W*W)*x/W + W*(q - s + t*t/(2*x*x) + s/(2*W*W)  );
       enforce_table_bounds_rho_Ye_eps( eos,&rho,&ye,&eps );
-      WVU_EOS_P_S_and_T_from_rho_Ye_eps( rho,ye,eps, &P,&ent,&temp );
+      WVU_EOS_P_S_and_T_from_rho_Ye_eps( rho,ye,eps,T_atm, &P,&ent,&temp );
     }
     else {
       // Modified Palenzuela con2prim: get Hydro quantities from (rho,Ye,S)
       ent = param[conWS]/W;
       enforce_table_bounds_rho_Ye_S( eos,&rho,&ye,&ent );
-      WVU_EOS_P_eps_and_T_from_rho_Ye_S( rho,ye,ent, &P,&eps,&temp );
+      WVU_EOS_P_eps_and_T_from_rho_Ye_S( rho,ye,ent,T_atm, &P,&eps,&temp );
     }
   }
   else {
@@ -377,8 +386,9 @@ double func_root( const igm_eos_parameters eos,
 #define SIGN(a,b) ((b) >= 0.0 ? fabs(a) : -fabs(a))
 
 
-double zbrent( double (*func)(const igm_eos_parameters, double, double *, double *restrict, output_stats&),
+double zbrent( double (*func)(const igm_eos_parameters, const double, double, double *, double *restrict, output_stats&),
                const igm_eos_parameters eos,
+               const double T_atm,
                double *restrict param,
                double * temp_guess,
                double x1,
@@ -402,8 +412,8 @@ double zbrent( double (*func)(const igm_eos_parameters, double, double *, double
   double temp_guess_a = *temp_guess;
   double temp_guess_b = *temp_guess;
   double temp_guess_c = *temp_guess;
-  double fa=(*func)(eos, a, param, &temp_guess_a, stats);
-  double fb=(*func)(eos, b, param, &temp_guess_b, stats);
+  double fa=(*func)(eos, T_atm, a, param, &temp_guess_a, stats);
+  double fb=(*func)(eos, T_atm, b, param, &temp_guess_b, stats);
   double fc,p,q,r,s,tol1;
 
   // root must be bracketed
@@ -493,7 +503,7 @@ double zbrent( double (*func)(const igm_eos_parameters, double, double *, double
       // update trial root
       if (fabs(d) > tol1)  b += d;
       else                 b += SIGN(tol1,maxerror);
-      fb=(*func)(eos, b, param, &temp_guess_b, stats);
+      fb=(*func)(eos, T_atm, b, param, &temp_guess_b, stats);
 
 
     } else {
@@ -511,7 +521,7 @@ double zbrent( double (*func)(const igm_eos_parameters, double, double *, double
       // update trial root
       if (fabs(d) > tol1)  b += d;
       else                 b += SIGN(tol1, maxerror);
-      fb=(*func)(eos, b, param, &temp_guess_b, stats);
+      fb=(*func)(eos, T_atm, b, param, &temp_guess_b, stats);
     }
 
     ++iter;

@@ -221,7 +221,7 @@ void newman( const igm_eos_parameters eos,
       xent = con[WS]/W;
       // Then compute P, eps, and T using (rho,Ye,S)
       enforce_table_bounds_rho_Ye_S( eos,&xrho,&xye,&xent );
-      WVU_EOS_P_eps_and_T_from_rho_Ye_S( xrho,xye,xent, &xprs,&xeps,&xtemp );
+      WVU_EOS_P_eps_and_T_from_rho_Ye_S( xrho,xye,xent,T_atm, &xprs,&xeps,&xtemp );
     }
     else {
       // If using the specific internal energy, remember that
@@ -237,17 +237,21 @@ void newman( const igm_eos_parameters eos,
       //
       // eps = - 1.0 + x(1-W^{2})/W + W( 1 + q - s + 0.5*( s/W^{2} + t^{2}/x^{2} ) )
       xeps = - 1.0 + (1.0-W*W)*x/W + W*( 1.0 + q - s + 0.5*( s/(W*W) + (t*t)/(x*x) ) );
-			CCTK_VINFO("Check vals after Palenzuela calc: eps = %e; W = %e, q = %e; s = %e; t = %e; x = %e; S^2 = %e; P_old = %e", xeps, W, q, s, t, x, S_squared, P_old);
-			if (xeps < 0.0) {
-				CCTK_VINFO("Negative eps after Palenzuela calc! eps = %e; W = %e, q = %e; s = %e; t = %e; x = %e; S^2 = %e; P_old = %e", xeps, W, q, s, t, x, S_squared, P_old);
-			}
+
+			// CCTK_VINFO("Check vals after Palenzuela calc: eps = %e; W = %e, q = %e; s = %e; t = %e; x = %e; S^2 = %e; P_old = %e", xeps, W, q, s, t, x, S_squared, P_old);
+			// if (xeps < 0.0) {
+			// 	CCTK_VINFO("Negative eps after Palenzuela calc! eps = %e; W = %e, q = %e; s = %e; t = %e; x = %e; S^2 = %e; P_old = %e", xeps, W, q, s, t, x, S_squared, P_old);
+			// }
+
       // Then compute P, S, and T using (rho,Ye,eps)
       enforce_table_bounds_rho_Ye_eps( eos,&xrho,&xye,&xeps );
-			CCTK_VINFO("Check vals after enforcing table bds! eps = %e; W = %e, q = %e; s = %e; t = %e; x = %e; S^2 = %e;  P_old = %e", xeps, W, q, s, t, x, S_squared, P_old);
-			if (xeps < 0.0) {
-				CCTK_VINFO("Negative eps after enforcing table bds! eps = %e; W = %e, q = %e; s = %e; t = %e; x = %e; S^2 = %e;  P_old = %e", xeps, W, q, s, t, x, S_squared, P_old);
-			}
-      WVU_EOS_P_S_and_T_from_rho_Ye_eps( xrho,xye,xeps, &xprs,&xent,&xtemp );
+
+			// CCTK_VINFO("Check vals after enforcing table bds! eps = %e; W = %e, q = %e; s = %e; t = %e; x = %e; S^2 = %e;  P_old = %e", xeps, W, q, s, t, x, S_squared, P_old);
+			// if (xeps < 0.0) {
+			// 	CCTK_VINFO("Negative eps after enforcing table bds! eps = %e; W = %e, q = %e; s = %e; t = %e; x = %e; S^2 = %e;  P_old = %e", xeps, W, q, s, t, x, S_squared, P_old);
+			// }
+
+      WVU_EOS_P_S_and_T_from_rho_Ye_eps( xrho,xye,xeps,T_atm, &xprs,&xent,&xtemp );
     }
 
     prim[EPS] = xeps;
@@ -312,7 +316,7 @@ void newman( const igm_eos_parameters eos,
     prim[ENT] = con[WS]/W;
     // Then compute P, eps, and T using (rho,Ye,S)
     enforce_table_bounds_rho_Ye_S( eos,&prim[RHO],&prim[YE],&prim[ENT] );
-    WVU_EOS_P_eps_and_T_from_rho_Ye_S( prim[RHO],prim[YE],prim[ENT],
+    WVU_EOS_P_eps_and_T_from_rho_Ye_S( prim[RHO],prim[YE],prim[ENT],T_atm,
                                        &prim[PRESS],&prim[EPS],&prim[TEMP] );
   }
   else {
@@ -332,7 +336,7 @@ void newman( const igm_eos_parameters eos,
     // Then compute P, S, and T using (rho,Ye,eps)
     prim[TEMP] = T_atm;
     enforce_table_bounds_rho_Ye_eps( eos,&prim[RHO],&prim[YE],&prim[EPS] );
-    WVU_EOS_P_S_and_T_from_rho_Ye_eps( prim[RHO],prim[YE],prim[EPS],
+    WVU_EOS_P_S_and_T_from_rho_Ye_eps( prim[RHO],prim[YE],prim[EPS],T_atm,
                                        &prim[PRESS],&prim[ENT],&prim[TEMP] );
   }
 

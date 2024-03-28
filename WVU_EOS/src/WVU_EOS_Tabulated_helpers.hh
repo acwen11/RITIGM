@@ -362,6 +362,7 @@ namespace WVU_EOS {
                  const double prec,
                  double *restrict ltout,
                  const int iv,
+                 const double ltatm,
                  int *restrict keyerrt) {
     // iv is the index of the variable we do the bisection on
 
@@ -381,7 +382,7 @@ namespace WVU_EOS {
 
     // temporary local vars
     double lt, lt1, lt2;
-    double ltmin = logtemp[0];
+    double ltmin = ltatm; // AWMOD: Do not search below atmospheric temperature.
     double ltmax = logtemp[ntemp-1];
     double f1,f2,fmid,dlt,ltmid;
     double f1a = 0.0;
@@ -502,6 +503,7 @@ namespace WVU_EOS {
                           const double ye,
                           const double tablevar_in,
                           const double prec,
+                          const double ltatm,
                           double *restrict ltout,
                           int *keyerrt ) {
 
@@ -515,7 +517,7 @@ namespace WVU_EOS {
     double tablevar; // temp vars for eps
     double ltn; // temp vars for temperature
     const double ltmax = logtemp[ntemp-1]; // max temp
-    const double ltmin = logtemp[0]; // min temp
+    const double ltmin = ltatm; // AWMOD: radially dependent atm temp
     int it = 0;
 
     // setting up some vars
@@ -543,7 +545,11 @@ namespace WVU_EOS {
        Verifying Newton-Raphson result evaluating the derivative. 
        The variable shouldgotobisection will be modified accordingly
        to the value of derivative of eps wrt temp ******* */
-    bool shouldgotobisection = false; // LSMOD
+    // bool shouldgotobisection = false; // LSMOD
+    
+    // FOR TESTING
+		bool shouldgotobisection = true;
+
     while(it < itmax && shouldgotobisection == false) {
       it++;
 
@@ -632,7 +638,7 @@ namespace WVU_EOS {
     } // while(it < itmax)
 
     // try bisection
-    WVU_EOS::bisection(lr,lt0,ye,tablevar_in,prec,ltout,tablevar_key,keyerrt);
+    WVU_EOS::bisection(lr,lt0,ye,tablevar_in,prec,ltout,tablevar_key,ltatm,keyerrt);
 
     return;
   }

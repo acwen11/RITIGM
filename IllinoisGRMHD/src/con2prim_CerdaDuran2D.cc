@@ -23,6 +23,7 @@ void NR_2D_WT( const igm_eos_parameters eos,
                const double S_squared,
                const double BdotS,
                const double B_squared,
+               const double T_atm,
                const double *restrict S_con,
                const double *restrict con,
                double *restrict prim,
@@ -44,6 +45,7 @@ int con2prim_CerdaDuran2D( const igm_eos_parameters eos,
                            const CCTK_REAL *restrict adm_quantities,
                            const CCTK_REAL *restrict con,
                            CCTK_REAL *restrict prim,
+                           const CCTK_REAL T_atm,
                            output_stats& stats ) {
 
   // Set gamma_{ij}
@@ -106,12 +108,12 @@ int con2prim_CerdaDuran2D( const igm_eos_parameters eos,
   bool c2p_failed = false;
   int safe_guess  = 0;
   double tol_x    = 5e-9;
-  NR_2D_WT( eos, safe_guess,tol_x, S_squared,BdotS,B_squared, SU,con,prim, &c2p_failed );
+  NR_2D_WT( eos, safe_guess,tol_x, S_squared,BdotS,B_squared,T_atm, SU,con,prim, &c2p_failed );
 
   if( c2p_failed ) {
     // If failed to recover the prims, try again with safe guesses
     int safe_guess=1;
-    NR_2D_WT( eos, safe_guess,tol_x, S_squared,BdotS,B_squared, SU,con,prim, &c2p_failed );
+    NR_2D_WT( eos, safe_guess,tol_x, S_squared,BdotS,B_squared,T_atm, SU,con,prim, &c2p_failed );
   }
 
   return c2p_failed;
@@ -123,6 +125,7 @@ int con2prim_CerdaDuran2D( const igm_eos_parameters eos,
 /*****************************************************************************/
 void calc_WT_max( const igm_eos_parameters eos,
                   const double B_squared,
+                  const double T_atm,
                   const double *restrict con,
                   double *restrict xmax ) {
 
@@ -143,7 +146,7 @@ void calc_WT_max( const igm_eos_parameters eos,
   double xye   = con[YE]/con[DD];
   double xtemp = eos.T_max; // initial guess, choose large enough
   double xprs  = 0.0;
-  WVU_EOS_P_and_T_from_rho_Ye_eps( rhomax,xye,epsmax, &xprs,&xtemp );
+  WVU_EOS_P_and_T_from_rho_Ye_eps( rhomax,xye,epsmax,T_atm, &xprs,&xtemp );
 
   // Now set W_max and T_max
   xmax[0] = 1.0e4;
@@ -304,6 +307,7 @@ void NR_2D_WT( const igm_eos_parameters eos,
                const double S_squared,
                const double BdotS,
                const double B_squared,
+               const double T_atm,
                const double *restrict S_con,
                const double *restrict con,
                double *restrict prim,
@@ -334,7 +338,7 @@ void NR_2D_WT( const igm_eos_parameters eos,
     x[1] = prim[TEMP    ];
   }
   else if( safe_guess==1 ) {
-    calc_WT_max(eos,B_squared,con,x);
+    calc_WT_max(eos,B_squared,T_atm,con,x);
   }
 
   // initialize variables
