@@ -4,8 +4,26 @@ import bisect
 import h5py as h5
 import numpy as np
 
+# UNIT CONVERSIONS
+## APR stores entropy in units of k_B / baryon, while helmholtz uses erg / K / g. Convert between the two using m_n / k_B.
+ENTFAC = 1.2131450484808232e-08
+K_TO_MEV = 8.61733326214518e-11 
+
 def stitch(chi, tab, helm):
     return chi * tab + (1 - chi) * helm
+
+def extend_composition(new_shape, num_new_pts_T, num_new_pts_rho, orig_tab):
+    # Assume composition does not change in low density, temperature region (see Hayashi et al 2023)
+    new_tab = np.full(new_shape, np.nan)
+    new_tab[:, num_new_pts_T:, num_new_pts_rho:] = orig_tab
+    for iYe in range(new_shape[0]):
+        for iT in range(new_shape[1]):
+            for irho in range(new_shape[2]):
+                if np.isnan(new_tab[iYe, iT, irho]):
+                    irho_star = max(0, irho - num_new_pts_rho)
+                    iT_star = max(0, iT - num_new_pts_T)
+                    new_tab[iYe, iT, irho] = orig_tab[iYe, iT_star, irho_star]
+    return new_tab
 
 def main(original_tablepath):
     try:
@@ -80,9 +98,7 @@ def main(original_tablepath):
     rho_space_final = np.linspace(rho_min_adj, tab_logrho[-1], total_pts_rho)
     T_space_final = np.linspace(T_min_adj, tab_logtemp[-1], total_pts_T)
 
-    # Helmholtz EOS has maximum rho * Y_e = 1e15. Find index where this occurs.
-    helm_rho_max = 1e15 / tab_Ye[-1]
-    helm_irho_max = bisect.bisect_left(10**rho_space_final, helm_rho_max)
+    new_shape = (len(tab_Ye), len(T_space_final), len(rho_space_final))
 
     # STITCHING PARAMETERS
     rho_stitch = 2.5 # log10(rho in g cm^-3)
@@ -119,28 +135,51 @@ def main(original_tablepath):
     if (iT_minus < num_new_pts_T) or (irho_minus < num_new_pts_rho) or (iT_plus > len(T_space_final)) or (irho_plus > len(rho_space_final)):
         print("Error: transition region out of bounds.")
         return 
+    
+
+    # CREATE NEW COMPOSITION TABLES
+    muhat = extend_composition(new_shape, num_new_pts_T, num_new_pts_rho, tab_muhat)
+    mu_n = extend_composition(new_shape, num_new_pts_T, num_new_pts_rho, tab_mu_n)
+    mu_p = extend_composition(new_shape, num_new_pts_T, num_new_pts_rho, tab_mu_p)
+    mu_e = extend_composition(new_shape, num_new_pts_T, num_new_pts_rho, tab_mu_e)
+    munu = extend_composition(new_shape, num_new_pts_T, num_new_pts_rho, tab_munu)
+    Xp = extend_composition(new_shape, num_new_pts_T, num_new_pts_rho, tab_Xp)
+    Xn = extend_composition(new_shape, num_new_pts_T, num_new_pts_rho, tab_Xn)
+    Xa = extend_composition(new_shape, num_new_pts_T, num_new_pts_rho, tab_Xa)
+    Xh = extend_composition(new_shape, num_new_pts_T, num_new_pts_rho, tab_Xh)
+    Abar = extend_composition(new_shape, num_new_pts_T, num_new_pts_rho, tab_Abar)
+    Zbar = extend_composition(new_shape, num_new_pts_T, num_new_pts_rho, tab_Zbar)
+
+    # CREATE HELMHOLTZ TABLE
+    ## Prepare input arrays for Helmholtz EOS
+    helm_rhospace = np.tile(10**rho_space_final, (new_shape[1], 1))
+    helm_rhospace = np.tile(helm_rhospace, (new_shape[0], 1, 1))
+
+    helm_Tspace = np.tile(10**T_space_final / K_TO_MEV, (new_shape[2], 1)).T
+    helm_Tspace = np.tile(helm_Tspace, (new_shape[0], 1, 1))
+
+    helm_yespace = np.tile(tab_Ye, (new_shape[2], 1)).T
+    helm_yespace = np.tile(helm_yespace, (new_shape[1], 1, 1))
+    helm_yespace = np.swapaxes(helm_yespace, 1, 0)
+
+    ## Helmholtz EOS has maximum rho * Y_e = 1e15. This will only be violated in the APREOS region or the forbidden high density, low temp region
+    for iYe in range(new_shape[0]):
+        for iT in range(new_shape[1]):
+            for irho in range(new_shape[2]):
+                if helm_rhospace[iYe, iT, irho] * helm_yespace[iYe, iT, irho] > 1e15:
+                    helm_rhospace[iYe, iT, irho] = (1 - 1e-3) * 1e15 / helm_yespace[iYe, iT, irho]
+
+    h = helmholtz.helmeos(dens=helm_rhospace, temp=helm_Tspace, abar=Abar, zbar=Abar*helm_yespace) # Y_e = zbar / abar 
 
     # Initialize temporary tables
-    new_shape = (len(tab_Ye), len(T_space_final), len(rho_space_final))
     P = np.empty(new_shape)
     eps = np.empty(new_shape)
     S = np.empty(new_shape)
     cs2 = np.empty(new_shape)
-    muhat = np.empty(new_shape)
-    mu_n = np.empty(new_shape)
-    mu_p = np.empty(new_shape)
-    mu_e = np.empty(new_shape)
-    munu = np.empty(new_shape)
-    Xp = np.empty(new_shape)
-    Xn = np.empty(new_shape)
-    Xa = np.empty(new_shape)
-    Xh = np.empty(new_shape)
-    Abar = np.empty(new_shape)
-    Zbar = np.empty(new_shape)
     gamma = np.empty(new_shape)
 
-    # APR stores entropy in units of k_B / baryon, while helmholtz uses erg / K / g. Convert between the two using m_n / k_B.
-    ENTFAC = 1.2131450484808232e-08
+
+
 
     for iYe, valYe in enumerate(tab_Ye):
         print("Calculating Ye = {:.4f}".format(valYe))
