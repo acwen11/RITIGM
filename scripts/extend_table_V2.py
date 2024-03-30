@@ -25,6 +25,21 @@ def extend_composition(new_shape, num_new_pts_T, num_new_pts_rho, orig_tab):
                     new_tab[iYe, iT, irho] = orig_tab[iYe, iT_star, irho_star]
     return new_tab
 
+def extend_std_table_at_Ye(iYe, nT_new, nrho_new, irp, irm, iTp, iTm, chi_rho, chi_temp, extend_tab, orig_tab, h_tab):
+    # In dens merge region
+    extend_tab[iYe, nT_new:, irm:irp+1] = chi_rho * orig_tab[iYe, :, irm-nrho_new:irp-nrho_new+1] + (1 - chi_rho) * h_tab[nT_new:, irm:irp+1]
+
+    # In low dens region
+    extend_tab[iYe,nT_new:, :irm+1] = h_tab[nT_new:, :irm+1]
+
+    # In temp merge region
+    extend_tab[iYe, iTm:iTp+1, :] = chi_temp * extend_tab[iYe, iTm:iTp+1, :] + (1 - chi_temp) * h_tab[iTm:iTp+1, :]
+
+    # low temp region
+    extend_tab[iYe,:iTm+1,:] = h_tab[:iTm+1, :]
+
+    return extend_tab
+
 def main(original_tablepath):
     try:
         import helmholtz
@@ -150,205 +165,86 @@ def main(original_tablepath):
     Abar = extend_composition(new_shape, num_new_pts_T, num_new_pts_rho, tab_Abar)
     Zbar = extend_composition(new_shape, num_new_pts_T, num_new_pts_rho, tab_Zbar)
 
-    # CREATE HELMHOLTZ TABLE
-    ## Prepare input arrays for Helmholtz EOS
-    helm_rhospace = np.tile(10**rho_space_final, (new_shape[1], 1))
-    helm_rhospace = np.tile(helm_rhospace, (new_shape[0], 1, 1))
-
-    helm_Tspace = np.tile(10**T_space_final / K_TO_MEV, (new_shape[2], 1)).T
-    helm_Tspace = np.tile(helm_Tspace, (new_shape[0], 1, 1))
-
-    helm_yespace = np.tile(tab_Ye, (new_shape[2], 1)).T
-    helm_yespace = np.tile(helm_yespace, (new_shape[1], 1, 1))
-    helm_yespace = np.swapaxes(helm_yespace, 1, 0)
-
-    ## Helmholtz EOS has maximum rho * Y_e = 1e15. This will only be violated in the APREOS region or the forbidden high density, low temp region
-    for iYe in range(new_shape[0]):
-        for iT in range(new_shape[1]):
-            for irho in range(new_shape[2]):
-                if helm_rhospace[iYe, iT, irho] * helm_yespace[iYe, iT, irho] > 1e15:
-                    helm_rhospace[iYe, iT, irho] = (1 - 1e-3) * 1e15 / helm_yespace[iYe, iT, irho]
-
-    h = helmholtz.helmeos(dens=helm_rhospace, temp=helm_Tspace, abar=Abar, zbar=Abar*helm_yespace) # Y_e = zbar / abar 
-
-    # Initialize temporary tables
+    # INITIALIZE EXTENDED TABLES
     P = np.empty(new_shape)
-    eps = np.empty(new_shape)
     S = np.empty(new_shape)
     cs2 = np.empty(new_shape)
     gamma = np.empty(new_shape)
+    # eps needs special treatment due to eps_nuc (see Hayashi et al 2023)
+    eps = np.full(new_shape, np.nan)
 
+    # FILL ORIGINAL REGION
+    P[:, num_new_pts_T:, num_new_pts_rho:] = tab_P
+    eps[:, num_new_pts_T:, num_new_pts_rho:] = tab_eps
+    S[:, num_new_pts_T:, num_new_pts_rho:] = tab_S
+    cs2[:, num_new_pts_T:, num_new_pts_rho:] = tab_cs2
+    gamma[:, num_new_pts_T:, num_new_pts_rho:] = tab_gamma
 
+    # EXTEND REMAINING TABLES
 
+    ## Set stitching functions
+    chi_rho = 0.5 * (1 + np.tanh((rho_space_final[irho_minus:irho_plus+1] - rho_stitch) / width))
+    chi_rho = np.tile(chi_rho, (new_shape[1] - num_new_pts_T, 1))
 
+    chi_temp = 0.5 * (1 + np.tanh((T_space_final[iT_minus:iT_plus+1] - T_stitch) / width))
+    chi_temp = np.tile(chi_temp, (new_shape[2], 1)).T
+
+    ## Loop over Y_e
     for iYe, valYe in enumerate(tab_Ye):
         print("Calculating Ye = {:.4f}".format(valYe))
 
-        # Loop over temperature range covered by original table
-        print("\tOriginal temp range loop.")
-        for iT in range(len(T_space_final) - 1, num_new_pts_T - 1, -1):
-            tab_iT = iT - num_new_pts_T
-            tempK = 10**T_space_final[iT] / 8.61733326214518e-11 # convert logT to K
-            #print("\tDebug: calc temp {:.4f} K".format(tempK))
+        ## Prepare input arrays for Helmholtz EOS
+        helm_rhospace = 10**rho_space_final
+        ## Helmholtz EOS has maximum rho * Y_e = 1e15. This will only be violated in the APREOS region or the forbidden high density, low temp region
+        for irho in range(new_shape[2]):
+            if helm_rhospace[irho] * valYe > 1e15:
+                helm_rhospace[irho] = (1 - 1e-3) * 1e15 / valYe
+        helm_rhospace = np.tile(helm_rhospace, (new_shape[1], 1))
 
-            # Get Abar from APR table, assume mean mass number does not change in low density region (see Hayashi et al 2023)
-            abar_approx = tab_Abar[iYe, tab_iT, 0]
+        helm_Tspace = np.tile(10**T_space_final / K_TO_MEV, (new_shape[2], 1)).T
 
-            # Set Helmholtz slice where needed.
-            h = helmholtz.helmeos(dens=10**rho_space_final[:irho_plus+1], temp=tempK, abar=abar_approx, zbar=abar_approx*valYe) # Y_e = zbar / abar 
+        # Create Helmholtz 2D table
+        h = helmholtz.helmeos(dens=helm_rhospace, temp=helm_Tspace, abar=Abar[iYe,:,:], zbar=Abar[iYe,:,:]*valYe) # Y_e = zbar / abar 
 
-            # In low density region, fill temp tables with Helmholtz values 
-            for irho in range(0, irho_minus):
-                irho_star = max(0, irho - num_new_pts_rho)
+        # Extend tables
+        P = extend_std_table_at_Ye(iYe, num_new_pts_T, num_new_pts_rho, irho_plus, irho_minus, iT_plus, iT_minus, chi_rho, chi_temp, P, tab_P, h.ptot)
+        S = extend_std_table_at_Ye(iYe, num_new_pts_T, num_new_pts_rho, irho_plus, irho_minus, iT_plus, iT_minus, chi_rho, chi_temp, S, tab_S, ENTFAC * h.stot)
+        cs2 = extend_std_table_at_Ye(iYe, num_new_pts_T, num_new_pts_rho, irho_plus, irho_minus, iT_plus, iT_minus, chi_rho, chi_temp, cs2, tab_cs2, h.cs**2)
+        gamma = extend_std_table_at_Ye(iYe, num_new_pts_T, num_new_pts_rho, irho_plus, irho_minus, iT_plus, iT_minus, chi_rho, chi_temp, gamma, tab_gamma, h.gam1)
 
-                P[iYe, iT, irho] = h.ptot[irho]
-                ## Set eps offset due to nuclear binding energy in extended table region (see Hayashi et al 2023)
-                eps_nuc = tab_eps[iYe, tab_iT, irho_star] - h.etot[max(irho, num_new_pts_rho)]
-                eps[iYe, iT, irho] = h.etot[irho] + eps_nuc
-                #print("\t\teps calc: eps extended = {:.4e}; eps Helm = {:.4e}; eps APR = {:.4e}; eps_nuc = {:.4e}".format(eps[iYe,iT,irho], h.etot[max(irho, num_new_pts_rho)], tab_eps[iYe, tab_iT, irho_star], eps_nuc))
-                S[iYe, iT, irho] = ENTFAC * h.stot[irho]
-                cs2[iYe, iT, irho] = h.cs[irho]**2
-                gamma[iYe, iT, irho] = h.gam1[irho]
-
-                # Assume composition is frozen in at low density
-                muhat[iYe, iT, irho] = tab_muhat[iYe, tab_iT, irho_star]
-                mu_n[iYe, iT, irho] = tab_mu_n[iYe, tab_iT, irho_star]
-                mu_p[iYe, iT, irho] = tab_mu_p[iYe, tab_iT, irho_star]
-                mu_e[iYe, iT, irho] = tab_mu_e[iYe, tab_iT, irho_star]
-                munu[iYe, iT, irho] = tab_munu[iYe, tab_iT, irho_star]
-                Xp[iYe, iT, irho] = tab_Xp[iYe, tab_iT, irho_star]
-                Xn[iYe, iT, irho] = tab_Xn[iYe, tab_iT, irho_star]
-                Xa[iYe, iT, irho] = tab_Xa[iYe, tab_iT, irho_star]
-                Xh[iYe, iT, irho] = tab_Xh[iYe, tab_iT, irho_star]
-                Abar[iYe, iT, irho] = tab_Abar[iYe, tab_iT, irho_star]
-                Zbar[iYe, iT, irho] = tab_Zbar[iYe, tab_iT, irho_star]
-
-            # In transition region, apply interpolation
-            for irho in range(irho_minus, irho_plus):
-                chi = 0.5 * (1 + np.tanh((rho_space_final[irho] - rho_stitch) / width))
-                tab_irho = irho - num_new_pts_rho
-
-                P[iYe, iT, irho] = stitch(chi, tab_P[iYe, tab_iT, tab_irho], h.ptot[irho])
-                # Copy eps from table. eps_nuc treatment from above at least guarantees continuity
-                eps[iYe, iT, irho] = tab_eps[iYe, tab_iT, tab_irho]
-                S[iYe, iT, irho] = stitch(chi, tab_S[iYe, tab_iT, tab_irho], ENTFAC * h.stot[irho])
-                cs2[iYe, iT, irho] = stitch(chi, tab_cs2[iYe, tab_iT, tab_irho], h.cs[irho]**2)
-                gamma[iYe, iT, irho] = stitch(chi, tab_gamma[iYe, tab_iT, tab_irho], h.gam1[irho])
-
-                # Assume composition is frozen in at low density
-                muhat[iYe, iT, irho] = tab_muhat[iYe, tab_iT, tab_irho]
-                mu_n[iYe, iT, irho] = tab_mu_n[iYe, tab_iT, tab_irho]
-                mu_p[iYe, iT, irho] = tab_mu_p[iYe, tab_iT, tab_irho]
-                mu_e[iYe, iT, irho] = tab_mu_e[iYe, tab_iT, tab_irho]
-                munu[iYe, iT, irho] = tab_munu[iYe, tab_iT, tab_irho]
-                Xp[iYe, iT, irho] = tab_Xp[iYe, tab_iT, tab_irho]
-                Xn[iYe, iT, irho] = tab_Xn[iYe, tab_iT, tab_irho]
-                Xa[iYe, iT, irho] = tab_Xa[iYe, tab_iT, tab_irho]
-                Xh[iYe, iT, irho] = tab_Xh[iYe, tab_iT, tab_irho]
-                Abar[iYe, iT, irho] = tab_Abar[iYe, tab_iT, tab_irho]
-                Zbar[iYe, iT, irho] = tab_Zbar[iYe, tab_iT, tab_irho]
-
-            # In high density region, copy from original table
-            for irho in range(irho_plus, len(rho_space_final)):
-                tab_irho = irho - num_new_pts_rho
-
-                P[iYe, iT, irho] = tab_P[iYe, tab_iT, tab_irho]
-                eps[iYe, iT, irho] = tab_eps[iYe, tab_iT, tab_irho]
-                S[iYe, iT, irho] = tab_S[iYe, tab_iT, tab_irho]
-                cs2[iYe, iT, irho] = tab_cs2[iYe, tab_iT, tab_irho]
-                gamma[iYe, iT, irho] = tab_gamma[iYe, tab_iT, tab_irho]
-                muhat[iYe, iT, irho] = tab_muhat[iYe, tab_iT, tab_irho]
-                mu_n[iYe, iT, irho] = tab_mu_n[iYe, tab_iT, tab_irho]
-                mu_p[iYe, iT, irho] = tab_mu_p[iYe, tab_iT, tab_irho]
-                mu_e[iYe, iT, irho] = tab_mu_e[iYe, tab_iT, tab_irho]
-                munu[iYe, iT, irho] = tab_munu[iYe, tab_iT, tab_irho]
-                Xp[iYe, iT, irho] = tab_Xp[iYe, tab_iT, tab_irho]
-                Xn[iYe, iT, irho] = tab_Xn[iYe, tab_iT, tab_irho]
-                Xa[iYe, iT, irho] = tab_Xa[iYe, tab_iT, tab_irho]
-                Xh[iYe, iT, irho] = tab_Xh[iYe, tab_iT, tab_irho]
-                Abar[iYe, iT, irho] = tab_Abar[iYe, tab_iT, tab_irho]
-                Zbar[iYe, iT, irho] = tab_Zbar[iYe, tab_iT, tab_irho]
-            del h
-
-        # Loop over extended temperature range 
-        print("\tExtended temp range loop.")
-
-        ## Update points in transition region
-        for iT in range(iT_plus, iT_minus, -1):
-            tempK = 10**T_space_final[iT] / 8.61733326214518e-11 # convert logT to K
-            #print("\tDebug: calc temp {:.4f} K".format(tempK))
-
-            # From looking at the APR table, Abar ~ 74 at low temperatures and densities. This is not true at high densities but we hope that region of table space is not reached.
-            h = helmholtz.helmeos(dens=10**rho_space_final[:helm_irho_max+1], temp=tempK, abar=74, zbar=74*valYe) # Y_e = zbar / abar 
-
-            chi = 0.5 * (1 + np.tanh((T_space_final[iT] - T_stitch) / width))
-            for irho in range(len(rho_space_final)):
-                # Enforce Density limit on Helmholtz EOS. These values should not be used in a simulation.
-                helm_irho_cap = min(helm_irho_max, irho)
-
-                P[iYe, iT, irho] = stitch(chi, P[iYe, iT, irho], h.ptot[helm_irho_cap])
-                # Don't update eps. eps_nuc treatment at least guarantees continuity
-                S[iYe, iT, irho] = stitch(chi, S[iYe, iT, irho], ENTFAC * h.stot[helm_irho_cap])
-                cs2[iYe, iT, irho] = stitch(chi, cs2[iYe, iT, irho], h.cs[helm_irho_cap]**2)
-                gamma[iYe, iT, irho] = stitch(chi, gamma[iYe, iT, irho], h.gam1[helm_irho_cap])
-            del h
-        
-        ## Copy values from Helm EOS in low temp range
-        for iT in range(iT_minus, -1, -1):
-            tempK = 10**T_space_final[iT] / 8.61733326214518e-11 # convert logT to K
-            #print("\tDebug: calc temp {:.4f} K".format(tempK))
-            h = helmholtz.helmeos(dens=10**rho_space_final[:helm_irho_max+1], temp=tempK, abar=74, zbar=74*valYe) # Y_e = zbar / abar 
+        # eps needs special treatment due to eps_nuc (see Hayashi et al 2023)
+        for iT in range(new_shape[1]):
             iT_star = max(0, iT - num_new_pts_T)
-            for irho in range(len(rho_space_final)):
-                helm_irho_cap = min(helm_irho_max, irho)
-
-                P[iYe, iT, irho] = h.ptot[helm_irho_cap]
-                ## Set eps offset due to nuclear binding energy in extended table region (see Hayashi et al 2023)
+            for irho in range(new_shape[2]):
                 irho_star = max(0, irho - num_new_pts_rho)
-                eps_nuc = tab_eps[iYe, iT_star, irho_star] - h.etot[max(helm_irho_cap, num_new_pts_rho)]
-                eps[iYe, iT, irho] = h.etot[helm_irho_cap] + eps_nuc
-                S[iYe, iT, irho] = ENTFAC * h.stot[helm_irho_cap]
-                cs2[iYe, iT, irho] = h.cs[helm_irho_cap]**2
-                gamma[iYe, iT, irho] = h.gam1[helm_irho_cap]
+                if np.isnan(eps[iYe, iT, irho]):
+                    eps_nuc = tab_eps[iYe, iT_star, irho_star] - h.etot[max(iT, num_new_pts_T), max(irho, num_new_pts_rho)]
+                    eps[iYe, iT, irho] = h.etot[iT, irho] + eps_nuc
 
-                # Assume composition is frozen in at low density, temperature
-                muhat[iYe, iT, irho] = tab_muhat[iYe, iT_star, irho_star]
-                mu_n[iYe, iT, irho] = tab_mu_n[iYe, iT_star, irho_star]
-                mu_p[iYe, iT, irho] = tab_mu_p[iYe, iT_star, irho_star]
-                mu_e[iYe, iT, irho] = tab_mu_e[iYe, iT_star, irho_star]
-                munu[iYe, iT, irho] = tab_munu[iYe, iT_star, irho_star]
-                Xp[iYe, iT, irho] = tab_Xp[iYe, iT_star, irho_star]
-                Xn[iYe, iT, irho] = tab_Xn[iYe, iT_star, irho_star]
-                Xa[iYe, iT, irho] = tab_Xa[iYe, iT_star, irho_star]
-                Xh[iYe, iT, irho] = tab_Xh[iYe, iT_star, irho_star]
-                Abar[iYe, iT, irho] = tab_Abar[iYe, iT_star, irho_star]
-                Zbar[iYe, iT, irho] = tab_Zbar[iYe, iT_star, irho_star]
-            del h
+    ## End of Ye Loop
 
-        print("Done with Ye = {:.4f}".format(valYe))
-
-    # Calculate Derivatives.
+    # CALCULATE DERIVATIVES
     print("Calculating Derivatives")
-    dT = 10**tab_logtemp
-    drho = 10**tab_logrho
+    dT = 10**T_space_final
+    drho = 10**rho_space_final
 
-    dedT = np.gradient(tab_eps, dT, axis=1)
-    dPdT = np.gradient(tab_P, dT, axis=1)
+    dedT = np.gradient(eps, dT, axis=1)
+    dPdT = np.gradient(P, dT, axis=1)
     dPde = dPdT / dedT
-    dPdrho = np.gradient(tab_P, drho, axis=2)
-    dedrho = np.gradient(tab_eps, drho, axis=2)
+    dPdrho = np.gradient(P, drho, axis=2)
+    dedrho = np.gradient(eps, drho, axis=2)
     dPdrhoe = dPdrho - dPdT * dedrho / dedT
 
-    # Default to original values when possible, even if they are no longer accurate in the stitching regions. May enhance C2P
+    # Default to original values when possible, even if they are no longer accurate in the stitching regions. May enhance C2P? Needs to be tested.
 
     ## Load in original data
-    orig_dedt = np.array(ref_file["dedt"])[:]
-    orig_dPde = np.array(ref_file["dpderho"])[:]
-    orig_dPdrhoe = np.array(ref_file["dpdrhoe"])[:]
+    tab_dedt = np.array(eos_file["dedt"])[:]
+    tab_dPde = np.array(eos_file["dpderho"])[:]
+    tab_dPdrhoe = np.array(eos_file["dpdrhoe"])[:]
 
-    dedT[:,num_new_pts_temp:,num_new_pts_rho:] = orig_dedt
-    dPde[:,num_new_pts_temp:,num_new_pts_rho:] = orig_dPde
-    dPdrhoe[:,num_new_pts_temp:,num_new_pts_rho:] = orig_dPdrhoe
+    dedT[:,num_new_pts_T:,num_new_pts_rho:] = tab_dedt
+    dPde[:,num_new_pts_T:,num_new_pts_rho:] = tab_dPde
+    dPdrhoe[:,num_new_pts_T:,num_new_pts_rho:] = tab_dPdrhoe
 
     # Update new HDF5
     print("Outputting to file")
