@@ -202,6 +202,7 @@ CarpetIOASCII::out0D_vars             = "
   outflow::outflow_flux[10]
   QuasiLocalMeasures::qlm_scalars
   SphericalSurface::sf_active
+	BNSTrackerGen::bns_positions
 "
 
 CarpetIOASCII::out3D_ghosts           = "no"
@@ -427,7 +428,7 @@ CoordBase::zmax                  = CoordBase::xmax
 # Parameters of thorn EOS_Omni (implementing EOS_Omni)
 EOS_Omni::do_energy_shift   = "yes"
 EOS_Omni::nuceos_read_table = "yes"
-EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APR_3335_rho420_temp187_ye66_gitMf0fc21f_20240227_extended_adjusted.h5"
+EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APR_3335_rho420_temp187_ye66_gitMf0fc21f_20240329_extended_adjusted.h5"
 
 # Parameters of thorn HydroBase (implementing HydroBase)
 HydroBase::initial_Aphi        = "zero"
@@ -478,7 +479,7 @@ IllinoisGRMHD::update_HydroBase               = yes
 InitBase::initial_data_setup_method = "init_all_levels"
 
 # Parameters of thorn IOUtil (implementing IO)
-IOUtil::checkpoint_dir                  = "output_directory/checkpoints"
+IOUtil::checkpoint_dir                  = "../checkpoints"
 IOUtil::checkpoint_every_walltime_hours = 12
 IOUtil::checkpoint_keep                 = 1
 IOUtil::checkpoint_on_terminate         = "yes"
@@ -487,7 +488,7 @@ IOUtil::out_fileinfo                    = "none"
 IOUtil::parfile_write                   = "generate"
 IOUtil::recover                         = "autoprobe"
 IOUtil::recover_and_remove              = "yes"
-IOUtil::recover_dir                     = "output_directory/checkpoints"
+IOUtil::recover_dir                     = "../checkpoints"
 
 # Parameters of thorn Meudon_Bin_NS (implementing Meudon_Bin_NS)
 Meudon_Bin_NS::eos_table = "nuc_eos"

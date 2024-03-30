@@ -141,8 +141,8 @@ extern "C" void WVU_EOS_from_rho_Ye_aux_find_T_and_interpolate_n_quantities( con
   report->error_key = keyerr;
   report->error     = anyerr;
 
-  if( *T < T_atm){
-    CCTK_VINFO("T = %e from rho, Ye, eps below atm!!! rho = %e; Ye = %e; eps = %e", *T, rho, Ye, aux);
+  if( *T < T_atm * 0.8){ // A small deviation due to the root finding precision is acceptable.
+    CCTK_VINFO("T = %e from rho, Ye, eps below T_atm = %e!!! rho = %e; Ye = %e; eps = %e", *T, T_atm, rho, Ye, aux);
 		for (int ii=0; ii<n; ii++){
 			CCTK_VINFO("Interp result: key:%d; val = %e", tablevars_keys[ii], tablevars[ii]);
 		}
