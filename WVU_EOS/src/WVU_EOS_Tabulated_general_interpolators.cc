@@ -75,6 +75,7 @@ extern "C" void WVU_EOS_from_rho_Ye_aux_find_T_and_interpolate_n_quantities( con
                                                                              const CCTK_REAL& prec,
                                                                              const CCTK_REAL& rho,
                                                                              const CCTK_REAL& Ye,
+                                                                             const CCTK_REAL& T_atm,
                                                                              const CCTK_REAL& tablevar_in,
                                                                              const CCTK_INT& tablevar_in_key,
                                                                              const CCTK_INT *restrict tablevars_keys,
@@ -126,9 +127,10 @@ extern "C" void WVU_EOS_from_rho_Ye_aux_find_T_and_interpolate_n_quantities( con
   // Now compute the temperature
   const CCTK_REAL lr  = log(rho);
   const CCTK_REAL lt0 = log(*T);
+  const CCTK_REAL ltatm = log(T_atm);
   CCTK_REAL lt        = 0.0;
   CCTK_INT keyerr=0;
-  WVU_EOS::findtemp_from_any(tablevar_in_key,lr,lt0,Ye,aux,prec,&lt,&keyerr);
+  WVU_EOS::findtemp_from_any(tablevar_in_key,lr,lt0,Ye,aux,prec,ltatm,&lt,&keyerr);
 
   // Now set the temperature
   *T = exp(lt);
@@ -138,4 +140,11 @@ extern "C" void WVU_EOS_from_rho_Ye_aux_find_T_and_interpolate_n_quantities( con
   WVU_EOS_from_rho_Ye_T_interpolate_n_quantities(n,rho,Ye,*T,tablevars_keys,tablevars,report);
   report->error_key = keyerr;
   report->error     = anyerr;
+
+  if( *T < T_atm){
+    CCTK_VINFO("T = %e from rho, Ye, eps below atm!!! rho = %e; Ye = %e; eps = %e", *T, rho, Ye, aux);
+		for (int ii=0; ii<n; ii++){
+			CCTK_VINFO("Interp result: key:%d; val = %e", tablevars_keys[ii], tablevars[ii]);
+		}
+  }
 }

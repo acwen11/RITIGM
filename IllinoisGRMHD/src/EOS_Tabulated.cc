@@ -171,15 +171,22 @@ void initialize_Tabulated_EOS_parameters_from_input( const CCTK_REAL cctk_time,i
 void compute_remaining_prims_on_right_and_left_face( const igm_eos_parameters eos,
                                                      const cGH *restrict cctkGH,
                                                      const CCTK_INT *restrict cctk_lsh,
+																										 const CCTK_REAL *restrict r,
                                                      const gf_and_gz_struct *restrict in_prims,
                                                      gf_and_gz_struct *restrict out_prims_r,
                                                      gf_and_gz_struct *restrict out_prims_l ) {
 
+  DECLARE_CCTK_PARAMETERS;
 #pragma omp parallel for
   for(int k=0;k<cctk_lsh[2];k++) {
     for(int j=0;j<cctk_lsh[1];j++) {
       for(int i=0;i<cctk_lsh[0];i++) {
         CCTK_INT index  = CCTK_GFINDEX3D(cctkGH,i,j,k);
+
+				// Set atmospheric temperature for table inversion routines
+				const CCTK_REAL r_atmo        = MAX(r_atmo_min, r[index]);
+				const CCTK_REAL r_pow_T       = atmo_falloff_T ? r_power_T : 0.;
+				const CCTK_REAL T_atm         = MAX(igm_T_atm*std::pow(r_atmo / r_atmo_min, r_pow_T), eos.T_min);
 
         //---------- Left face ----------
         CCTK_REAL xrhoR  = out_prims_r[RHOB    ].gf[index];
@@ -192,14 +199,14 @@ void compute_remaining_prims_on_right_and_left_face( const igm_eos_parameters eo
           xprsR = out_prims_r[PRESSURE].gf[index];
           xepsR = 0.0;
           enforce_table_bounds_rho_Ye_P(eos,&xrhoR,&xyeR,&xprsR);
-          WVU_EOS_eps_S_and_T_from_rho_Ye_P( xrhoR,xyeR,xprsR, &xepsR,&xentR,&xtempR );
+          WVU_EOS_eps_S_and_T_from_rho_Ye_P( xrhoR,xyeR,xprsR,T_atm, &xepsR,&xentR,&xtempR );
           out_prims_r[EPSILON  ].gf[index] = xepsR;
         }
         else if( eos.PPM_reconstructed_var == EPSILON ) {
           xprsR = 0.0;
           xepsR = out_prims_r[EPSILON].gf[index];
           enforce_table_bounds_rho_Ye_eps(eos,&xrhoR,&xyeR,&xepsR);
-          WVU_EOS_P_S_and_T_from_rho_Ye_eps( xrhoR,xyeR,xepsR, &xprsR,&xentR,&xtempR );
+          WVU_EOS_P_S_and_T_from_rho_Ye_eps( xrhoR,xyeR,xepsR,T_atm, &xprsR,&xentR,&xtempR );
           out_prims_r[PRESSURE ].gf[index] = xprsR;
         }
         // Update everything
@@ -222,14 +229,14 @@ void compute_remaining_prims_on_right_and_left_face( const igm_eos_parameters eo
           xprsL = out_prims_l[PRESSURE].gf[index];
           xepsL = 0.0;
           enforce_table_bounds_rho_Ye_P(eos,&xrhoL,&xyeL,&xprsL);
-          WVU_EOS_eps_S_and_T_from_rho_Ye_P( xrhoL,xyeL,xprsL, &xepsL,&xentL,&xtempL );
+          WVU_EOS_eps_S_and_T_from_rho_Ye_P( xrhoL,xyeL,xprsL,T_atm, &xepsL,&xentL,&xtempL );
           out_prims_l[EPSILON  ].gf[index] = xepsL;
         }
         else if( eos.PPM_reconstructed_var == EPSILON ) {
           xprsL = 0.0;
           xepsL = out_prims_l[EPSILON].gf[index];
           enforce_table_bounds_rho_Ye_eps(eos,&xrhoL,&xyeL,&xepsL);
-          WVU_EOS_P_S_and_T_from_rho_Ye_eps( xrhoL,xyeL,xepsL, &xprsL,&xentL,&xtempL );
+          WVU_EOS_P_S_and_T_from_rho_Ye_eps( xrhoL,xyeL,xepsL,T_atm, &xprsL,&xentL,&xtempL );
           out_prims_l[PRESSURE ].gf[index] = xprsL;
         }
         // Update everything

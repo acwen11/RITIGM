@@ -52,6 +52,8 @@ void WVU_EOS_validation_against_EOS_Omni(CCTK_ARGUMENTS) {
   CCTK_REAL unit_test_ly_max = log(0.9*nuc_eos::eos_yemax);
   CCTK_REAL unit_test_ly_min = log(1.1*nuc_eos::eos_yemin);
 
+	CCTK_REAL T_atm = nuc_eos::eos_tempmin;
+
   // Compute step sizes
   CCTK_REAL dlr = (unit_test_lr_max - unit_test_lr_min)/unit_test_npoints;
   CCTK_REAL dlt = (unit_test_lt_max - unit_test_lt_min)/unit_test_npoints;
@@ -110,7 +112,7 @@ void WVU_EOS_validation_against_EOS_Omni(CCTK_ARGUMENTS) {
           // Compute P and T using WVU_EOS
           xprs_wvu             = 0.0;
           CCTK_REAL xtemp_wvu  = xtemp;
-          WVU_EOS_P_and_T_from_rho_Ye_eps( xrho,xye,xeps_wvu, &xprs_wvu,&xtemp_wvu );
+          WVU_EOS_P_and_T_from_rho_Ye_eps( xrho,xye,xeps_wvu,T_atm, &xprs_wvu,&xtemp_wvu );
           // Compute P and T using EOS_Omni
           xprs_omni            = 0.0;
           CCTK_REAL xtemp_omni = xtemp;
@@ -138,7 +140,7 @@ void WVU_EOS_validation_against_EOS_Omni(CCTK_ARGUMENTS) {
           xprs_wvu           = 0.0;
           xtemp_wvu          = xtemp;
           CCTK_REAL xent_wvu = 0.0;
-          WVU_EOS_P_S_and_T_from_rho_Ye_eps( xrho,xye,xeps_wvu,&xprs_wvu,&xent_wvu,&xtemp_wvu );
+          WVU_EOS_P_S_and_T_from_rho_Ye_eps( xrho,xye,xeps_wvu,T_atm,&xprs_wvu,&xent_wvu,&xtemp_wvu );
           // Now compute the errors
                     temp_err          = fabs(1.0 - xtemp_wvu/xtemp_omni);
           CCTK_REAL ent_err = fabs(1.0 - xent_wvu /xent_omni);
@@ -155,7 +157,7 @@ void WVU_EOS_validation_against_EOS_Omni(CCTK_ARGUMENTS) {
           xprs_wvu  = 0.0;
           xeps_wvu  = 0.0;
           xtemp_wvu = xtemp;
-          WVU_EOS_P_eps_and_T_from_rho_Ye_S( xrho,xye,xent_wvu, &xprs_wvu,&xeps_wvu,&xtemp_wvu );
+          WVU_EOS_P_eps_and_T_from_rho_Ye_S( xrho,xye,xent_wvu,T_atm, &xprs_wvu,&xeps_wvu,&xtemp_wvu );
           // Compute P, eps, T(S) using EOS_Omni
           EOS_Omni_short( eoskey,haveent,prec,npoints,
                           &xrho,&xeps_omni,&xtemp_omni,&xye,&xprs_omni,&xent_omni,

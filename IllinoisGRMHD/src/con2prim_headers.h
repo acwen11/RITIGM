@@ -173,6 +173,7 @@ int con2prim_CerdaDuran2D( const igm_eos_parameters eos,
                            const CCTK_REAL *restrict adm_quantities,
                            const CCTK_REAL *restrict con,
                            CCTK_REAL *restrict prim,
+                           const CCTK_REAL T_atm,
                            output_stats& stats );
 
 int con2prim_CerdaDuran3D( const igm_eos_parameters eos,
@@ -215,6 +216,7 @@ int con2prim_Palenzuela1D( const igm_eos_parameters eos,
                            const CCTK_REAL *restrict adm_quantities,
                            const CCTK_REAL *restrict cons,
                            CCTK_REAL *restrict prim,
+                           const CCTK_REAL T_atm,
                            output_stats& stats );
 
 int con2prim_Newman1D( const igm_eos_parameters eos,

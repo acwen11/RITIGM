@@ -15,6 +15,7 @@
 extern "C" void WVU_EOS_P_and_T_from_rho_Ye_eps_impl( const CCTK_REAL rho,
                                                       const CCTK_REAL Ye,
                                                       const CCTK_REAL eps,
+                                                      const CCTK_REAL T_atm,
                                                       CCTK_REAL *restrict P,
                                                       CCTK_REAL *restrict T ) {
   // Number of interpolated quantities: 1 (P)
@@ -33,7 +34,7 @@ extern "C" void WVU_EOS_P_and_T_from_rho_Ye_eps_impl( const CCTK_REAL rho,
 
   // Get T, then P
   WVU_EOS_from_rho_Ye_aux_find_T_and_interpolate_n_quantities( n,root_finding_precision,
-                                                               rho,Ye,aux,auxkey, keys,outvars,T, &report );
+                                                               rho,Ye,T_atm,aux,auxkey, keys,outvars,T, &report );
 
   // Error handling
   if( report.error ) {
@@ -53,6 +54,7 @@ extern "C" void WVU_EOS_P_and_T_from_rho_Ye_eps_impl( const CCTK_REAL rho,
 extern "C" void WVU_EOS_P_S_and_T_from_rho_Ye_eps_impl( const CCTK_REAL rho,
                                                         const CCTK_REAL Ye,
                                                         const CCTK_REAL eps,
+                                                        const CCTK_REAL T_atm,
                                                         CCTK_REAL *restrict P,
                                                         CCTK_REAL *restrict S,
                                                         CCTK_REAL *restrict T ) {
@@ -72,7 +74,7 @@ extern "C" void WVU_EOS_P_S_and_T_from_rho_Ye_eps_impl( const CCTK_REAL rho,
 
   // Get T, then P and S
   WVU_EOS_from_rho_Ye_aux_find_T_and_interpolate_n_quantities( n,root_finding_precision,
-                                                               rho,Ye,aux,auxkey, keys,outvars,T, &report );
+                                                               rho,Ye,T_atm,aux,auxkey, keys,outvars,T, &report );
 
   // Error handling
   if( report.error ) {
@@ -94,6 +96,7 @@ extern "C" void WVU_EOS_P_S_and_T_from_rho_Ye_eps_impl( const CCTK_REAL rho,
 extern "C" void WVU_EOS_P_S_T_and_depsdT_from_rho_Ye_eps_impl( const CCTK_REAL rho,
                                                                const CCTK_REAL Ye,
                                                                const CCTK_REAL eps,
+                                                               const CCTK_REAL T_atm,
                                                                CCTK_REAL *restrict P,
                                                                CCTK_REAL *restrict S,
                                                                CCTK_REAL *restrict depsdT,
@@ -114,7 +117,7 @@ extern "C" void WVU_EOS_P_S_T_and_depsdT_from_rho_Ye_eps_impl( const CCTK_REAL r
 
   // Get T, then P and S
   WVU_EOS_from_rho_Ye_aux_find_T_and_interpolate_n_quantities( n,root_finding_precision,
-                                                               rho,Ye,aux,auxkey, keys,outvars,T, &report );
+                                                               rho,Ye,T_atm,aux,auxkey, keys,outvars,T, &report );
 
   // Error handling
   if( report.error ) {
@@ -136,6 +139,7 @@ extern "C" void WVU_EOS_P_S_T_and_depsdT_from_rho_Ye_eps_impl( const CCTK_REAL r
 extern "C" void WVU_EOS_eps_S_and_T_from_rho_Ye_P_impl( const CCTK_REAL rho,
                                                         const CCTK_REAL Ye,
                                                         const CCTK_REAL P,
+                                                        const CCTK_REAL T_atm,
                                                         CCTK_REAL *restrict eps,
                                                         CCTK_REAL *restrict S,
                                                         CCTK_REAL *restrict T ) {
@@ -155,7 +159,7 @@ extern "C" void WVU_EOS_eps_S_and_T_from_rho_Ye_P_impl( const CCTK_REAL rho,
 
   // Get T, then eps and S
   WVU_EOS_from_rho_Ye_aux_find_T_and_interpolate_n_quantities( n,root_finding_precision,
-                                                               rho,Ye,aux,auxkey, keys,outvars,T, &report );
+                                                               rho,Ye,T_atm,aux,auxkey, keys,outvars,T, &report );
 
   // Error handling
   if( report.error ) {
@@ -176,6 +180,7 @@ extern "C" void WVU_EOS_eps_S_and_T_from_rho_Ye_P_impl( const CCTK_REAL rho,
 extern "C" void WVU_EOS_P_eps_and_T_from_rho_Ye_S_impl( const CCTK_REAL rho,
                                                         const CCTK_REAL Ye,
                                                         const CCTK_REAL S,
+                                                        const CCTK_REAL T_atm,
                                                         CCTK_REAL *restrict P,
                                                         CCTK_REAL *restrict eps,
                                                         CCTK_REAL *restrict T ) {
@@ -195,7 +200,7 @@ extern "C" void WVU_EOS_P_eps_and_T_from_rho_Ye_S_impl( const CCTK_REAL rho,
 
   // Get T, then P and eps
   WVU_EOS_from_rho_Ye_aux_find_T_and_interpolate_n_quantities( n,root_finding_precision,
-                                                               rho,Ye,aux,auxkey, keys,outvars,T, &report );
+                                                               rho,Ye,T_atm,aux,auxkey, keys,outvars,T, &report );
 
   // Error handling
   if( report.error ) {
