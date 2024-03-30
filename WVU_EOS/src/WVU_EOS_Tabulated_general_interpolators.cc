@@ -116,7 +116,6 @@ extern "C" void WVU_EOS_from_rho_Ye_aux_find_T_and_interpolate_n_quantities( con
     aux += nuc_eos::energy_shift;
     // At this point, aux *must* be positive. If not, error out.
     if( aux < 0.0 ) {
-			CCTK_VINFO("eps is negative! Energy shift = %e; Requested rho = %e; Ye = %e; eps = %e", nuc_eos::energy_shift, rho, Ye, aux); 
       CCTK_VError(__LINE__, __FILE__, CCTK_THORNSTRING,
                   "WVU_EOS::from_rho_Ye_aux_find_T_and_interpolate_n_quantities: found eps+energy_shift < 0.0 (%e). ABORTING.",
                   aux);
@@ -142,7 +141,7 @@ extern "C" void WVU_EOS_from_rho_Ye_aux_find_T_and_interpolate_n_quantities( con
   report->error_key = keyerr;
   report->error     = anyerr;
 
-  if( *T < 1e-2){
+  if( *T < T_atm){
     CCTK_VINFO("T = %e from rho, Ye, eps below atm!!! rho = %e; Ye = %e; eps = %e", *T, rho, Ye, aux);
 		for (int ii=0; ii<n; ii++){
 			CCTK_VINFO("Interp result: key:%d; val = %e", tablevars_keys[ii], tablevars[ii]);
