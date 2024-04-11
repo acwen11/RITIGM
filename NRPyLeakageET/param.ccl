@@ -61,6 +61,11 @@ CCTK_REAL rho_min_threshold "Only leak for rho > rho_min_threshold" STEERABLE = 
   0:* :: "Any non-negative number"
 } 0.0
 
+CCTK_REAL rho_min_threshold_init_tau "Only initialize tau for rho > rho_min_threshold" STEERABLE = ALWAYS
+{
+  0:* :: "Any non-negative number"
+} 0.0
+
 restricted:
 CCTK_REAL rho_max_threshold "Only leak for rho < rho_max_threshold" STEERABLE = ALWAYS
 {

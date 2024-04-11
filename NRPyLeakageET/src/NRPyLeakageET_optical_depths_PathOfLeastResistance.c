@@ -39,7 +39,7 @@ void NRPyLeakageET_optical_depths_PathOfLeastResistance(CCTK_ARGUMENTS) {
 
         const CCTK_REAL rhoL = rho[i_j_k];
         // Only compute optical depths if density is above a threshold
-        if( rhoL < rho_min_threshold || rhoL > rho_max_threshold ) {
+        if( rhoL < rho_min_threshold_init_tau || rhoL > rho_max_threshold ) {
           tau_0_nue [i_j_k] = 0.0;
           tau_1_nue [i_j_k] = 0.0;
           tau_0_anue[i_j_k] = 0.0;
