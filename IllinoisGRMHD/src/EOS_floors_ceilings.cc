@@ -21,12 +21,26 @@ void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_paramete
 
   DECLARE_CCTK_PARAMETERS;
 
+	// Nuclear Option:
+	// if (radius >= r_atmo_min) {
+	//
+	// if (PRIMS[RHOB] <= rho_b_atm) {
+	// 	// For now, set IGM velocity to zero
+	// 	// PRIMS[VX] = 0;
+	// 	// PRIMS[VY] = 0;
+	// 	// PRIMS[VZ] = 0;
+
+	// 	// Or, set HydroBase vels to zero
+	// 	PRIMS[VX] = -shiftx;
+	// 	PRIMS[VY] = -shifty;
+	// 	PRIMS[VZ] = -shiftz;
+	// }
+
   // The density floor and ceiling is always applied
-  const CCTK_REAL xrho = MIN(MAX(PRIMS[RHOB], rho_b_atm),eos.rho_max);
+  PRIMS[RHOB] = MIN(MAX(PRIMS[RHOB], rho_b_atm),eos.rho_max);
 
   // Hybrid EOS specific floors and ceilings
   if( eos.is_Hybrid ) {
-		PRIMS[RHOB] = xrho;
     // Pressure and epsilon must be recomputed
     // Compute P and eps
     CCTK_REAL prs_cold = 0.0;
@@ -57,21 +71,18 @@ void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_paramete
     const CCTK_REAL xye   = MIN(MAX(PRIMS[YEPRIM     ],eos.Ye_min),eos.Ye_atm);
     const CCTK_REAL xtemp = MIN(MAX(PRIMS[TEMPERATURE],T_atm ),eos.T_max );
 
-		// Only perform table lookup if needed
-		if (!(xrho == PRIMS[RHOB] && xye == PRIMS[YEPRIM] && xtemp == PRIMS[TEMPERATURE])) {
-			// Additional variables used for the EOS call
-			CCTK_REAL xprs        = 0.0;
-			CCTK_REAL xeps        = 0.0;
-			CCTK_REAL xent        = 0.0;
-			WVU_EOS_P_eps_and_S_from_rho_Ye_T(xrho,xye,xtemp, &xprs,&xeps,&xent);
-			// Now update the primitives (rho has already been set)
-			PRIMS[RHOB       ] = xrho;
-			PRIMS[YEPRIM     ] = xye;
-			PRIMS[TEMPERATURE] = xtemp;
-			PRIMS[PRESSURE   ] = xprs;
-			PRIMS[EPSILON    ] = xeps;
-			PRIMS[ENTROPY    ] = xent;
-		}
+    // Additional variables used for the EOS call
+    const CCTK_REAL xrho  = PRIMS[RHOB];
+    CCTK_REAL xprs        = 0.0;
+    CCTK_REAL xeps        = 0.0;
+    CCTK_REAL xent        = 0.0;
+    WVU_EOS_P_eps_and_S_from_rho_Ye_T(xrho,xye,xtemp, &xprs,&xeps,&xent);
+    // Now update the primitives (rho has already been set)
+    PRIMS[YEPRIM     ] = xye;
+    PRIMS[TEMPERATURE] = xtemp;
+    PRIMS[PRESSURE   ] = xprs;
+    PRIMS[EPSILON    ] = xeps;
+    PRIMS[ENTROPY    ] = xent;
   }
 
 }
