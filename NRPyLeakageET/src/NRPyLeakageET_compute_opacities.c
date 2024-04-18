@@ -32,7 +32,7 @@ void NRPyLeakageET_compute_opacities(CCTK_ARGUMENTS) {
           CCTK_REAL tau_nue[2], tau_anue[2], tau_nux[2];
 
           // Step 3: Check density threshold, compute opacities
-          if( rhoL < rho_min_threshold || rhoL > rho_max_threshold ) {
+          if( rhoL <  rho_min_threshold_init_tau || rhoL > rho_max_threshold ) {
             // Step 3.a: Below density threshold; set opacities and optical
             // depths to zero
             kappa_nue[0] = kappa_anue[0] = kappa_nux[0] = 0.0;
