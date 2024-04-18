@@ -545,7 +545,9 @@ namespace WVU_EOS {
        Verifying Newton-Raphson result evaluating the derivative. 
        The variable shouldgotobisection will be modified accordingly
        to the value of derivative of eps wrt temp ******* */
-    bool shouldgotobisection = false; // LSMOD
+    // bool shouldgotobisection = false; // LSMOD
+
+    bool shouldgotobisection = true; // Try only using bisection?
 
     while(it < itmax && shouldgotobisection == false) {
       it++;
