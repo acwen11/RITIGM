@@ -40,11 +40,12 @@ ID_TabEOS_HydroQuantities
 IllinoisGRMHD 
 InitBase 
 IOUtil 
-KadathImporter
 LAPACK 
 LocalInterp 
 LocalReduce 
 LoopControl 
+LORENE 
+Meudon_Bin_NS 
 MHD_Diagnostics
 MoL 
 MPI 
@@ -81,11 +82,11 @@ zlib
 ADMBase::dtlapse_evolution_method = "Baikal"
 ADMBase::dtshift_evolution_method = "Baikal"
 ADMBase::evolution_method         = "Baikal"
-ADMBase::initial_data             = "Kadath"
+ADMBase::initial_data             = "Meudon_Bin_NS"
 ADMBase::initial_dtlapse          = "zero"
 ADMBase::initial_dtshift          = "zero"
-ADMBase::initial_lapse            = "Kadath"
-ADMBase::initial_shift            = "Kadath"
+ADMBase::initial_lapse            = "Meudon_Bin_NS"
+ADMBase::initial_shift            = "zero"
 ADMBase::lapse_evolution_method   = "Baikal"
 ADMBase::lapse_timelevels         = 3
 ADMBase::metric_timelevels        = 3
@@ -353,46 +354,46 @@ carpetregrid2::position_x_1              = 0
 carpetregrid2::position_x_2              = -15.2 # Adjust according to ID. Corresponds to ~45 km sep.
 carpetregrid2::position_x_3              = 15.2
 
-carpetregrid2::radius_1[1]               = 16384 #dx=157.696
-carpetregrid2::radius_1[2]               = 8192  #dx=78.848
-carpetregrid2::radius_1[3]               = 4096  #dx=39.424
-carpetregrid2::radius_1[4]               = 2048  #dx=19.712
-carpetregrid2::radius_1[5]               = 1024  #dx=9.856
-carpetregrid2::radius_1[6]               = 512   #dx=4.928
-carpetregrid2::radius_1[7]               = 256   #dx=2.464
-carpetregrid2::radius_1[8]               = 128   #dx=1.232
-carpetregrid2::radius_1[9]               = 70    #dx=0.616
-carpetregrid2::radius_1[10]              = 40    #dx=0.308 #activated at merger
-carpetregrid2::radius_1[11]              = 20    #dx=0.154 #activated at merger
+carpetregrid2::radius_1[1]               = 16384 #dx=122.8
+carpetregrid2::radius_1[2]               = 8192  #dx=61.44
+carpetregrid2::radius_1[3]               = 4096  #dx=30.72
+carpetregrid2::radius_1[4]               = 2048  #dx=15.36
+carpetregrid2::radius_1[5]               = 1024  #dx=7.68
+carpetregrid2::radius_1[6]               = 512   #dx=3.84
+carpetregrid2::radius_1[7]               = 256   #dx=1.92
+carpetregrid2::radius_1[8]               = 128   #dx=0.96
+carpetregrid2::radius_1[9]               = 70    #dx=0.48
+carpetregrid2::radius_1[10]              = 40    #dx=0.24 #activated at merger
+carpetregrid2::radius_1[11]              = 20    #dx=0.12 #activated at merger
 
-carpetregrid2::radius_1[12]               = 3.2  #dx=0.077 #activated just before collapse
+carpetregrid2::radius_1[12]               = 3.2  #dx=0.06 #activated just before collapse
 carpetregrid2::radius_1[13]               = 2.4  #disabled
 
 #during inspiral
 
-carpetregrid2::radius_2[1]               = 1944.0 #dx=157.696
-carpetregrid2::radius_2[2]               = 1296   #dx=78.848
-carpetregrid2::radius_2[3]               = 864    #dx=39.424
-carpetregrid2::radius_2[4]               = 576    #dx=19.712
-carpetregrid2::radius_2[5]               = 384    #dx=9.856
-carpetregrid2::radius_2[6]               = 192    #dx=4.928
-carpetregrid2::radius_2[7]               = 96     #dx=2.464
-carpetregrid2::radius_2[8]               = 48     #dx=1.232
-carpetregrid2::radius_2[9]               = 24     #dx=0.616
-carpetregrid2::radius_2[10]               = 18    #dx=0.308
-carpetregrid2::radius_2[11]               = 12    #dx=0.154
+carpetregrid2::radius_2[1]               = 1944.0 #dx=122.88
+carpetregrid2::radius_2[2]               = 1296   #dx=61.44
+carpetregrid2::radius_2[3]               = 864    #dx=30.72
+carpetregrid2::radius_2[4]               = 576    #dx=15.36
+carpetregrid2::radius_2[5]               = 384    #dx=7.68
+carpetregrid2::radius_2[6]               = 192    #dx=3.84
+carpetregrid2::radius_2[7]               = 96     #dx=1.92
+carpetregrid2::radius_2[8]               = 48     #dx=0.96
+carpetregrid2::radius_2[9]               = 24     #dx=0.48
+carpetregrid2::radius_2[10]               = 18    #dx=0.24
+carpetregrid2::radius_2[11]               = 12    #dx=0.12
 
-carpetregrid2::radius_3[1]               = 1944.0 #dx=157.696
-carpetregrid2::radius_3[2]               = 1296   #dx=78.848
-carpetregrid2::radius_3[3]               = 864    #dx=39.424
-carpetregrid2::radius_3[4]               = 576    #dx=19.712
-carpetregrid2::radius_3[5]               = 384    #dx=9.856
-carpetregrid2::radius_3[6]               = 192    #dx=4.928
-carpetregrid2::radius_3[7]               = 96     #dx=2.464
-carpetregrid2::radius_3[8]               = 48     #dx=1.232
-carpetregrid2::radius_3[9]               = 24     #dx=0.616
-carpetregrid2::radius_3[10]               = 18    #dx=0.308
-carpetregrid2::radius_3[11]               = 12    #dx=0.154
+carpetregrid2::radius_3[1]               = 1944.0 #dx=122.88
+carpetregrid2::radius_3[2]               = 1296   #dx=61.44
+carpetregrid2::radius_3[3]               = 864    #dx=30.72
+carpetregrid2::radius_3[4]               = 576    #dx=15.36
+carpetregrid2::radius_3[5]               = 384    #dx=7.68
+carpetregrid2::radius_3[6]               = 192    #dx=3.84
+carpetregrid2::radius_3[7]               = 96     #dx=1.92
+carpetregrid2::radius_3[8]               = 48     #dx=0.96
+carpetregrid2::radius_3[9]               = 24     #dx=0.48
+carpetregrid2::radius_3[10]               = 18    #dx=0.24
+carpetregrid2::radius_3[11]               = 12    #dx=0.12
 
 ###
 
@@ -414,11 +415,11 @@ CoordBase::boundary_size_y_upper = 3
 CoordBase::boundary_size_z_upper = 3
 CoordBase::domainsize            = "minmax"
 CoordBase::spacing               = "gridspacing"
-CoordBase::dx                    = 315.392
+CoordBase::dx                    = 245.76
 CoordBase::dy                    = CoordBase::dx
 CoordBase::dz                    = CoordBase::dx
-CoordBase::xmin                  = -35008.512 
-CoordBase::xmax                  = 35008.512 
+CoordBase::xmin                  = -34897.92 #245.76*142
+CoordBase::xmax                  = 34897.92 #245.76*142
 CoordBase::ymin                  = CoordBase::xmin
 CoordBase::zmin                  = CoordBase::xmin
 CoordBase::ymax                  = CoordBase::xmax
@@ -433,7 +434,7 @@ EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APR_3335_rho420
 HydroBase::initial_Aphi        = "zero"
 HydroBase::initial_Avec        = "zero"
 HydroBase::initial_entropy     = "ID_TabEOS_HydroQuantities"
-HydroBase::initial_hydro       = "Kadath"
+HydroBase::initial_hydro       = "Meudon_Bin_NS"
 HydroBase::initial_temperature = "ID_TabEOS_HydroQuantities"
 HydroBase::initial_Y_e         = "ID_TabEOS_HydroQuantities"
 HydroBase::timelevels          = 3
@@ -464,8 +465,8 @@ IllinoisGRMHD::tau_atm_hybrid                 = 1e-20
 # Graded Atmo params
 IllinoisGRMHD::atmo_falloff                   = "yes"
 IllinoisGRMHD::atmo_falloff_T                 = "yes"
-IllinoisGRMHD::r_power 			                  = -2
-IllinoisGRMHD::r_power_T 			                = -0.44846722248800275
+IllinoisGRMHD::r_power 			                  = -6
+IllinoisGRMHD::r_power_T 			                = -1.3454016674640086
 IllinoisGRMHD::rho_b_atm_max                  = 1e-13
 IllinoisGRMHD::igm_Ye_atm                     = 0.5
 IllinoisGRMHD::igm_T_atm                      = 1e-2
@@ -489,9 +490,9 @@ IOUtil::recover                         = "autoprobe"
 IOUtil::recover_and_remove              = "yes"
 IOUtil::recover_dir                     = "../checkpoints"
 
-#---------KadathImporter----------
-KadathImporter::type = "BNS"
-KadathImporter::filename = "/work2/09319/acw6923/frontera/EOS/BNS_ECC_RED.eos_akmalpr.30.47.0.0.2.7.q1.0.0.13.info"
+# Parameters of thorn Meudon_Bin_NS (implementing Meudon_Bin_NS)
+Meudon_Bin_NS::eos_table = "nuc_eos"
+Meudon_Bin_NS::filename  = "/work2/09319/acw6923/frontera/EOS/resu.d"
 
 # Parameters of thorn MHD_Diagnostics
 MHD_Diagnostics::diagnostics_compute_every = 256
@@ -638,7 +639,7 @@ quasilocalmeasures::surface_index[8]     = 11
 quasilocalmeasures::surface_index[9]     = 12
 
 # Parameters of thorn Seed_Magnetic_Fields_BNS (implementing Seed_Magnetic_Fields_Privt)
-Seed_Magnetic_Fields_BNS::A_b                                     = 11185248.68948743 # E_mag = 7e46
+Seed_Magnetic_Fields_BNS::A_b                                     = 289170096.6819339 # E_mag = 5e49
 Seed_Magnetic_Fields_BNS::enable_IllinoisGRMHD_staggered_A_fields = "yes"
 Seed_Magnetic_Fields_BNS::have_two_NSs_along_x_axis               = "yes"
 Seed_Magnetic_Fields_BNS::n_s                                     = 3

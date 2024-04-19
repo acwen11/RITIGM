@@ -354,45 +354,45 @@ carpetregrid2::position_x_2              = -15.2 # Adjust according to ID. Corre
 carpetregrid2::position_x_3              = 15.2
 
 carpetregrid2::radius_1[1]               = 16384 #dx=157.696
-carpetregrid2::radius_1[2]               = 8192 #dx=78.848
-carpetregrid2::radius_1[3]               = 4096 #dx=39.424
-carpetregrid2::radius_1[4]               = 2048 #dx=19.712
-carpetregrid2::radius_1[5]               = 1024 #dx=9.856
-carpetregrid2::radius_1[6]               = 512 #dx=4.928
-carpetregrid2::radius_1[7]               = 256 #dx=2.464
-carpetregrid2::radius_1[8]               = 128  #dx=1.232
-carpetregrid2::radius_1[9]               = 70  #dx=0.616
-carpetregrid2::radius_1[10]              = 40  #dx=0.308 #activated at merger
-carpetregrid2::radius_1[11]              = 20  #dx=0.154 #activated at merger
+carpetregrid2::radius_1[2]               = 8192  #dx=78.848
+carpetregrid2::radius_1[3]               = 4096  #dx=39.424
+carpetregrid2::radius_1[4]               = 2048  #dx=19.712
+carpetregrid2::radius_1[5]               = 1024  #dx=9.856
+carpetregrid2::radius_1[6]               = 512   #dx=4.928
+carpetregrid2::radius_1[7]               = 256   #dx=2.464
+carpetregrid2::radius_1[8]               = 128   #dx=1.232
+carpetregrid2::radius_1[9]               = 70    #dx=0.616
+carpetregrid2::radius_1[10]              = 40    #dx=0.308 #activated at merger
+carpetregrid2::radius_1[11]              = 20    #dx=0.154 #activated at merger
 
 carpetregrid2::radius_1[12]               = 3.2  #dx=0.077 #activated just before collapse
 carpetregrid2::radius_1[13]               = 2.4  #disabled
 
 #during inspiral
 
-carpetregrid2::radius_2[1]               = 1944.0 #dx=122.88
-carpetregrid2::radius_2[2]               = 1296 #dx=61.44
-carpetregrid2::radius_2[3]               = 864 #dx=30.72
-carpetregrid2::radius_2[4]               = 576 #dx=15.36
-carpetregrid2::radius_2[5]               = 384 #dx=7.68
-carpetregrid2::radius_2[6]               = 192 #dx=3.84
-carpetregrid2::radius_2[7]               = 96  #dx=1.92
-carpetregrid2::radius_2[8]               = 48  #dx=0.96
-carpetregrid2::radius_2[9]               = 24  #dx=0.48
-carpetregrid2::radius_2[10]               = 18  #dx=0.24
-carpetregrid2::radius_2[11]               = 12  #dx=0.12
+carpetregrid2::radius_2[1]               = 1944.0 #dx=157.696
+carpetregrid2::radius_2[2]               = 1296   #dx=78.848
+carpetregrid2::radius_2[3]               = 864    #dx=39.424
+carpetregrid2::radius_2[4]               = 576    #dx=19.712
+carpetregrid2::radius_2[5]               = 384    #dx=9.856
+carpetregrid2::radius_2[6]               = 192    #dx=4.928
+carpetregrid2::radius_2[7]               = 96     #dx=2.464
+carpetregrid2::radius_2[8]               = 48     #dx=1.232
+carpetregrid2::radius_2[9]               = 24     #dx=0.616
+carpetregrid2::radius_2[10]               = 18    #dx=0.308
+carpetregrid2::radius_2[11]               = 12    #dx=0.154
 
-carpetregrid2::radius_3[1]               = 1944.0 #dx=122.88
-carpetregrid2::radius_3[2]               = 1296 #dx=61.44
-carpetregrid2::radius_3[3]               = 864 #dx=30.72
-carpetregrid2::radius_3[4]               = 576 #dx=15.36
-carpetregrid2::radius_3[5]               = 384 #dx=7.68
-carpetregrid2::radius_3[6]               = 192 #dx=3.84
-carpetregrid2::radius_3[7]               = 96  #dx=1.92
-carpetregrid2::radius_3[8]               = 48  #dx=0.96
-carpetregrid2::radius_3[9]               = 24  #dx=0.48
-carpetregrid2::radius_3[10]               = 18  #dx=0.24
-carpetregrid2::radius_3[11]               = 12  #dx=0.12
+carpetregrid2::radius_3[1]               = 1944.0 #dx=157.696
+carpetregrid2::radius_3[2]               = 1296   #dx=78.848
+carpetregrid2::radius_3[3]               = 864    #dx=39.424
+carpetregrid2::radius_3[4]               = 576    #dx=19.712
+carpetregrid2::radius_3[5]               = 384    #dx=9.856
+carpetregrid2::radius_3[6]               = 192    #dx=4.928
+carpetregrid2::radius_3[7]               = 96     #dx=2.464
+carpetregrid2::radius_3[8]               = 48     #dx=1.232
+carpetregrid2::radius_3[9]               = 24     #dx=0.616
+carpetregrid2::radius_3[10]               = 18    #dx=0.308
+carpetregrid2::radius_3[11]               = 12    #dx=0.154
 
 ###
 
@@ -427,7 +427,7 @@ CoordBase::zmax                  = CoordBase::xmax
 # Parameters of thorn EOS_Omni (implementing EOS_Omni)
 EOS_Omni::do_energy_shift   = "yes"
 EOS_Omni::nuceos_read_table = "yes"
-EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APR_3335_rho420_temp187_ye66_gitMf0fc21f_20240329_extended_adjusted.h5"
+EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APR_3335_rho420_temp187_ye66_gitMf0fc21f_20240329_extended_adjusted_V2.h5"
 
 # Parameters of thorn HydroBase (implementing HydroBase)
 HydroBase::initial_Aphi        = "zero"
@@ -465,7 +465,7 @@ IllinoisGRMHD::tau_atm_hybrid                 = 1e-20
 IllinoisGRMHD::atmo_falloff                   = "yes"
 IllinoisGRMHD::atmo_falloff_T                 = "yes"
 IllinoisGRMHD::r_power 			                  = -6
-IllinoisGRMHD::r_power_T 			                = -2.712911
+IllinoisGRMHD::r_power_T 			                = -1.3454016674640086
 IllinoisGRMHD::rho_b_atm_max                  = 1e-13
 IllinoisGRMHD::igm_Ye_atm                     = 0.5
 IllinoisGRMHD::igm_T_atm                      = 1e-2
@@ -542,7 +542,7 @@ NaNChecker::verbose         = "all"
 # Parameters of thorn NRPyLeakageET (implementing NRPyLeakageET)
 NRPyLeakageET::maxInitRefLevel              = 11
 NRPyLeakageET::minInitRefLevel              = 11
-NRPyLeakageET::numberOfIterations           = 1e6
+NRPyLeakageET::numberOfIterations           = 8192
 NRPyLeakageET::optical_depth_evolution_type = "PathOfLeastResistance"
 NRPyLeakageET::psi6_threshold               = 60
 NRPyLeakageET::rho_max_threshold            = 0.0040000000000000000833
