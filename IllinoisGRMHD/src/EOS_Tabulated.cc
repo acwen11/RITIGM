@@ -120,45 +120,61 @@ void initialize_Tabulated_EOS_parameters_from_input( const CCTK_REAL cctk_time,i
   eos.tau_atm_max = eos.rho_atm_max * eos.eps_atm_max;
   // --------------------------------------
 
-  // -------------- Ceilings --------------
-  // Get the maximum pressure. Remember that the alltables
-  // array actually constains ln(press), so we must adjust
-  // appropriately.
-  const CCTK_REAL eos_prsmax = exp(get_EOS_table_max( table_key_pressure ));
-  // Then get the maximum value of eps. Remember that the
-  // alltables array actually contains ln(eps + energy_shift),
-  // so we must adjust appropriately.
-  const CCTK_REAL eos_epsmax = exp(get_EOS_table_max( table_key_epsilon )) - energy_shift;
-  // Finally, get the maximum entropy
-  const CCTK_REAL eos_entmax = get_EOS_table_max( table_key_entropy );
-  // Now set the EOS struct variables
-  eos.rho_max = MIN(rho_b_max,eos_rhomax  * igm_eos_table_ceiling_safety_factor);
-  eos.Ye_max  = eos_yemax   * igm_eos_table_ceiling_safety_factor;
-  eos.T_max   = MIN(igm_T_max,eos_tempmax * igm_eos_table_ceiling_safety_factor);
-  eos.P_max   = eos_prsmax  * igm_eos_table_ceiling_safety_factor;
-  eos.eps_max = eos_epsmax  * igm_eos_table_ceiling_safety_factor;
-  eos.S_max   = eos_entmax  * igm_eos_table_ceiling_safety_factor;
-  // --------------------------------------
+	// Only set floors and ceilings once.
+	static bool init_minmax = false;
+	static CCTK_REAL eos_prsmax = -1;
+	static CCTK_REAL eos_epsmax = -1;
+	static CCTK_REAL eos_entmax = -1;
 
-  // --------------- Floors ---------------
-  // Get the miniimum pressure. Remember that the alltables
-  // array actually constains ln(press), so we must adjust
-  // appropriately.
-  const CCTK_REAL eos_prsmin = exp(get_EOS_table_min( table_key_pressure ));
-  // Then get the minimum value of eps. Remember that the
-  // alltables array actually contains ln(eps + energy_shift),
-  // so we must adjust appropriately.
-  const CCTK_REAL eos_epsmin = exp(get_EOS_table_min( table_key_epsilon )) - energy_shift;
-  // Finally, get the minimum entropy
-  const CCTK_REAL eos_entmin = get_EOS_table_min( table_key_entropy );
-  // Now set the EOS struct variables
-  eos.rho_min = eos_rhomin  * igm_eos_table_floor_safety_factor;
-  eos.Ye_min  = eos_yemin   * igm_eos_table_floor_safety_factor;
-  eos.T_min   = eos_tempmin * igm_eos_table_floor_safety_factor;
-  eos.P_min   = eos_prsmin  * igm_eos_table_floor_safety_factor;
-  eos.eps_min = eos_epsmin  * igm_eos_table_floor_safety_factor;
-  eos.S_min   = eos_entmin  * igm_eos_table_floor_safety_factor;
-  // --------------------------------------
+	static CCTK_REAL eos_prsmin = -1;
+	static CCTK_REAL eos_epsmin = -1;
+	static CCTK_REAL eos_entmin = -1;
+
+	if (!init_minmax) {
+		// -------------- Ceilings --------------
+		// Get the maximum pressure. Remember that the alltables
+		// array actually constains ln(press), so we must adjust
+		// appropriately.
+		eos_prsmax = exp(get_EOS_table_max( table_key_pressure ));
+		// Then get the maximum value of eps. Remember that the
+		// alltables array actually contains ln(eps + energy_shift),
+		// so we must adjust appropriately.
+		eos_epsmax = exp(get_EOS_table_max( table_key_epsilon )) - energy_shift;
+		// Finally, get the maximum entropy
+		eos_entmax = get_EOS_table_max( table_key_entropy );
+		// --------------------------------------
+
+		// --------------- Floors ---------------
+		// Get the miniimum pressure. Remember that the alltables
+		// array actually constains ln(press), so we must adjust
+		// appropriately.
+		eos_prsmin = exp(get_EOS_table_min( table_key_pressure ));
+		// Then get the minimum value of eps. Remember that the
+		// alltables array actually contains ln(eps + energy_shift),
+		// so we must adjust appropriately.
+		eos_epsmin = exp(get_EOS_table_min( table_key_epsilon )) - energy_shift;
+		// Finally, get the minimum entropy
+		eos_entmin = get_EOS_table_min( table_key_entropy );
+		// --------------------------------------
+
+		// Mins, maxes are set
+		init_minmax = true;
+	}
+
+	// Now set the EOS struct variables
+	eos.rho_max = MIN(rho_b_max,eos_rhomax  * igm_eos_table_ceiling_safety_factor);
+	eos.Ye_max  = eos_yemax   * igm_eos_table_ceiling_safety_factor;
+	eos.T_max   = MIN(igm_T_max,eos_tempmax * igm_eos_table_ceiling_safety_factor);
+	eos.P_max   = eos_prsmax  * igm_eos_table_ceiling_safety_factor;
+	eos.eps_max = eos_epsmax  * igm_eos_table_ceiling_safety_factor;
+	eos.S_max   = eos_entmax  * igm_eos_table_ceiling_safety_factor;
+
+	eos.rho_min = eos_rhomin  * igm_eos_table_floor_safety_factor;
+	eos.Ye_min  = eos_yemin   * igm_eos_table_floor_safety_factor;
+	eos.T_min   = eos_tempmin * igm_eos_table_floor_safety_factor;
+	eos.P_min   = eos_prsmin  * igm_eos_table_floor_safety_factor;
+	eos.eps_min = eos_epsmin  * igm_eos_table_floor_safety_factor;
+	eos.S_min   = eos_entmin  * igm_eos_table_floor_safety_factor;
 
   // ----- con2prim threshold values ------
   eos.depsdT_threshold = palenzuela_depsdT_threshold;
