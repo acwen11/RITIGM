@@ -464,8 +464,8 @@ IllinoisGRMHD::tau_atm_hybrid                 = 1e-20
 # Graded Atmo params
 IllinoisGRMHD::atmo_falloff                   = "yes"
 IllinoisGRMHD::atmo_falloff_T                 = "yes"
-IllinoisGRMHD::r_power 			                  = -6
-IllinoisGRMHD::r_power_T 			                = -1.3454016674640086
+IllinoisGRMHD::r_power 			                  = -2
+IllinoisGRMHD::r_power_T 			                = -0.44846722248800275
 IllinoisGRMHD::rho_b_atm_max                  = 1e-13
 IllinoisGRMHD::igm_Ye_atm                     = 0.5
 IllinoisGRMHD::igm_T_atm                      = 1e-2
@@ -491,7 +491,7 @@ IOUtil::recover_dir                     = "../checkpoints"
 
 #---------KadathImporter----------
 KadathImporter::type = "BNS"
-KadathImporter::filename = "/work2/09319/acw6923/frontera/EOS/BNS_ECC_RED.APR4.30.47.0.0.2.7.q1.0.0.13.info"
+KadathImporter::filename = "/work2/09319/acw6923/frontera/EOS/BNS_ECC_RED.eos_akmalpr.30.47.0.0.2.7.q1.0.0.13.info"
 
 # Parameters of thorn MHD_Diagnostics
 MHD_Diagnostics::diagnostics_compute_every = 256
@@ -638,7 +638,7 @@ quasilocalmeasures::surface_index[8]     = 11
 quasilocalmeasures::surface_index[9]     = 12
 
 # Parameters of thorn Seed_Magnetic_Fields_BNS (implementing Seed_Magnetic_Fields_Privt)
-Seed_Magnetic_Fields_BNS::A_b                                     = 289170096.6819339 # E_mag = 5e49
+Seed_Magnetic_Fields_BNS::A_b                                     = 11185248.68948743 # E_mag = 7e46
 Seed_Magnetic_Fields_BNS::enable_IllinoisGRMHD_staggered_A_fields = "yes"
 Seed_Magnetic_Fields_BNS::have_two_NSs_along_x_axis               = "yes"
 Seed_Magnetic_Fields_BNS::n_s                                     = 3
