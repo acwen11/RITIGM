@@ -11,3 +11,9 @@ When building the ETK with Kadath thorns, you may run into a strange bug when re
 gmake [config name] SILENT=NO -j16 2>&1 | tee gmake_out
 
 and modify the link command at the end. Move -mkl to the end of the command and run the link command yourself.
+
+To use FUKA with simfactory, I needed to compile with this particular order of operations:
+1) run ./simfactory/bin/sim build
+2) delete the executable
+3) run the gmake command above
+4) manually link as detailed above
