@@ -53,6 +53,7 @@ Multipole
 NaNChecker 
 NewRad 
 Outflow
+particle_tracerET 
 QuasiLocalMeasures 
 Seed_Magnetic_Fields_BNS 
 Slab 
@@ -222,7 +223,7 @@ CarpetIOHDF5::checkpoint                    = "yes"
 CarpetIOHDF5::compression_level             = 0
 CarpetIOHDF5::one_file_per_group            = "yes"
 CarpetIOHDF5::open_one_input_file_at_a_time = "yes"
-CarpetIOHDF5::out2D_dir                     = "output_directory/hdf5_output_2d"
+CarpetIOHDF5::out2D_dir                     = "$parfile/hdf5_output_2d"
 CarpetIOHDF5::out2D_every                   = 1024
 CarpetIOHDF5::out2D_vars                    = "
   ADMBase::metric
@@ -276,7 +277,7 @@ CarpetIOHDF5::out2D_vars                    = "
 	MHD_Diagnostics::a4sq
   WeylScal4::psi4r
 "
-CarpetIOHDF5::out_dir                       = "output_directory/hdf5_output_3d"
+CarpetIOHDF5::out_dir                       = "$parfile/hdf5_output_3d"
 CarpetIOHDF5::out_every                     = 8196
 CarpetIOHDF5::out_vars                      = "
   ADMBase::metric
@@ -424,7 +425,7 @@ CoordBase::zmax                  = CoordBase::xmax
 # Parameters of thorn EOS_Omni (implementing EOS_Omni)
 EOS_Omni::do_energy_shift   = "yes"
 EOS_Omni::nuceos_read_table = "yes"
-EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APR_3335_rho420_temp187_ye66_gitMf0fc21f_20240227_extended_adjusted.h5"
+EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APR_3335_rho420_temp187_ye66_gitMf0fc21f_20240329_extended_adjusted_V2.h5"
 
 # Parameters of thorn HydroBase (implementing HydroBase)
 HydroBase::initial_Aphi        = "zero"
@@ -462,7 +463,7 @@ IllinoisGRMHD::tau_atm_hybrid                 = 1e-20
 IllinoisGRMHD::atmo_falloff                   = "yes"
 IllinoisGRMHD::atmo_falloff_T                 = "yes"
 IllinoisGRMHD::r_power 			                  = -2
-IllinoisGRMHD::r_power_T 			                = -0.9043038030280685
+IllinoisGRMHD::r_power_T 			                = -0.44846722248800275
 IllinoisGRMHD::rho_b_atm_max                  = 1e-13
 IllinoisGRMHD::igm_Ye_atm                     = 0.5
 IllinoisGRMHD::igm_T_atm                      = 1e-2
@@ -475,16 +476,16 @@ IllinoisGRMHD::update_HydroBase               = yes
 InitBase::initial_data_setup_method = "init_all_levels"
 
 # Parameters of thorn IOUtil (implementing IO)
-IOUtil::checkpoint_dir                  = "output_directory/checkpoints"
+IOUtil::checkpoint_dir                  = "./checkpoints"
 IOUtil::checkpoint_every_walltime_hours = 12
 IOUtil::checkpoint_keep                 = 1
 IOUtil::checkpoint_on_terminate         = "yes"
-IOUtil::out_dir                         = "output_directory"
+IOUtil::out_dir                         = "$parfile"
 IOUtil::out_fileinfo                    = "none"
 IOUtil::parfile_write                   = "generate"
 IOUtil::recover                         = "autoprobe"
 IOUtil::recover_and_remove              = "yes"
-IOUtil::recover_dir                     = "output_directory/checkpoints"
+IOUtil::recover_dir                     = "./checkpoints"
 
 # Parameters of thorn Meudon_Bin_NS (implementing Meudon_Bin_NS)
 Meudon_Bin_NS::eos_table = "nuc_eos"
@@ -566,6 +567,41 @@ HydroBase::press
 HydroBase::entropy
 HydroBase::Y_e
 "
+
+# Parameters of thorn particle_tracerET (implementing particle_tracerET)
+particle_tracerET::density_max                          = 0.0013705362390320999927
+particle_tracerET::max_num_particles                    = 20000
+particle_tracerET::out_of_bounds_xyz                    = 800
+particle_tracerET::output_four_velocity_u4U           = "yes"
+particle_tracerET::output_four_velocity_u4D           = "yes"
+particle_tracerET::output_hydro                       = "yes"
+particle_tracerET::output_freq                          = 128
+particle_tracerET::update_RK4_freq                      = 16
+particle_tracerET::verbose                              = 1
+
+# Seed particles in the crust from the beginning.
+particle_tracerET::start_tracing_particles_iteration[0] = 0
+particle_tracerET::start_tracing_particles_iteration[1] = 0
+particle_tracerET::num_particles[0]                        = 2500
+particle_tracerET::num_particles[1]                        = 2500
+particle_tracerET::seed_particles_inside_sphere__radius[0] = 8
+particle_tracerET::seed_particles_outside_sphere__radius[0] = 5.506706706706705 # 8.1 km
+particle_tracerET::seed_particles_inside_sphere__x_coord[0] = -15.2 # Adjust according to ID. Corresponds to ~45 km sep.
+particle_tracerET::seed_particles_inside_sphere__radius[1] = 8
+particle_tracerET::seed_particles_outside_sphere__radius[1] = 5.506706706706705 # 8.1 km
+particle_tracerET::seed_particles_inside_sphere__x_coord[1] = 15.2 # Adjust according to ID. Corresponds to ~45 km sep.
+
+# Seed particles to test for unbound material from inner regions.
+particle_tracerET::start_tracing_particles_iteration[2] = 0
+particle_tracerET::start_tracing_particles_iteration[3] = 0
+particle_tracerET::num_particles[2]                        = 500
+particle_tracerET::num_particles[3]                        = 500
+particle_tracerET::seed_particles_inside_sphere__radius[2] = 2.7087127838436773 # 4 km
+particle_tracerET::seed_particles_outside_sphere__radius[2] = 2.031534587882758 # 3 km
+particle_tracerET::seed_particles_inside_sphere__x_coord[2] = -15.2 # Adjust according to ID. Corresponds to ~45 km sep.
+particle_tracerET::seed_particles_inside_sphere__radius[3] = 2.7087127838436773 # 4 km
+particle_tracerET::seed_particles_outside_sphere__radius[3] = 2.031534587882758 # 3 km
+particle_tracerET::seed_particles_inside_sphere__x_coord[3] = 15.2 # Adjust according to ID. Corresponds to ~45 km sep.
 
 # Parameters of thorn QuasiLocalMeasures (implementing QuasiLocalMeasures)
 QuasiLocalMeasures::interpolator         = "Lagrange polynomial interpolation"
@@ -697,7 +733,7 @@ VolumeIntegrals_GRMHD::NumIntegrals = 14
 VolumeIntegrals_GRMHD::VolIntegral_out_every = 256
 
 VolumeIntegrals_GRMHD::enable_file_output = 1
-VolumeIntegrals_GRMHD::outVolIntegral_dir = "output_directory/volume_integration"
+VolumeIntegrals_GRMHD::outVolIntegral_dir = "$parfile/volume_integration"
 VolumeIntegrals_GRMHD::verbose = 1
 
 #   The AMR centre will only track the first referenced integration quantities that track said centre.
