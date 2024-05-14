@@ -8,7 +8,7 @@ Use provided CmakeLocal.cmake config file.
 
 When building the ETK with Kadath thorns, you may run into a strange bug when reading initial data. This could be caused by the order in which libraries are linked. Run:
 
-gmake [config name] SILENT=NO -j16 2>&1 | tee gmake_out
+gmake [config name] SILENT=NO -j28 2>&1 | tee gmake_out
 
 and modify the link command at the end. Move -mkl to the end of the command and run the link command yourself.
 
