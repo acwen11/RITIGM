@@ -11,6 +11,7 @@ SRCS = compute_particles_four_velocities.C \
        Interpolate_density_many_pts.C \
        Interpolate_four_velocities_at_particle_positions.C \
        Interpolate_hydro_vars_at_particle_positions.C \
+       Interpolate_metric_vars_at_particle_positions.C \
        Interpolate_velocities_at_particle_positions.C
 
 # Subdirectories containing source files

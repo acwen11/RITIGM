@@ -142,7 +142,11 @@ BOOLEAN output_four_velocity_u4D "Whether or not to output the particles' covari
 {
 } "no"
 
-BOOLEAN output_hydro "Whether or not to output HydroBase vars to interpolated to particle positions" STEERABLE=ALWAYS
+BOOLEAN output_hydro "Whether or not to output HydroBase vars interpolated to particle positions" STEERABLE=ALWAYS
+{
+} "no"
+
+BOOLEAN output_metric "Whether or not to output ADMBase vars interpolated to particle positions" STEERABLE=ALWAYS
 {
 } "no"
 
