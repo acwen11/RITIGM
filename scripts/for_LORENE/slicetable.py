@@ -1,52 +1,66 @@
-# This code was was initially developed by Leo Werneck
-
 # Load necessary Python modules
 import os,sys                                   # Multiplatform OS specific functions
 import bisect                                   # Bisection algorithms
-import numpy as np                              # Support for large, multi-dimensional arrays and matrices and mathematical functions
+
 import h5py as h5                               # HDF5 file system support
+from numpy import array, log, exp, empty
 from collections import namedtuple              # C-like struct functionality
 from scipy.interpolate import interp1d,interp2d # 1d and 2d interpolating functions
 
-def read_and_slice_EOS_table_at_given_temperature(eos_file_path,T_in_MeV):
-    eos_file = h5.File(eos_file_path,"r")
+def read_and_slice_EOS_table_at_given_temperature(eos_file_path, T_in_MeV):
+    eos_file = h5.File(eos_file_path, "r")
 
     # Read in the ye, P, eps, T, and rho
-    tab_Ye   =     np.array(eos_file['ye'       ])[:]
-    tab_P    = 10**np.array(eos_file['logpress' ])[:]
-    tab_eps  = 10**np.array(eos_file['logenergy'])[:] - eos_file['energy_shift'][0]
-    tab_temp = 10**np.array(eos_file['logtemp'  ])[:]
-    tab_rho  = 10**np.array(eos_file['logrho'   ])[:]
+    tab_Ye = array(eos_file['ye'])[:]
+    tab_lp = log(10**array(eos_file['logpress'])[:])
+    tab_le = log(10**array(eos_file['logenergy'])[:])
+    tab_lt = log(10**array(eos_file['logtemp'])[:])
+    tab_lr = log(10**array(eos_file['logrho'])[:])
+    tab_ent = array(eos_file['entropy'])[:]
 
-    # Read in the neutrino chemical potential
-    munu     =     np.array(eos_file['munu'   ])[:]
+    # Read in the chemical potentials
+#     munu     =     array(eos_file['munu'   ])[:]
+    mu_e = array(eos_file['mu_e'])[:]
+    mu_hat = array(eos_file['muhat'])[:]
+    mu_l = mu_e - mu_hat
 
     # Find temperature index
-    T_idx = bisect.bisect_left(tab_temp,T_in_MeV)
-    print("Slicing table at index %d. T[%d] = %.3lf MeV | Input temperature: %.3lf MeV"%(T_idx,T_idx,tab_temp[T_idx],T_in_MeV))
+    T_idx = bisect.bisect_left(tab_lt, log(T_in_MeV))
+    print("Slicing table at index %d. T[%d] = %.3lf MeV | Input temperature: %.3lf MeV" % (
+        T_idx, T_idx, exp(tab_lt[T_idx]), T_in_MeV))
 
     # Set 2d interpolators for P and eps
     # as functions of rho and Ye
-    P_interp   = interp2d(tab_rho,tab_Ye,tab_P[  :,T_idx,:])
-    eps_interp = interp2d(tab_rho,tab_Ye,tab_eps[:,T_idx,:])
+    lp_interp = interp2d(tab_lr, tab_Ye, tab_lp[:, T_idx, :])
+    le_interp = interp2d(tab_lr, tab_Ye, tab_le[:, T_idx, :])
+    ent_interp = interp2d(tab_lr, tab_Ye, tab_ent[:, T_idx, :])
 
     # Now, loop over the density and set the array
-    Ye_be  = np.empty(len(tab_rho))
-    P_be   = np.empty(len(tab_rho))
-    eps_be = np.empty(len(tab_rho))
-    for rho_idx in range(len(tab_rho)):
+    Ye_be = empty(len(tab_lr))
+    lp_be = empty(len(tab_lr))
+    le_be = empty(len(tab_lr))
+    ent_be = empty(len(tab_lr))
+    Y_e_min = 1.1*tab_Ye.min()
+    for rho_idx in range(len(tab_lr)):
         # Set the interpolator
-        Ye_ito_munu_of_T_and_rho = interp1d(munu[:,T_idx,rho_idx],tab_Ye)
+        #         Ye_ito_munu_of_T_and_rho = interp1d(munu[:,T_idx,rho_idx],tab_Ye)
+        Ye_ito_munu_of_T_and_rho = interp1d(mu_l[:, T_idx, rho_idx], tab_Ye)
         # Then find the value of Ye which sets munu to zero
-        Ye_be[rho_idx]  = Ye_ito_munu_of_T_and_rho(0.0)
+        try:
+            YeL = Ye_ito_munu_of_T_and_rho(0.0)
+        except:
+            YeL = Y_e_min
+        # Set Ye in beta equilibrium
+        Ye_be[rho_idx] = YeL
         # Finally, determine P and eps in beta equilibrium
-        P_be[  rho_idx] = P_interp(  tab_rho[rho_idx],Ye_be[rho_idx])
-        eps_be[rho_idx] = eps_interp(tab_rho[rho_idx],Ye_be[rho_idx])
+        lp_be[rho_idx] = lp_interp(tab_lr[rho_idx], Ye_be[rho_idx])
+        le_be[rho_idx] = le_interp(tab_lr[rho_idx], Ye_be[rho_idx])
+        ent_be[rho_idx] = ent_interp(tab_lr[rho_idx], Ye_be[rho_idx])
 
     # Convert table to code units
     # Set physical constants in cgs units
-    G    = 6.6738480e-8   # cm^3/g/s^2
-    c    = 2.99792458e10  # cm/s
+    G = 6.6738480e-8   # cm^3/g/s^2
+    c = 2.99792458e10  # cm/s
     Msun = 1.9884e33      # g
 
     # Set the length factor:
@@ -71,19 +85,51 @@ def read_and_slice_EOS_table_at_given_temperature(eos_file_path,T_in_MeV):
     units_of_spec_int_energy = c**2
 
     # Convert the table to dimensionless units
-    P_be    /= units_of_pressure
-    tab_rho /= units_of_density
-    eps_be  /= units_of_spec_int_energy
+    lp_be = log(exp(lp_be)/units_of_pressure)
+    le_be = log(exp(le_be)/units_of_spec_int_energy)
+    tab_lr = log(exp(tab_lr)/units_of_density)
 
     # Functions to interpolate P and eps
-    P_of_rho   = interp1d(P_be   ,tab_rho)
-    rho_of_P   = interp1d(tab_rho,P_be)
-    eps_of_rho = interp1d(tab_rho,eps_be)
-    Ye_of_rho  = interp1d(tab_rho,Ye_be)
+    lr_of_lp = interp1d(lp_be, tab_lr)
+    lp_of_lr = interp1d(tab_lr, lp_be)
+    le_of_lr = interp1d(tab_lr, le_be)
+    ye_of_lr = interp1d(tab_lr, Ye_be)
+    lent_of_lr = interp1d(tab_lr, log(ent_be))
+
+    def rho_of_P_func(P):
+        return exp(lr_of_lp(log(P)))
+
+    def P_of_rho_func(rho):
+        return exp(lp_of_lr(log(rho)))
+
+    def eps_of_rho_func(rho):
+        return exp(le_of_lr(log(rho)))
+
+    def ent_of_rho_func(rho):
+        return exp(lent_of_lr(log(rho)))
+
+    def Ye_of_rho_func(rho):
+        return ye_of_lr(log(rho))
+
+    rho_of_P = rho_of_P_func
+    P_of_rho = P_of_rho_func
+    eps_of_rho = eps_of_rho_func
+    Ye_of_rho = Ye_of_rho_func
+    ent_of_rho = ent_of_rho_func
 
     # Set the EOS tuple
-    eos_tuple = namedtuple("eos_tuple","rho Temperature rho_of_P_interpolator P_of_rho_interpolator eps_of_rho_interpolator Ye_of_rho_interpolator units_of_density units_of_pressure units_of_spec_int_energy")
-    beta_equilibrated_eos_slice = eos_tuple(tab_rho,tab_temp[T_idx],P_of_rho,rho_of_P,eps_of_rho,Ye_of_rho,units_of_density,units_of_pressure,units_of_spec_int_energy)
+    eos_tuple = namedtuple(
+        "eos_tuple", "rho Ye T Temperature rho_of_P_interpolator P_of_rho_interpolator eps_of_rho_interpolator Ye_of_rho_interpolator units_of_density units_of_pressure units_of_spec_int_energy ent_of_rho_interpolator")
+    beta_equilibrated_eos_slice = eos_tuple(exp(tab_lr), tab_Ye, exp(tab_lt),
+                                            exp(tab_lt[T_idx]),
+                                            rho_of_P,
+                                            P_of_rho,
+                                            eps_of_rho,
+                                            Ye_of_rho,
+                                            units_of_density,
+                                            units_of_pressure,
+                                            units_of_spec_int_energy,
+                                            ent_of_rho)
 
     return beta_equilibrated_eos_slice
 

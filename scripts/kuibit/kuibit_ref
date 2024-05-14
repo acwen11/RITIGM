@@ -1,0 +1,2 @@
+To generate pickles file:
+picklify.py -v --datadir Ambitious_lowres --pickle-file Ambitious_lowres.pickle
