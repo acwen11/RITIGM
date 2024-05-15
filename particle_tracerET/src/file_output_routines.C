@@ -37,6 +37,20 @@ void Interpolate_hydro_vars_at_particle_positions(
       double *particle_eps,
       double *particle_P);
 
+void Interpolate_metric_vars_at_particle_positions(
+      cGH *cctkGH,
+      int interp_num_points,
+      double *particle_x,
+      double *particle_y,
+      double *particle_z,
+      double *particle_gxx,
+      double *particle_gxy,
+      double *particle_gxz,
+      double *particle_gyy,
+      double *particle_gyz,
+      double *particle_gzz,
+      double *particle_alp);
+
 /********************************************************************
  ********************    Macro Definitions   ************************
  ********************************************************************/
@@ -185,6 +199,17 @@ void particle_tracerET_file_output_ascii(CCTK_ARGUMENTS) {
 			fclose(file);
 		}
 
+		if( output_metric ) {
+			sprintf(filename, "%sparticles_batch%d_metric.asc", actual_dir,pf);
+			if(!(file = fopen(filename, "a+"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
+			add_header_if_file_is_empty(file, "# Col. 1: Time (cctk_time). Subsequent columns: gxx, gxy, gxz, gyy, gyz, gzz, lapse of particle i\n");
+			sprintf(buffer,"%e",cctk_time);
+			for(int which_particle=np_tot;which_particle<np_tot+np;which_particle++) {
+				sprintf(buffer, "%s %e %e %e %e %e %e %e", buffer, particle_gxx[which_particle], particle_gxy[which_particle], particle_gxz[which_particle], particle_gyy[which_particle], particle_gyz[which_particle], particle_gzz[which_particle], particle_alp[which_particle]);
+			}
+			fprintf(file, "%s\n", buffer);
+			fclose(file);
+		}
 		free(buffer);
 		free(filename);
 		np_tot += np;
@@ -250,6 +275,20 @@ void particle_tracerET_file_output_binary(CCTK_ARGUMENTS) {
 			fwrite(particle_P   + np_tot, sizeof(CCTK_REAL), np, file);
 			fclose(file);
 		}
+		if( output_metric ) {
+			sprintf(filename, "%sparticles_batch%d_metric.bin", actual_dir,pf);
+			if(!(file = fopen(filename, "a+b"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
+			add_number_of_particles_and_quantities_if_file_is_empty(file, np, num_quantities);
+			fwrite(&cctk_time   , sizeof(CCTK_REAL), 1 , file);
+			fwrite(particle_gxx + np_tot, sizeof(CCTK_REAL), np, file);
+			fwrite(particle_gxy + np_tot, sizeof(CCTK_REAL), np, file);
+			fwrite(particle_gxz + np_tot, sizeof(CCTK_REAL), np, file);
+			fwrite(particle_gyy + np_tot, sizeof(CCTK_REAL), np, file);
+			fwrite(particle_gyz + np_tot, sizeof(CCTK_REAL), np, file);
+			fwrite(particle_gzz + np_tot, sizeof(CCTK_REAL), np, file);
+			fwrite(particle_alp + np_tot, sizeof(CCTK_REAL), np, file);
+			fclose(file);
+		}
 		free(filename);
 		np_tot += np;
 	}
@@ -293,6 +332,23 @@ void particle_tracerET_file_output(CCTK_ARGUMENTS) {
 						particle_W,
 						particle_eps,
 						particle_P);
+		}
+
+		if ( output_metric ) {
+      if(verbose>1) CCTK_VINFO("**** It: %d - Interpolating metric vars ****", cctk_iteration);
+			Interpolate_metric_vars_at_particle_positions(
+						cctkGH,
+						*num_active,
+						particle_position_x,
+						particle_position_y,
+						particle_position_z,
+						particle_gxx,
+						particle_gxy,
+						particle_gxz,
+						particle_gyy,
+						particle_gyz,
+						particle_gzz,
+						particle_alp);
 		}
 
     if(verbose>0) CCTK_VINFO("**** It: %d - Outputting to file ****", cctk_iteration);

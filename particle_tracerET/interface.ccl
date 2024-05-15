@@ -75,11 +75,20 @@ CCTK_REAL particle_four_velocity_u4D_gridfunctions TYPE=GF TAGS='InterpNumTimele
 #########################################
 ###  HydroBase Interp quantities      ###
 #########################################
-# Four-velocity at particles' positions
+# Hydro quantities at particles' positions
 CCTK_REAL particle_hydro_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=max_num_particles
 {
   particle_rho,particle_T,particle_Ye,particle_W,particle_eps,particle_P
 } "Particle hydrodynamics quantities arrays"
+
+#########################################
+###  ADMBase Interp quantities      ###
+#########################################
+# Metric quantities at particles' positions, for mass flux calculation
+CCTK_REAL particle_metric_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=max_num_particles
+{
+  particle_gxx,particle_gxy,particle_gxz,particle_gyy,particle_gyz,particle_gzz,particle_alp
+} "Particle metric quantities arrays"
 
 #########################################
 ###  Aliased functions from Carpet    ###

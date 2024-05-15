@@ -27,6 +27,11 @@ if( output_hydro )
 	STORAGE: particle_hydro_arrays
 	STORAGE: HydroBase::temperature[timelevels], HydroBase::Y_e[timelevels], HydroBase::w_lorentz[timelevels]
 } 
+
+if( output_metric )
+{
+	STORAGE: particle_metric_arrays
+} 
 ###################################
 ##### INITIALIZATION ROUTINES #####
 ###################################

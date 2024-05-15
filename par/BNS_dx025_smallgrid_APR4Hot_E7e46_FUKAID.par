@@ -40,12 +40,11 @@ ID_TabEOS_HydroQuantities
 IllinoisGRMHD 
 InitBase 
 IOUtil 
+KadathImporter
 LAPACK 
 LocalInterp 
 LocalReduce 
 LoopControl 
-LORENE 
-Meudon_Bin_NS 
 MHD_Diagnostics
 MoL 
 MPI 
@@ -81,11 +80,11 @@ zlib
 ADMBase::dtlapse_evolution_method = "Baikal"
 ADMBase::dtshift_evolution_method = "Baikal"
 ADMBase::evolution_method         = "Baikal"
-ADMBase::initial_data             = "Meudon_Bin_NS"
+ADMBase::initial_data             = "Kadath"
 ADMBase::initial_dtlapse          = "zero"
 ADMBase::initial_dtshift          = "zero"
-ADMBase::initial_lapse            = "Meudon_Bin_NS"
-ADMBase::initial_shift            = "zero"
+ADMBase::initial_lapse            = "Kadath"
+ADMBase::initial_shift            = "Kadath"
 ADMBase::lapse_evolution_method   = "Baikal"
 ADMBase::lapse_timelevels         = 3
 ADMBase::metric_timelevels        = 3
@@ -431,7 +430,7 @@ EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APR_3335_rho420
 HydroBase::initial_Aphi        = "zero"
 HydroBase::initial_Avec        = "zero"
 HydroBase::initial_entropy     = "ID_TabEOS_HydroQuantities"
-HydroBase::initial_hydro       = "Meudon_Bin_NS"
+HydroBase::initial_hydro       = "Kadath"
 HydroBase::initial_temperature = "ID_TabEOS_HydroQuantities"
 HydroBase::initial_Y_e         = "ID_TabEOS_HydroQuantities"
 HydroBase::timelevels          = 3
@@ -487,9 +486,9 @@ IOUtil::recover                         = "autoprobe"
 IOUtil::recover_and_remove              = "yes"
 IOUtil::recover_dir                     = "./checkpoints"
 
-# Parameters of thorn Meudon_Bin_NS (implementing Meudon_Bin_NS)
-Meudon_Bin_NS::eos_table = "nuc_eos"
-Meudon_Bin_NS::filename  = "/work2/09319/acw6923/frontera/EOS/resu.d"
+#---------KadathImporter----------
+KadathImporter::type = "BNS"
+KadathImporter::filename = "/work2/09319/acw6923/frontera/EOS/BNS_ECC_RED.APR4.30.47.0.0.2.7.q1.0.0.13.info"
 
 # Parameters of thorn MHD_Diagnostics
 MHD_Diagnostics::diagnostics_compute_every = 256
@@ -575,6 +574,7 @@ particle_tracerET::out_of_bounds_xyz                    = 800
 particle_tracerET::output_four_velocity_u4U           = "yes"
 particle_tracerET::output_four_velocity_u4D           = "yes"
 particle_tracerET::output_hydro                       = "yes"
+particle_tracerET::output_metric                       = "yes"
 particle_tracerET::output_freq                          = 128
 particle_tracerET::update_RK4_freq                      = 16
 particle_tracerET::verbose                              = 1
