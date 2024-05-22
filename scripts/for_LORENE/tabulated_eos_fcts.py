@@ -1,11 +1,104 @@
 # Load necessary Python modules
-import os,sys                                   # Multiplatform OS specific functions
-import bisect                                   # Bisection algorithms
-
+import os
+import sys                                   # Multiplatform OS specific functions
+from bisect import bisect_left                  # Bisection algorithm
+# Support for large, multi-dimensional arrays and matrices and mathematical functions
 import h5py as h5                               # HDF5 file system support
-from numpy import array, log, exp, empty
 from collections import namedtuple              # C-like struct functionality
-from scipy.interpolate import interp1d,interp2d # 1d and 2d interpolating functions
+# 1d and 2d interpolating functions
+from scipy.interpolate import interp1d, interp2d
+import bisect                                   # Bisection algorithms
+import astropy.constants as constants
+from numpy import empty, array, zeros, log, exp, loadtxt
+
+
+def initialize_eos_struct(eos_table_path=os.path.join('IllinoisGRMHD', 'doc', 'eostable.h5'), idx_Ye=0, idx_T=0):
+    # Unit conversion: cgs to dimensionless
+    # Set physical constants
+    G = constants.G.cgs.value     # cm^3/g/s^2
+    c = constants.c.cgs.value     # cm/s
+    Msun = constants.M_sun.cgs.value  # g
+
+    # Set the length factor:
+    # .----------------------.
+    # | [Msun * G / c^2] = L |
+    # .----------------------.
+    units_of_length = Msun * G / c**2
+
+    # Set the time factor:
+    # .----------------------.
+    # | [Msun * G / c^3] = T |
+    # .----------------------.
+    units_of_time = units_of_length/c
+
+    # Pressure has units of M * L^(-1) * T^(-2), so
+    units_of_pressure = Msun * units_of_length**(-1) * units_of_time**(-2)
+
+    # Density has units of M * L^(-3), so
+    units_of_density = Msun * units_of_length**(-3)
+
+    # Specific internal energy has units of L^(2) * T^(-2),so
+    units_of_spec_int_energy = c**2
+
+    # Load the relevant quantities from the EOS table
+    eos_table = h5.File(eos_table_path, 'r')
+    tab_lp = log(10**array(eos_table["logpress"][:]))
+    tab_lr = log(10**array(eos_table["logrho"][:]))
+    tab_le = log(10**array(eos_table["logenergy"][:]))
+    tab_lp_of_lr = tab_lp[idx_Ye, idx_T, :]
+    tab_le_of_lr = tab_le[idx_Ye, idx_T, :]
+
+    # Define the eos_struct named tuple
+    eos_struct = namedtuple(
+        "eos_struct", "tab_P_of_rho tab_eps_of_rho tab_rho")
+
+    # Set the eos "struct" with dimensionless quantities
+    eos = eos_struct(tab_P_of_rho/units_of_pressure,
+                     tab_eps_of_rho/units_of_spec_int_energy,
+                     tab_rho/units_of_density)
+
+    return eos
+
+
+def Read_EOS_table_and_sliced_table(eos_table_path, sliced_table_path):
+    # Read in the EOS table
+    eos_table = h5.File(eos_table_path, 'r')
+    logrho = array(eos_table["logrho"])
+
+    # Read in the sliced table values
+    tempindex, rhoindex, yeindex, P, S, dummy, dummy, dummy, dummy, eps = loadtxt(
+        os.path.join(sliced_table_path, "eos.thermo")).T
+    yeb = loadtxt(os.path.join(sliced_table_path, "eos.yqb")).T
+
+    # Convert P to cgs units
+    # pressconv = 17.980714384531204 # math.log10(m_n * 1.0E-3 * 1.0E-4 / mev_si)  #useful constant for pressure conversion
+    # P = 10**(log10(P) + logrho + pressconv)
+
+    # Set rho
+    rho = 10**logrho
+
+    # Check that the length of all quantities match
+    length_check = len(logrho)
+    entries = [rhoindex, yeindex, P, rho, yeb]
+    for entry in entries:
+        if (len(entry) != length_check):
+            print("Error! Incorrect length found!")
+            sys.exit(1)
+    print("Loaded EOS quantities successfully")
+
+    # Convert from cgs to dimensionless units
+    P, rho, eps = Convert_table_to_code_units(P, rho, eps)
+
+    print("Converted P,rho,eps from cgs to dimensionless units")
+
+    # Set the eos namedtuple
+    eos_tuple = namedtuple("eos_tuple", "rho P yeindex yeb eps")
+    eos = eos_tuple(rho, P, yeindex, yeb, eps)
+
+    print("Finished without errors")
+
+    return eos
+
 
 def read_and_slice_EOS_table_at_given_temperature(eos_file_path, T_in_MeV):
     eos_file = h5.File(eos_file_path, "r")
@@ -132,4 +225,3 @@ def read_and_slice_EOS_table_at_given_temperature(eos_file_path, T_in_MeV):
                                             ent_of_rho)
 
     return beta_equilibrated_eos_slice
-

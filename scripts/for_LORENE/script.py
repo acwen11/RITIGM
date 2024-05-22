@@ -2,22 +2,23 @@
 
 # Import needed modules
 import os
-import slicetable
+#import slicetable
+from tabulated_eos_fcts import read_and_slice_EOS_table_at_given_temperature
 import numpy as np
 # Set table path and the slicing temperature
-tablepath = os.path.join(".","APR_3335_rho393_temp133_ye66_gitM180edd5_20190225_adjusted.h5")
+tablepath = os.path.join(".","SLy4_3335_rho391_temp163_ye66_adjusted.h5")
 slicetemp = 0.01 # in MeV
 # This command will provide the 1D interpolators we need, i.e.
 # P(rho), eps(rho), and Y_{e}(rho) in beta-equilibrium at
 # T = slicetemp
-eos = slicetable.read_and_slice_EOS_table_at_given_temperature(tablepath,slicetemp)
+eos = read_and_slice_EOS_table_at_given_temperature(tablepath,slicetemp)
 # Then output to file as needed
 rho_code_units = eos.rho
 P_code_units   = eos.P_of_rho_interpolator(rho_code_units)
 eps_code_units = eos.eps_of_rho_interpolator(rho_code_units)
 Ye  = eos.Ye_of_rho_interpolator(eos.rho)
 T   = eos.Temperature*np.ones(len(eos.rho))
-m_b = 1.660539040*(10**-24)
+m_b = 1.639274e-24
 
 #Getting proper units
 rho_cgs = rho_code_units*eos.units_of_density
