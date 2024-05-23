@@ -52,11 +52,18 @@ def read_and_slice_EOS_table_at_given_temperature(eos_file_path, T_in_MeV):
     Ye_be  = empty(len(tab_rho))
     P_be   = empty(len(tab_rho))
     eps_be = empty(len(tab_rho))
+
+    ye_min = tab_Ye[0]
+
     for rho_idx in range(len(tab_rho)):
         # Set the interpolator
         Ye_ito_munu_of_T_and_rho = interp1d(munu[:,T_idx,rho_idx],tab_Ye)
         # Then find the value of Ye which sets munu to zero
-        Ye_be[rho_idx]  = Ye_ito_munu_of_T_and_rho(0.0)
+        try:
+            Ye_be[rho_idx]  = Ye_ito_munu_of_T_and_rho(0.0)
+        except:
+						# Some high density points do not contain a beta equilibrium solution. Assume that the table minimum is a suitable fix.
+            Ye_be[rho_idx] = ye_min
         # Finally, determine P and eps in beta equilibrium
         P_be[  rho_idx] = P_interp(  tab_rho[rho_idx],Ye_be[rho_idx])
         eps_be[rho_idx] = eps_interp(tab_rho[rho_idx],Ye_be[rho_idx])
