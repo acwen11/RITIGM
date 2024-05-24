@@ -214,6 +214,7 @@ CactusUtils/NaNChecker
 CactusUtils/SystemStatistics
 CactusUtils/TerminationTrigger
 CactusUtils/TimerReport
+CactusUtils/Trigger
 CactusUtils/Vectors
 
 # CactusWave thorns
@@ -233,18 +234,33 @@ CactusUtils/Vectors
 !REPO_PATH= $2
 !CHECKOUT = Carpet/doc
 Carpet/Carpet
+Carpet/CarpetEvolutionMask
 Carpet/CarpetIOASCII
 Carpet/CarpetIOBasic
 Carpet/CarpetIOHDF5
 Carpet/CarpetIOScalar
+Carpet/CarpetIntegrateTest
 Carpet/CarpetInterp
+Carpet/CarpetInterp2
 Carpet/CarpetLib
 Carpet/CarpetMask
+Carpet/CarpetProlongateTest
 Carpet/CarpetReduce
+Carpet/CarpetRegrid
 Carpet/CarpetRegrid2
+Carpet/CarpetRegridTest
 Carpet/CarpetSlab
+Carpet/CarpetTracker
 Carpet/CycleClock
+Carpet/HighOrderWaveTest
 Carpet/LoopControl
+Carpet/PeriodicCarpet
+Carpet/ReductionTest
+Carpet/ReductionTest2
+Carpet/ReductionTest3
+Carpet/RegridSyncTest
+Carpet/TestCarpetGridInfo
+Carpet/TestLoopControl
 Carpet/Timers
 
 
@@ -264,9 +280,17 @@ Carpet/Timers
 !REPO_BRANCH = $ET_RELEASE
 !REPO_PATH= $2
 !CHECKOUT =
+EinsteinAnalysis/ADMAnalysis
+EinsteinAnalysis/ADMMass
+EinsteinAnalysis/AHFinder
 EinsteinAnalysis/AHFinderDirect
+EinsteinAnalysis/CalcK
+EinsteinAnalysis/EHFinder
+EinsteinAnalysis/Extract
+EinsteinAnalysis/Hydro_Analysis
 EinsteinAnalysis/Multipole
 EinsteinAnalysis/Outflow
+EinsteinAnalysis/PunctureTracker
 EinsteinAnalysis/QuasiLocalMeasures
 EinsteinAnalysis/WeylScal4
 
@@ -320,6 +344,7 @@ EinsteinEvolve/NewRad
 !REPO_PATH= $2
 !CHECKOUT =
 EinsteinInitialData/Meudon_Bin_NS
+EinsteinInitialData/ID_NrotStar
 
 # FLRW cosmological initial data
 !TARGET   = $ARR
@@ -408,18 +433,20 @@ ExternalLibraries/Boost
 # FUKA initial data thorns
 # the crazy path works around a bug in GetComponents that does not handle
 # symbolic links and ".." correctly
-# !TARGET = $ARR/Fuka/KadathThorn/src/fuka/../../../../repos/KadathThorn/src/fuka
-# !TYPE   = git
-# !URL    = https://bitbucket.org/fukaws/fuka
-# !REPO_BRANCH = $ET_RELEASE
-# !CHECKOUT = Cmake build_debug build_release codes eos include install_par.sh install_seq.sh src src_par src_seq
-# 
-# !TARGET   = $ARR
-# !TYPE     = git
-# !URL      = https://bitbucket.org/fukaws/$2
-# !REPO_BRANCH = $ET_RELEASE
-# !REPO_PATH=../$2
-# !CHECKOUT = Fuka/KadathImporter Fuka/KadathThorn
+!TARGET = $ARR/Fuka/KadathThorn/src/fuka/../../../../repos/KadathThorn/src/fuka
+!TYPE   = git
+!URL    = https://bitbucket.org/fukaws/fuka
+!REPO_BRANCH = $ET_RELEASE
+!CHECKOUT = Cmake build_debug build_release codes eos include install_par.sh install_seq.sh src src_par src_seq
+
+!TARGET   = $ARR
+!TYPE     = git
+!URL      = https://bitbucket.org/fukaws/$2
+!REPO_BRANCH = $ET_RELEASE
+!REPO_PATH=../$2
+!CHECKOUT = Fuka/KadathImporter Fuka/KadathThorn
+Fuka/KadathImporter
+Fuka/KadathThorn
 
 # From Kranc (required e.g. by McLachlan)
 !TARGET   = $ARR
@@ -524,6 +551,7 @@ Numerical/AEILocalInterp
 !REPO_PATH= $2
 !CHECKOUT =
 WVUThorns/Baikal
+WVUThorns/Seed_Magnetic_Fields
 
 
 # Various "diagnostic" thorns from WVU:
@@ -561,6 +589,13 @@ RITIGM_BNS/smallbPoynET
 RITIGM_BNS/VolumeIntegrals_GRMHD
 RITIGM_BNS/WVU_EOS
 
+# THCCore/THC_Core
+# 
+# THCBase/CPPUtils
+# THCBase/FDCore
+# THCBase/HRSCCore
+
+THCExtra/BNSAnalysis
 THCExtra/BNSTrackerGen
 THCExtra/PizzaBase
 THCExtra/PizzaNumUtils
@@ -569,4 +604,3 @@ THCExtra/PizzaNumUtils
 !TARGET   = $ARR
 !TYPE     = ignore
 !CHECKOUT =
-
