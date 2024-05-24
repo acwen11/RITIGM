@@ -3,6 +3,7 @@ import sys
 import bisect
 import h5py as h5
 import numpy as np
+from scipy.ndimage import median_filter
 
 # UNIT CONVERSIONS
 ## APR stores entropy in units of k_B / baryon, while helmholtz uses erg / K / g. Convert between the two using m_n / k_B.
@@ -40,6 +41,21 @@ def extend_std_table_at_Ye(iYe, nT_new, nrho_new, irp, irm, iTp, iTm, chi_rho, c
 
     return extend_tab
 
+def deriv_median_filter(tab, width, thresh):
+    tab_cpy = tab
+    # Get median value of neighbors at each point
+    filt_tab = median_filter(tab, size=width, mode="nearest")
+
+    # If value differs from neighbors too much, set value to median
+    bad_pts = (np.abs(tab - filt_tab) / np.abs(filt_tab)) > thresh
+
+    arr_iter = np.nditer(tab, flags=['multi_index'])
+    for val in arr_iter:
+        if bad_pts[arr_iter.multi_index]:
+            tab_cpy[arr_iter.multi_index] = filt_tab[arr_iter.multi_index]
+
+    return tab_cpy
+
 def main(original_tablepath):
     try:
         import helmholtz
@@ -51,7 +67,7 @@ def main(original_tablepath):
 
     # Final Params
     logrho_min = -4
-    logT_min = -6
+    logT_min = -4
 
     # TODO: Debug Params
     # logrho_min = 2.5
@@ -142,7 +158,8 @@ def main(original_tablepath):
     T_space_orig = np.arange(tab_logtemp[0], tab_logtemp[-1] + dlogT, dlogT)
 
     ## Stitch param check
-    print("npts rho = {:d}; npts T = {:d}".format(len(rho_space_final), len(T_space_final)))
+    print("new logrho_min = {:.6f}; new logT_min = {:.6f}".format(rho_min_adj, T_min_adj))
+    print("total pts rho = {:d}; total pts T = {:d}".format(len(rho_space_final), len(T_space_final)))
     print("rho_t_+ = {:.6f}; rho_t_- = {:.6f}; T_t_+ = {:.6f}; T_t_- = {:.6f}".format(rho_t_plus, rho_t_minus, T_t_plus, T_t_minus))
     print("irho_+ = {:d}; irho_- = {:d}; iT_+ = {:d}; iT_- = {:d}; ".format(irho_plus, irho_minus, iT_plus, iT_minus))
     print("new_pts_rho = {:d}; new_pts_T = {:d}".format(num_new_pts_rho, num_new_pts_T))
@@ -235,16 +252,23 @@ def main(original_tablepath):
     dedrho = np.gradient(eps, drho, axis=2)
     dPdrhoe = dPdrho - dPdT * dedrho / dedT
 
-    # Default to original values when possible, even if they are no longer accurate in the stitching regions. May enhance C2P? Needs to be tested.
+    # Default to original values in unmodified region
 
     ## Load in original data
     tab_dedt = np.array(eos_file["dedt"])[:]
     tab_dPde = np.array(eos_file["dpderho"])[:]
     tab_dPdrhoe = np.array(eos_file["dpdrhoe"])[:]
 
-    dedT[:,num_new_pts_T:,num_new_pts_rho:] = tab_dedt
-    dPde[:,num_new_pts_T:,num_new_pts_rho:] = tab_dPde
-    dPdrhoe[:,num_new_pts_T:,num_new_pts_rho:] = tab_dPdrhoe
+    dedT[:,iT_plus:,irho_plus:] = tab_dedt[:,iT_plus-num_new_pts_T:,irho_plus-num_new_pts_rho:] 
+    dPde[:,iT_plus:,irho_plus:] = tab_dPde[:,iT_plus-num_new_pts_T:,irho_plus-num_new_pts_rho:] 
+    dPdrhoe[:,iT_plus:,irho_plus:] = tab_dPdrhoe[:,iT_plus-num_new_pts_T:,irho_plus-num_new_pts_rho:] 
+
+    # Perform median filter as is done in Jonah Miller's Singularity EOS code
+    MF_W = 3 ## vals from Singularity
+    MF_THRESH = 10
+    dedT = deriv_median_filter(dedT, MF_W, MF_THRESH)
+    dPde = deriv_median_filter(dPde, MF_W, MF_THRESH)
+    dPdrhoe = deriv_median_filter(dPdrhoe, MF_W, MF_THRESH)
 
     # Update new HDF5
     print("Outputting to file")
