@@ -615,8 +615,8 @@ particle_tracerET::seed_particles_inside_sphere__x_coord[1] = 15.2 # Adjust acco
 # Seed particles to test for unbound material from inner regions.
 particle_tracerET::start_tracing_particles_iteration[2] = 0
 particle_tracerET::start_tracing_particles_iteration[3] = 0
-particle_tracerET::num_particles[2]                        = 500
-particle_tracerET::num_particles[3]                        = 500
+particle_tracerET::num_particles[2]                        = 5000
+particle_tracerET::num_particles[3]                        = 5000
 particle_tracerET::seed_particles_inside_sphere__radius[2] = 2.7087127838436773 # 4 km
 particle_tracerET::seed_particles_outside_sphere__radius[2] = 2.031534587882758 # 3 km
 particle_tracerET::seed_particles_inside_sphere__x_coord[2] = -15.2 # Adjust according to ID. Corresponds to ~45 km sep.
@@ -646,7 +646,7 @@ quasilocalmeasures::surface_index[8]     = 11
 quasilocalmeasures::surface_index[9]     = 12
 
 # Parameters of thorn Seed_Magnetic_Fields_BNS (implementing Seed_Magnetic_Fields_Privt)
-Seed_Magnetic_Fields_BNS::A_b                                     = 289170096.6819339 # E_mag = 5e49
+Seed_Magnetic_Fields_BNS::A_b                                     = 364919465.9961338 # E_mag = 5e49
 Seed_Magnetic_Fields_BNS::enable_IllinoisGRMHD_staggered_A_fields = "yes"
 Seed_Magnetic_Fields_BNS::have_two_NSs_along_x_axis               = "yes"
 Seed_Magnetic_Fields_BNS::n_s                                     = 3
