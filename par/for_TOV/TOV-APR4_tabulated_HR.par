@@ -56,7 +56,8 @@ ActiveThorns = "
   Time
   TmunuBase
   Vectors
-
+  VolumeIntegrals_GRMHD
+	VolumeIntegrals_vacuum
 "
 
 #---------Cactus---------
@@ -148,11 +149,11 @@ CoordBase::domainsize            = "minmax"
 CoordBase::spacing               = "gridspacing"
 
 # The values below are set to match Spritz
-CoordBase::dx   = 3.0
+CoordBase::dx   = 1.92
 CoordBase::dy   = CoordBase::dx
 CoordBase::dz   = CoordBase::dx
-CoordBase::xmin = -144 + CoordBase::dx/32.0
-CoordBase::xmax = +144 + CoordBase::dx/32.0
+CoordBase::xmin = -144
+CoordBase::xmax = +144
 CoordBase::ymin = CoordBase::xmin
 CoordBase::ymax = CoordBase::xmax
 CoordBase::zmin = CoordBase::xmin
@@ -160,7 +161,7 @@ CoordBase::zmax = CoordBase::xmax
 
 #---------EOS_Omni---------
 EOS_Omni::nuceos_read_table = "yes"
-EOS_Omni::nuceos_table_name = "APR_3335_rho420_temp187_ye66_gitMf0fc21f_20240329_ex_adj_massfix.h5"
+EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APR_3335_rho420_temp187_ye66_gitMf0fc21f_20240329_extended_adj_mineps0.h5"
 EOS_Omni::do_energy_shift   = "yes"
 
 #---------HydroBase---------
@@ -173,7 +174,7 @@ HydroBase::timelevels          = 3
 #---------ID_TabEOS_HydroQuantities---------
 ID_TabEOS_HydroQuantities::id_temperature_type = "constant"
 ID_TabEOS_HydroQuantities::id_entropy_type     = "from table"
-ID_TabEOS_HydroQuantities::Y_e_filename        = "Ye_beq_massfix.txt"
+ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APR4ex_mineps0.txt"
 
 #---------IllinoisGRMHD---------
 # Setting up the EOS parameters like this
@@ -235,7 +236,7 @@ NRPyLeakageET::minInitRefLevel              = Carpet::max_refinement_levels-1 # 
 NRPyLeakageET::maxInitRefLevel              = Carpet::max_refinement_levels-1 # Only initialize finest refinement level
 
 #---------NRPyPlusTOVID---------
-NRPyPlusTOVID::TOV_filename     = "outputTOVtabulated_APR4.txt"
+NRPyPlusTOVID::TOV_filename     = "/work2/09319/acw6923/frontera/EOS/outputTOVtabulated_APR4.txt"
 NRPyPlusTOVID::rho_atmosphere   = IllinoisGRMHD::rho_b_atm_max
 NRPyPlusTOVID::K_atmosphere     = 1
 NRPyPlusTOVID::Gamma_atmosphere = 1
@@ -423,3 +424,67 @@ CarpetIOScalar::outScalar_vars       = "
   MHD_Diagnostics::sigma4Trace{ reductions = 'minimum maximum' }
   MHD_Diagnostics::sigma4bb{ reductions = 'minimum maximum' }
 "
+
+# Parameters of thorn VolumeIntegrals_GRMHD (implementing VolumeIntegrals_GRMHD)
+VolumeIntegrals_GRMHD::NumIntegrals = 14
+VolumeIntegrals_GRMHD::VolIntegral_out_every = 2**Carpet::max_refinement_levels
+
+VolumeIntegrals_GRMHD::enable_file_output = 1
+VolumeIntegrals_GRMHD::outVolIntegral_dir = "$parfile/volume_integration"
+VolumeIntegrals_GRMHD::verbose = 1
+
+#   The AMR centre will only track the first referenced integration quantities that track said centre.
+#   Thus, centeroflapse output will not feed back into the AMR centre positions.
+
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[1] = "thermal_energy"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[2] = "kinetic_energy"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[3] = "kinetic_energy_palenzuela"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[4] = "kinetic_energy_shibata"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[5] = "kinetic_energy_total"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[6] = "magnetic_energy_total"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[7] = "magnetic_energy_comov"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[8] = "density_weighted_norm_B_field"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[9] = "volume_average_norm_B_ab"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[10]  = "volume_average_norm_B_cd"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[11]  = "em_energy_ab"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[12]  = "em_energy_cd"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[13]  = "centerofmass"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[14]  = "restmass"
+
+VolumeIntegrals_GRMHD::dens_a = 1.6193138848638947e-08
+VolumeIntegrals_GRMHD::dens_b = 1.6193138848638947e-05
+VolumeIntegrals_GRMHD::dens_c = 1.6193138848638947e-05
+#VolumeIntegrals_GRMHD::dens_d = 10
+
+# Parameters of thorn VolumeIntegrals_vacuum (implementing VolumeIntegrals_vacuum)
+VolumeIntegrals_vacuum::enable_file_output                     = 1
+VolumeIntegrals_vacuum::enable_time_reparameterization         = "no"
+VolumeIntegrals_vacuum::HamiltonianVarString                   = "Baikal::HGF"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[1]        = "H_M_CnstraintsL2"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[2]        = "H_M_CnstraintsL2"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[3]        = "H_M_CnstraintsL2"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[4]        = "H_M_CnstraintsL2"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[5]        = "H_M_CnstraintsL2"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[6]        = "H_M_CnstraintsL2"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[7]        = "H_M_CnstraintsL2"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[8]        = "H_M_CnstraintsL2"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[9]        = "H_M_CnstraintsL2"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[10]       = "ADM_Mass"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[11]       = "ADM_Mass"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[12]       = "ADM_Mass"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[13]       = "ADM_Mass"
+VolumeIntegrals_vacuum::Momentum0VarString                     = "Baikal::MU0GF"
+VolumeIntegrals_vacuum::Momentum1VarString                     = "Baikal::MU1GF"
+VolumeIntegrals_vacuum::Momentum2VarString                     = "Baikal::MU2GF"
+VolumeIntegrals_vacuum::NumIntegrals                           = 13
+VolumeIntegrals_vacuum::outVolIntegral_dir                     = "$parfile/volume_integration"
+VolumeIntegrals_vacuum::verbose                                = 1
+VolumeIntegrals_vacuum::VIv_time_reparam_t0                    = 10
+VolumeIntegrals_vacuum::VIv_time_reparam_w                     = 5
+VolumeIntegrals_vacuum::VolIntegral_out_every                  = 2**Carpet::max_refinement_levels
+VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[2]  = 4
+VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[3]  = 8
+VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[4]  = 16
+VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[5]  = 32
+VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[6]  = 64
+VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[7]  = 128
