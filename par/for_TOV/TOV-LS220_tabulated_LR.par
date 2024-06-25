@@ -56,7 +56,7 @@ ActiveThorns = "
   Time
   TmunuBase
   Vectors
-  VolumeIntegrals_GRMHD
+  VolumeIntegrals_GRMHD_TOV
 	VolumeIntegrals_vacuum
 "
 
@@ -425,36 +425,36 @@ CarpetIOScalar::outScalar_vars       = "
   MHD_Diagnostics::sigma4bb{ reductions = 'minimum maximum' }
 "
 
-# Parameters of thorn VolumeIntegrals_GRMHD (implementing VolumeIntegrals_GRMHD)
-VolumeIntegrals_GRMHD::NumIntegrals = 14
-VolumeIntegrals_GRMHD::VolIntegral_out_every = 2**Carpet::max_refinement_levels
+# Parameters of thorn VolumeIntegrals_GRMHD_TOV (implementing VolumeIntegrals_GRMHD_TOV)
+VolumeIntegrals_GRMHD_TOV::NumIntegrals = 14
+VolumeIntegrals_GRMHD_TOV::VolIntegral_out_every = 2**Carpet::max_refinement_levels
 
-VolumeIntegrals_GRMHD::enable_file_output = 1
-VolumeIntegrals_GRMHD::outVolIntegral_dir = "$parfile/volume_integration"
-VolumeIntegrals_GRMHD::verbose = 1
+VolumeIntegrals_GRMHD_TOV::enable_file_output = 1
+VolumeIntegrals_GRMHD_TOV::outVolIntegral_dir = "$parfile/volume_integration"
+VolumeIntegrals_GRMHD_TOV::verbose = 1
 
 #   The AMR centre will only track the first referenced integration quantities that track said centre.
 #   Thus, centeroflapse output will not feed back into the AMR centre positions.
 
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[1] = "thermal_energy"
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[2] = "kinetic_energy"
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[3] = "kinetic_energy_palenzuela"
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[4] = "kinetic_energy_shibata"
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[5] = "kinetic_energy_total"
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[6] = "magnetic_energy_total"
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[7] = "magnetic_energy_comov"
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[8] = "density_weighted_norm_B_field"
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[9] = "volume_average_norm_B_ab"
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[10]  = "volume_average_norm_B_cd"
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[11]  = "em_energy_ab"
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[12]  = "em_energy_cd"
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[13]  = "centerofmass"
-VolumeIntegrals_GRMHD::Integration_quantity_keyword[14]  = "restmass"
+VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[1] = "thermal_energy"
+VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[2] = "kinetic_energy"
+VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[3] = "kinetic_energy_palenzuela"
+VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[4] = "kinetic_energy_shibata"
+VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[5] = "kinetic_energy_total"
+VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[6] = "magnetic_energy_total"
+VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[7] = "magnetic_energy_comov"
+VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[8] = "density_weighted_norm_B_field"
+VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[9] = "volume_average_norm_B_ab"
+VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[10]  = "volume_average_norm_B_cd"
+VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[11]  = "em_energy_ab"
+VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[12]  = "em_energy_cd"
+VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[13]  = "centerofmass"
+VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[14]  = "restmass"
 
-VolumeIntegrals_GRMHD::dens_a = 1.6193138848638947e-08
-VolumeIntegrals_GRMHD::dens_b = 1.6193138848638947e-05
-VolumeIntegrals_GRMHD::dens_c = 1.6193138848638947e-05
-#VolumeIntegrals_GRMHD::dens_d = 10
+VolumeIntegrals_GRMHD_TOV::dens_a = 1.6193138848638947e-08
+VolumeIntegrals_GRMHD_TOV::dens_b = 1.6193138848638947e-05
+VolumeIntegrals_GRMHD_TOV::dens_c = 1.6193138848638947e-05
+#VolumeIntegrals_GRMHD_TOV::dens_d = 10
 
 # Parameters of thorn VolumeIntegrals_vacuum (implementing VolumeIntegrals_vacuum)
 VolumeIntegrals_vacuum::enable_file_output                     = 1

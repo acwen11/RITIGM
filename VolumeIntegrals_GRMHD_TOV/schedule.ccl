@@ -39,7 +39,7 @@ SCHEDULE VI_GRMHD_InitializeIntegralCounter before VI_GRMHD_VolumeIntegralGroup 
   OPTIONS: GLOBAL
 } "Initialize IntegralCounter variable"
 ##################
-SCHEDULE GROUP VI_GRMHD_VolumeIntegralGroup AT CCTK_ANALYSIS BEFORE CarpetLib_printtimestats BEFORE CarpetLib_printmemstats WHILE VolumeIntegrals_GRMHD::IntegralCounter
+SCHEDULE GROUP VI_GRMHD_VolumeIntegralGroup AT CCTK_ANALYSIS BEFORE CarpetLib_printtimestats BEFORE CarpetLib_printmemstats WHILE VolumeIntegrals_GRMHD_TOV::IntegralCounter
 {
 } "Evaluate all volume integrals"
 
