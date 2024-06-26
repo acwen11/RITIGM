@@ -64,7 +64,7 @@ ActiveThorns = "
 Cactus::cctk_run_title     = "Baikal_IGM_APR4_TOV"
 Cactus::cctk_full_warnings = "yes"
 Cactus::terminate          = "time"
-Cactus::cctk_final_time    = 140 #more or less 6 ms # divide by ~203 to get ms
+Cactus::cctk_final_time    = 1400000 #more or less 6 ms # divide by ~203 to get ms
 
 #---------ADMBase---------
 ADMBase::evolution_method         = "Baikal"
@@ -152,8 +152,8 @@ CoordBase::spacing               = "gridspacing"
 CoordBase::dx   = 1.92
 CoordBase::dy   = CoordBase::dx
 CoordBase::dz   = CoordBase::dx
-CoordBase::xmin = -144
-CoordBase::xmax = +144
+CoordBase::xmin = -144 + CoordBase::dx/32.0
+CoordBase::xmax = +144 + CoordBase::dx/32.0
 CoordBase::ymin = CoordBase::xmin
 CoordBase::ymax = CoordBase::xmax
 CoordBase::zmin = CoordBase::xmin
@@ -229,7 +229,7 @@ NaNChecker::check_every     = 1024
 NaNChecker::check_vars      = "ADMBase::metric ADMBase::lapse ADMBase::shift"
 
 #---------NRPyLeakageET---------
-NRPyLeakageET::verbosity_level              = 2
+NRPyLeakageET::verbosity_level              = 1
 NRPyLeakageET::optical_depth_evolution_type = "PathOfLeastResistance"
 NRPyLeakageET::numberOfIterations           = 2048
 NRPyLeakageET::minInitRefLevel              = Carpet::max_refinement_levels-1 # Only initialize finest refinement level
@@ -254,8 +254,8 @@ SpaceMask::use_mask = "yes"
 TerminationTrigger::create_termination_file = "yes"
 TerminationTrigger::termination_from_file   = "yes"
 TerminationTrigger::termination_file        = "TERMINATE"
-TerminationTrigger::max_walltime            = 48 # IN HOURS
-TerminationTrigger::on_remaining_walltime   = 15 # IN MINUTES
+TerminationTrigger::max_walltime            = 2 # IN HOURS
+TerminationTrigger::on_remaining_walltime   = 10 # IN MINUTES
 
 #---------Time---------
 Time::dtfac = 0.5 # == 0.5 (Courant factor) * (1/2)^N_repeats (from time_refinement_factors above)
@@ -272,8 +272,8 @@ TmunuBase::prolongation_type     = none
 
 #---------IOUtil---------
 IOUtil::out_dir                         = "$parfile"
-IOUtil::checkpoint_dir                  = "$parfile/checkpoints"
-IOUtil::recover_dir                     = "$parfile/checkpoints"
+IOUtil::checkpoint_dir                  = "../checkpoints"
+IOUtil::recover_dir                     = "../checkpoints"
 IOUtil::checkpoint_keep                 = 1
 IOUtil::checkpoint_on_terminate         = "yes"
 IOUtil::out_fileinfo                    = "none"
@@ -334,7 +334,7 @@ CarpetIOHDF5::compression_level             = 0
 CarpetIOHDF5::one_file_per_group            = "no"
 CarpetIOHDF5::open_one_input_file_at_a_time = "yes"
 CarpetIOHDF5::out2D_dir                     = "$parfile/hdf5_output_2d"
-CarpetIOHDF5::out2D_every                   = 1024
+CarpetIOHDF5::out2D_every                   = 128
 CarpetIOHDF5::out2D_vars                    = "
   ADMBase::metric
   ADMBase::curv

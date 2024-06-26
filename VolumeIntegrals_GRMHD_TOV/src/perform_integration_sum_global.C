@@ -54,7 +54,7 @@ void VI_GRMHD_DoSum(CCTK_ARGUMENTS)
   int reduction_handle = CCTK_ReductionHandle("sum");
 
   for(int i=0;i<num_reductions;i++) {
-    char integralname[100]; sprintf(integralname,"VolumeIntegrals_GRMHD::VolIntegrand%d",i+1);
+    char integralname[100]; sprintf(integralname,"VolumeIntegrals_GRMHD_TOV::VolIntegrand%d",i+1);
     int varindex = CCTK_VarIndex(integralname);
     int ierr=0;
     assert(varindex>=0);
