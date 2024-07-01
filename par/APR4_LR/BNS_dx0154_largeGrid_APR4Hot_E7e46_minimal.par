@@ -456,6 +456,7 @@ IllinoisGRMHD::igm_con2prim_backup_routine[0] = "Palenzuela1D"
 IllinoisGRMHD::igm_eos_type                   = "Tabulated"
 IllinoisGRMHD::igm_evolve_temperature         = "yes"
 IllinoisGRMHD::igm_evolve_entropy             = "yes"
+IllinoisGRMHD::igm_T_max                      = 240
 IllinoisGRMHD::conserv_to_prims_debug         = 0
 IllinoisGRMHD::Psi6threshold                  = 60 # This value should only be reached far inside the horizon! Verify this!
 IllinoisGRMHD::damp_lorenz                    = 0.217416512059369 #1.5/(dtfac*dx_coarsest)=1.5/(0.021875*315.392)
