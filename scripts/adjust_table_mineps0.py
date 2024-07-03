@@ -79,7 +79,7 @@ mu = MN_MEV
 mu_cgs = MN_CGS
 
 # Step 3c: Compute m_f = (1 - (eps_{0} - eps_min))*m_u
-mf = MN_MEV*(1.0 + eps_min/C_CGS**2)
+mf = MN_MEV*(1.0 + (1.0 + 1.75e-14) * eps_min/C_CGS**2)
 
 # Step 3d: Convert mf from MeV to cgs units
 mf_cgs = (mf*MEV_CGS)/(C_CGS**2)
@@ -89,7 +89,8 @@ print("THE ADJUSTED BARYON MASS IS {:e} GRAMS.".format(mf_cgs))
 energy = rho*(1+eps/(C_CGS**2))
 
 # Step 5: Adjust rho
-rho *= (mf_cgs/mu_cgs)
+#rho *= (mf_cgs/mu_cgs)
+rho *= (1.0 + eps_min/C_CGS**2)
 
 # Step 6: Adjust eps
 eps = (energy/rho - 1)*C_CGS**2
