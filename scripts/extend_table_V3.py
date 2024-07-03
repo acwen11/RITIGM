@@ -59,7 +59,7 @@ def deriv_median_filter(tab, width, thresh):
 
     return tab_cpy
 
-def main(original_tablepath, do_temp_extend):
+def main(args):
     try:
         import helmholtz
     except:
@@ -68,15 +68,16 @@ def main(original_tablepath, do_temp_extend):
  
     # Set New Table Parameters
 
-    # Final Params
-    logrho_min = -4
-    logT_min = -4
+    do_temp_extend = args.do_temp_extend
+    print("TEMP EXTEND???")
+    print(do_temp_extend)
 
-    # TODO: Debug Params
-    # logrho_min = 2.5
-    # logT_min = -2.5
+    # Final Params
+    logrho_min = args.rhomin
+    logT_min = args.Tmin
 
     # Create New Table
+    original_tablepath = args.table
     output_tablepath   = original_tablepath.split(".h5")[0]+"_ext_norad.h5"
 
     os.system("cp %s %s"%(original_tablepath,output_tablepath))
@@ -92,35 +93,39 @@ def main(original_tablepath, do_temp_extend):
     tab_logtemp = np.array(eos_file['logtemp'  ])[:]
     tab_logrho  = np.array(eos_file['logrho'   ])[:]
 
-    # TODO: reset debug
-    # tab_Ye   = np.array(eos_file['ye'       ])[:2]
-    # tab_logtemp = np.array(eos_file['logtemp'  ])[:20]
-    # tab_logrho  = np.array(eos_file['logrho'   ])[:20]
-
-    tab_logrho_min = tab_logrho[0]
-    tab_logT_min = tab_logtemp[0]
-
     dYe = np.abs(tab_Ye[1] - tab_Ye[0])
     dlogT = np.abs(tab_logtemp[1] - tab_logtemp[0])
     dlogrho = np.abs(tab_logrho[1] - tab_logrho[0])
     
-    tab_P    = 10**np.array(eos_file['logpress' ])[:]
+    if args.og_rhomin != 999:
+        irho_ogmin = bisect.bisect_left(tab_logrho, args.og_rhomin)
+        tab_logrho = tab_logrho[irho_ogmin:]
+    else:
+        irho_ogmin = 0
+
+    if args.og_Tmin != 999:
+        iT_ogmin = bisect.bisect_left(tab_logtemp, args.og_Tmin)
+        tab_logtemp = tab_logtemp[iT_ogmin:]
+    else:
+        iT_ogmin = 0
+
+    tab_P    = 10**np.array(eos_file['logpress' ])[:, iT_ogmin:, irho_ogmin:]
     tab_shift = eos_file['energy_shift'][0]
-    tab_eps  = 10**np.array(eos_file['logenergy'])[:] - tab_shift 
-    tab_S = np.array(eos_file['entropy'])[:]
-    tab_cs2 = np.array(eos_file['cs2'])[:]
-    tab_muhat = np.array(eos_file['muhat'])[:]
-    tab_mu_n = np.array(eos_file['mu_n'])[:]
-    tab_mu_p = np.array(eos_file['mu_p'])[:]
-    tab_mu_e = np.array(eos_file['mu_e'])[:]
-    tab_munu = np.array(eos_file['munu'])[:]
-    tab_Xn = np.array(eos_file['Xn'])[:]
-    tab_Xp = np.array(eos_file['Xp'])[:]
-    tab_Xa = np.array(eos_file['Xa'])[:]
-    tab_Xh = np.array(eos_file['Xh'])[:]
-    tab_Abar = np.array(eos_file['Abar'])[:]
-    tab_Zbar = np.array(eos_file['Zbar'])[:]
-    tab_gamma = np.array(eos_file['gamma'])[:]
+    tab_eps  = 10**np.array(eos_file['logenergy'])[:, iT_ogmin:, irho_ogmin:] - tab_shift 
+    tab_S = np.array(eos_file['entropy'])[:, iT_ogmin:, irho_ogmin:]
+    tab_cs2 = np.array(eos_file['cs2'])[:, iT_ogmin:, irho_ogmin:]
+    tab_muhat = np.array(eos_file['muhat'])[:, iT_ogmin:, irho_ogmin:]
+    tab_mu_n = np.array(eos_file['mu_n'])[:, iT_ogmin:, irho_ogmin:]
+    tab_mu_p = np.array(eos_file['mu_p'])[:, iT_ogmin:, irho_ogmin:]
+    tab_mu_e = np.array(eos_file['mu_e'])[:, iT_ogmin:, irho_ogmin:]
+    tab_munu = np.array(eos_file['munu'])[:, iT_ogmin:, irho_ogmin:]
+    tab_Xn = np.array(eos_file['Xn'])[:, iT_ogmin:, irho_ogmin:]
+    tab_Xp = np.array(eos_file['Xp'])[:, iT_ogmin:, irho_ogmin:]
+    tab_Xa = np.array(eos_file['Xa'])[:, iT_ogmin:, irho_ogmin:]
+    tab_Xh = np.array(eos_file['Xh'])[:, iT_ogmin:, irho_ogmin:]
+    tab_Abar = np.array(eos_file['Abar'])[:, iT_ogmin:, irho_ogmin:]
+    tab_Zbar = np.array(eos_file['Zbar'])[:, iT_ogmin:, irho_ogmin:]
+    tab_gamma = np.array(eos_file['gamma'])[:, iT_ogmin:, irho_ogmin:]
 
     # We want the new table to line up with the old one where they overlap
     num_new_pts_rho = int((tab_logrho[0] - logrho_min) / dlogrho)
@@ -143,16 +148,10 @@ def main(original_tablepath, do_temp_extend):
     new_shape = (len(tab_Ye), len(T_space_final), len(rho_space_final))
 
     # STITCHING PARAMETERS
-    rho_stitch = 2.5 # log10(rho in g cm^-3)
-    T_stitch = -3.5  # log10(T in MeV)
-    width = 0.25
-    tol = 5e-2
-
-    # TODO: reset
-    # rho_stitch = 3.5 # log10(rho in g cm^-3)
-    # T_stitch = -1.75  # log10(T in MeV)
-    # width = 0.15
-    # tol = 1e-1
+    rho_stitch = args.rho_stitch # log10(rho in g cm^-3)
+    T_stitch = args.T_stitch  # log10(T in MeV)
+    width = args.width
+    tol = args.tol
 
     ## Transition region bounds. See MERGE in SROEOS User Guide
     rho_t_plus = rho_stitch - width * np.arctanh(2 * tol - 1)
@@ -275,9 +274,9 @@ def main(original_tablepath, do_temp_extend):
     # Default to original values in unmodified region
 
     ## Load in original data
-    tab_dedt = np.array(eos_file["dedt"])[:]
-    tab_dPde = np.array(eos_file["dpderho"])[:]
-    tab_dPdrhoe = np.array(eos_file["dpdrhoe"])[:]
+    tab_dedt = np.array(eos_file["dedt"])[:, iT_ogmin:, irho_ogmin:]
+    tab_dPde = np.array(eos_file["dpderho"])[:, iT_ogmin:, irho_ogmin:]
+    tab_dPdrhoe = np.array(eos_file["dpdrhoe"])[:, iT_ogmin:, irho_ogmin:]
 
     dedT[:,iT_plus:,irho_plus:] = tab_dedt[:,iT_plus-num_new_pts_T:,irho_plus-num_new_pts_rho:] 
     dPde[:,iT_plus:,irho_plus:] = tab_dPde[:,iT_plus-num_new_pts_T:,irho_plus-num_new_pts_rho:] 
@@ -326,14 +325,32 @@ def main(original_tablepath, do_temp_extend):
     return
  
 if __name__ == '__main__':
-    from sys import argv
+    #from sys import argv
+    import argparse
+    # -----------------------------------------------------------------------------
+    parser = argparse.ArgumentParser()
+    # -----------------------------------------------------------------------------
+    parser.add_argument("-t", "--table", dest="table", required=True,
+        help="EOS table")
+    parser.add_argument("--ex-temp", dest="do_temp_extend", action="store_true",
+        help="Extend temperature?")
+    parser.add_argument("--orig-min-logdens", dest="og_rhomin", type=float, default=999,
+        help="Set minimum density of original table in log10(g cm^-3)")
+    parser.add_argument("--orig-min-logtemp", dest="og_Tmin", type=float, default=999,
+        help="Set minimum temperature of original table in log10(MeV)")
+    parser.add_argument("--min-logtemp", dest="Tmin", required=True, type=float,
+        help="New minimum temperature")
+    parser.add_argument("--min-dens", dest="rhomin", required=True, type=float,
+        help="New minimum density")
+    parser.add_argument("--stitch-dens", dest="rho_stitch", required=True, type=float,
+        help="Transition density")
+    parser.add_argument("--stitch-temp", dest="T_stitch", required=True, type=float,
+        help="Transition temperature")
+    parser.add_argument("--width", dest="width", required=True, type=float,
+        help="Width of transition region")
+    parser.add_argument("--tol", dest="tol", required=True, type=float,
+        help="Tolerance of transition region")
 
-    if len(argv) != 3:
-        print(f"Correct usage: python3 {argv[0]} <Table Path> <Do Temp Extend? 1/0>")
-        exit(1)
-
-    do_temp_extend = bool(int(argv[2]))
-
-    main(argv[1], do_temp_extend)
+    args = parser.parse_args()
+    main(args)
     print("Done :)")
-
