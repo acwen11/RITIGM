@@ -43,7 +43,7 @@ extern "C" void THC_M1_SetToEquilibrium(CCTK_ARGUMENTS) {
     }
 
     tensor::slicing_geometry_const geom(alp, betax, betay, betaz, gxx, gxy, gxz,
-            gyy, gyz, gzz, kxx, kxy, kxz, kyy, kyz, kzz, volform);
+            gyy, gyz, gzz, kxx, kxy, kxz, kyy, kyz, kzz, psi_bssn);
     tensor::fluid_velocity_field_const fidu(alp, betax, betay, betaz, fidu_w_lorentz,
             fidu_velx, fidu_vely, fidu_velz);
 
@@ -97,6 +97,10 @@ extern "C" void THC_M1_SetToEquilibrium(CCTK_ARGUMENTS) {
                     &nudens_1[0], &nudens_1[1], &nudens_1[2]);
             assert(!ierr);
 
+						//
+						//Get det(g)
+						double volform = std::pow(psi_bssn[ijk], 6);
+
             for (int ig = 0; ig < nspecies*ngroups; ++ig) {
                 int const i4D = CCTK_VectGFIndex3D(cctkGH, i, j, k, ig);
 
@@ -106,7 +110,7 @@ extern "C" void THC_M1_SetToEquilibrium(CCTK_ARGUMENTS) {
                 rHx[i4D] = 0.0;
                 rHy[i4D] = 0.0;
                 rHz[i4D] = 0.0;
-                rJ[i4D]  = nudens_1[ig]*volform[ijk];
+                rJ[i4D]  = nudens_1[ig]*volform;
                 chi[i4D] = 1.0/3.0;
 
                 //
@@ -126,7 +130,7 @@ extern "C" void THC_M1_SetToEquilibrium(CCTK_ARGUMENTS) {
 
                 //
                 // Now compute neutrino number density
-                rnnu[i4D] = nudens_0[ig]*volform[ijk];
+                rnnu[i4D] = nudens_0[ig]*volform;
                 rN[i4D]   = max(fidu_w_lorentz[ijk]*rnnu[i4D], rad_N_floor);
             }
         } UTILS_ENDLOOP3(thc_m1_equilibrium);

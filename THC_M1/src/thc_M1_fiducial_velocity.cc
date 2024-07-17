@@ -53,12 +53,12 @@ extern "C" void THC_M1_FiducialVelocity(CCTK_ARGUMENTS) {
                 i, 0, cctk_lsh[0]) {
             int const ijk = CCTK_GFINDEX3D(cctkGH, i, j, k);
 
-            CCTK_REAL fac = 1.0/std::max(dens[ijk],
+            CCTK_REAL fac = 1.0/std::max(rho_star[ijk],
                     fiducial_velocity_rho_fluid*CGS_GCC);
 
-            fidu_velx[ijk] = velx[ijk]*dens[ijk]*fac;
-            fidu_vely[ijk] = vely[ijk]*dens[ijk]*fac;
-            fidu_velz[ijk] = velz[ijk]*dens[ijk]*fac;
+            fidu_velx[ijk] = velx[ijk]*rho_star[ijk]*fac;
+            fidu_vely[ijk] = vely[ijk]*rho_star[ijk]*fac;
+            fidu_velz[ijk] = velz[ijk]*rho_star[ijk]*fac;
 
             CCTK_REAL const fidu_vel_x =
                 gxx[ijk]*fidu_velx[ijk] +

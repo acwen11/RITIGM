@@ -1,6 +1,6 @@
 # Interface definition for thorn THC_M1
 IMPLEMENTS: THC_M1
-INHERITS: ADMBase Boundary Grid HydroBase THC_Core TmunuBase
+INHERITS: ADMBase Boundary Grid HydroBase TmunuBase IllinoisGRMHD #THC_Core 
 
 USES INCLUDE: finite_difference.h
 USES INCLUDE: Symmetry.h

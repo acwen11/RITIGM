@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <cassert>
 #include <sstream>
+#include <cmath>
 
 #include "cctk.h"
 #include "cctk_Arguments.h"
@@ -53,15 +54,17 @@ extern "C" void THC_M1_Analysis(CCTK_ARGUMENTS) {
             int const ijka = CCTK_VectGFIndex3D(cctkGH, i, j, k, 1);
             int const ijkx = CCTK_VectGFIndex3D(cctkGH, i, j, k, 2);
 
+						double volform = std::pow(psi_bssn[ijk], 6);
+
             CCTK_REAL const nb = rho[ijk]/mb;
-            ynue[ijk] = rnnu[ijke]/volform[ijk]/nb;
-            ynua[ijk] = rnnu[ijka]/volform[ijk]/nb;
-            ynux[ijk] = rnnu[ijkx]/volform[ijk]/nb;
+            ynue[ijk] = rnnu[ijke]/volform/nb;
+            ynua[ijk] = rnnu[ijka]/volform/nb;
+            ynux[ijk] = rnnu[ijkx]/volform/nb;
 
             CCTK_REAL const egas = rho[ijk]*(1 + eps[ijk]);
-            CCTK_REAL const enue = rJ[ijke]/volform[ijk];
-            CCTK_REAL const enua = rJ[ijka]/volform[ijk];
-            CCTK_REAL const enux = rJ[ijkx]/volform[ijk];
+            CCTK_REAL const enue = rJ[ijke]/volform;
+            CCTK_REAL const enua = rJ[ijka]/volform;
+            CCTK_REAL const enux = rJ[ijkx]/volform;
             CCTK_REAL const etot = egas + enue + enua + enux;
             znue[ijk] = enue/etot;
             znua[ijk] = enua/etot;

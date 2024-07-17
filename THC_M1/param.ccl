@@ -6,14 +6,18 @@ EXTENDS KEYWORD initial_hydro "Hydro initial data"
     "THC_M1" :: ""
 }
 
-SHARES: THC_Core
-USES BOOLEAN verbose
+# SHARES: THC_Core
+# USES BOOLEAN verbose
 
 SHARES: HydroBase
 USES INT hydro_excision
 USES KEYWORD evolution_method
 
 RESTRICTED:
+
+BOOLEAN verbose "Print more debug statements" STEERABLE=ALWAYS
+{
+} "no"
 
 ###############################################################################
 # Physics options

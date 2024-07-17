@@ -81,7 +81,7 @@ extern "C" void THC_M1_CalcFluxes(CCTK_ARGUMENTS) {
 
     // Tensor fields
     tensor::slicing_geometry_const geom(alp, betax, betay, betaz, gxx, gxy, gxz,
-            gyy, gyz, gzz, kxx, kxy, kxz, kyy, kyz, kzz, volform);
+            gyy, gyz, gzz, kxx, kxy, kxz, kyy, kyz, kzz, psi_bssn);
     tensor::fluid_velocity_field_const fidu(alp, betax, betay, betaz, fidu_w_lorentz,
             fidu_velx, fidu_vely, fidu_velz);
 

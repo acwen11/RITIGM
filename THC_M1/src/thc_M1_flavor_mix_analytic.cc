@@ -67,7 +67,7 @@ extern "C" void THC_M1_FlavorMixAnalytic(CCTK_ARGUMENTS) {
     }
 
     tensor::slicing_geometry_const geom(alp, betax, betay, betaz, gxx, gxy, gxz,
-            gyy, gyz, gzz, kxx, kxy, kxz, kyy, kyz, kzz, volform);
+            gyy, gyz, gzz, kxx, kxy, kxz, kyy, kyz, kzz, psi_bssn);
 
 #pragma omp parallel
     {

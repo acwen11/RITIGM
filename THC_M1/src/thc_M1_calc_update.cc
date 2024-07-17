@@ -16,6 +16,7 @@
 
 
 #include <cassert>
+#include <cmath>
 
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_vector.h>
@@ -85,14 +86,15 @@ extern "C" void THC_M1_CalcUpdate(CCTK_ARGUMENTS) {
     --(*TimeIntegratorStage);
 
     tensor::slicing_geometry_const geom(alp, betax, betay, betaz, gxx, gxy, gxz,
-            gyy, gyz, gzz, kxx, kxy, kxz, kyy, kyz, kzz, volform);
+            gyy, gyz, gzz, kxx, kxy, kxz, kyy, kyz, kzz, psi_bssn);
     tensor::fluid_velocity_field_const fidu(alp, betax, betay, betaz, fidu_w_lorentz,
             fidu_velx, fidu_vely, fidu_velz);
 
-    int const siz = UTILS_GFSIZE(cctkGH);
-    CCTK_REAL * sconx = &scon[0*siz];
-    CCTK_REAL * scony = &scon[1*siz];
-    CCTK_REAL * sconz = &scon[2*siz];
+		// Don't think this is necessary since IGM has separate GFs for each component?
+    // int const siz = UTILS_GFSIZE(cctkGH);
+    // CCTK_REAL * sconx = &scon[0*siz];
+    // CCTK_REAL * scony = &scon[1*siz];
+    // CCTK_REAL * sconz = &scon[2*siz];
 
     CCTK_REAL const mb = AverageBaryonMass();
 
@@ -149,6 +151,10 @@ extern "C" void THC_M1_CalcUpdate(CCTK_ARGUMENTS) {
             CCTK_REAL DrN[ngroups*nspecies];
             CCTK_REAL DDxp[ngroups*nspecies];
 
+						// 
+						// Get det(g)
+						double volform = std::pow(psi_bssn[ijk], 6);
+
             //
             // Step 1 -- compute the sources
             for (int ig = 0; ig < ngroups*nspecies; ++ig) {
@@ -176,7 +182,7 @@ extern "C" void THC_M1_CalcUpdate(CCTK_ARGUMENTS) {
 
                 //
                 // Compute radiation sources
-                calc_rad_sources(eta_1[i4D]*volform[ijk],
+                calc_rad_sources(eta_1[i4D]*volform,
                         abs_1[i4D], scat_1[i4D], u_d, J, H_d, &S_d);
                 DrE[ig] = dt*calc_rE_source(alp[ijk], n_u, S_d);
 
@@ -185,7 +191,7 @@ extern "C" void THC_M1_CalcUpdate(CCTK_ARGUMENTS) {
                 DrFy[ig] = dt*tS_d(2);
                 DrFz[ig] = dt*tS_d(3);
 
-                DrN[ig] = dt*alp[ijk]*(volform[ijk]*eta_0[i4D] - abs_0[i4D]*rN[i4D]/Gamma);
+                DrN[ig] = dt*alp[ijk]*(volform*eta_0[i4D] - abs_0[i4D]*rN[i4D]/Gamma);
 
 #else // (THC_M1_SRC_METHOD == THC_M1_SRC_EXPL)
 
@@ -225,7 +231,7 @@ extern "C" void THC_M1_CalcUpdate(CCTK_ARGUMENTS) {
                 //
                 // Estimate interaction with matter
                 CCTK_REAL const dtau = dt/fidu_w_lorentz[ijk];
-                CCTK_REAL Jnew = (Jstar + dtau*eta_1[i4D]*volform[ijk])/(1 + dtau*abs_1[i4D]);
+                CCTK_REAL Jnew = (Jstar + dtau*eta_1[i4D]*volform)/(1 + dtau*abs_1[i4D]);
 
                 // Only three components of H^a are independent H^0 is found by
                 // requiring H^a u_a = 0
@@ -270,7 +276,7 @@ extern "C" void THC_M1_CalcUpdate(CCTK_ARGUMENTS) {
                         closure_fun, gsl_solver_1d, gsl_solver_nd, dt,
                         alp[ijk], g_dd, g_uu, n_d, n_u, gamma_ud, u_d, u_u,
                         v_d, v_u, proj_ud, fidu_w_lorentz[ijk], Estar, Fstar_d,
-                        Estar, Fstar_d, volform[ijk]*eta_1[i4D],
+                        Estar, Fstar_d, volform*eta_1[i4D],
                         abs_1[i4D], scat_1[i4D], &chi[i4D], &Enew, &Fnew_d);
                 apply_floor(g_uu, &Enew, &Fnew_d);
 
@@ -301,7 +307,7 @@ extern "C" void THC_M1_CalcUpdate(CCTK_ARGUMENTS) {
                 //
                 // N^k+1 = N^* + dt ( eta - abs N^k+1 )
                 if (source_therm_limit < 0 || dt*abs_0[i4D] < source_therm_limit) {
-                    DrN[ig] = (Nstar + dt*alp[ijk]*volform[ijk]*eta_0[i4D])/
+                    DrN[ig] = (Nstar + dt*alp[ijk]*volform*eta_0[i4D])/
                                 (1 + dt*alp[ijk]*abs_0[i4D]/Gamma) - Nstar;
                 }
                 //
@@ -339,7 +345,7 @@ extern "C" void THC_M1_CalcUpdate(CCTK_ARGUMENTS) {
                     }
                     DDxp_sum += DDxp[ig];
                 }
-                CCTK_REAL const DYe = DDxp_sum/dens[ijk];
+                CCTK_REAL const DYe = DDxp_sum/rho_star[ijk];
                 if (DTau_sum < 0) {
                     theta = min(-source_limiter*max(tau[ijk], 0.0)/DTau_sum, theta);
                 }
@@ -375,12 +381,12 @@ extern "C" void THC_M1_CalcUpdate(CCTK_ARGUMENTS) {
                     assert (ngroups == 1);
                     assert (nspecies == 3);
 
-                    sconx[ijk]  -= theta*DrFx[ig];
-                    scony[ijk]  -= theta*DrFy[ig];
-                    sconz[ijk]  -= theta*DrFz[ig];
+                    mhd_st_x[ijk]  -= theta*DrFx[ig];
+                    mhd_st_y[ijk]  -= theta*DrFy[ig];
+                    mhd_st_z[ijk]  -= theta*DrFz[ig];
                     tau[ijk]    -= theta*DrE[ig];
-                    densxp[ijk] += theta*DDxp[ig];
-                    densxn[ijk] -= theta*DDxp[ig];
+                    Ye_star[ijk] += theta*DDxp[ig];
+                    // densxn[ijk] -= theta*DDxp[ig];  // Not needed in IGM
 
                     netabs[ijk]  += theta*DDxp[ig];
                     netheat[ijk] -= theta*DrE[ig];

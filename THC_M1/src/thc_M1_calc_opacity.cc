@@ -127,18 +127,20 @@ extern "C" void THC_M1_CalcOpacity(CCTK_ARGUMENTS) {
 
             // Compute the neutrino black body functions assuming trapped neutrinos
             CCTK_REAL nudens_0_trap[3], nudens_1_trap[3];
+						// Get det(g)
+						double volform = std::pow(psi_bssn[ijk], 6);
             if (opacity_tau_trap >= 0 && tau > opacity_tau_trap) {
                 CCTK_REAL temperature_trap, Y_e_trap;
                 // Compute local neutrino densities (undensitized)
                 CCTK_REAL const nudens_0[3] = {
-                    rnnu[CCTK_VectGFIndex3D(cctkGH, i, j, k, 0)]/volform[ijk],
-                    rnnu[CCTK_VectGFIndex3D(cctkGH, i, j, k, 1)]/volform[ijk],
-                    rnnu[CCTK_VectGFIndex3D(cctkGH, i, j, k, 2)]/volform[ijk],
+                    rnnu[CCTK_VectGFIndex3D(cctkGH, i, j, k, 0)]/volform,
+                    rnnu[CCTK_VectGFIndex3D(cctkGH, i, j, k, 1)]/volform,
+                    rnnu[CCTK_VectGFIndex3D(cctkGH, i, j, k, 2)]/volform,
                 };
                 CCTK_REAL const nudens_1[3] = {
-                    rJ[CCTK_VectGFIndex3D(cctkGH, i, j, k, 0)]/volform[ijk],
-                    rJ[CCTK_VectGFIndex3D(cctkGH, i, j, k, 1)]/volform[ijk],
-                    rJ[CCTK_VectGFIndex3D(cctkGH, i, j, k, 2)]/volform[ijk],
+                    rJ[CCTK_VectGFIndex3D(cctkGH, i, j, k, 0)]/volform,
+                    rJ[CCTK_VectGFIndex3D(cctkGH, i, j, k, 1)]/volform,
+                    rJ[CCTK_VectGFIndex3D(cctkGH, i, j, k, 2)]/volform,
                 };
                 ierr = WeakEquilibrium(
                         rho[ijk], temperature[ijk], Y_e[ijk],

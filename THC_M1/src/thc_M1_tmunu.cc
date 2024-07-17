@@ -14,6 +14,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <cmath>
 
 #include "cctk.h"
 #include "cctk_Arguments.h"
@@ -65,7 +66,7 @@ extern "C" void THC_M1_AddToTmunu(CCTK_ARGUMENTS) {
             m1_max_num_msg, m1_max_num_msg);
 
     tensor::slicing_geometry_const geom(alp, betax, betay, betaz, gxx, gxy, gxz,
-            gyy, gyz, gzz, kxx, kxy, kxz, kyy, kyz, kzz, volform);
+            gyy, gyz, gzz, kxx, kxy, kxz, kyy, kyz, kzz, psi_bssn);
     tensor::fluid_velocity_field_const fidu(alp, betax, betay, betaz, fidu_w_lorentz,
             fidu_velx, fidu_vely, fidu_velz);
 
@@ -106,7 +107,7 @@ extern "C" void THC_M1_AddToTmunu(CCTK_ARGUMENTS) {
             tensor::symmetric2<CCTK_REAL, 4, 2> rT_dd;
 
             // To de-densitize the Tmunu
-            CCTK_REAL const iV = 1.0/volform[ijk];
+            CCTK_REAL const iV = 1.0/std::pow(psi_bssn[ijk], 6);
 
             for (int ig = 0; ig < nspecies*ngroups; ++ig) {
                 int const i4D = CCTK_VectGFIndex3D(cctkGH, i, j, k, ig);

@@ -25,7 +25,8 @@ SRCS = thc_M1_analysis.cc \
        thc_M1_sources.cc \
        thc_M1_test_bc.cc \
        thc_M1_time_integrator.cc \
-       thc_M1_tmunu.cc
+       thc_M1_tmunu.cc \
+       thc_printer.cc
 
 # Subdirectories containing source files
 SUBDIRS =

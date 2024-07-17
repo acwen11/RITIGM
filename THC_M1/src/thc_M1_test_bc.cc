@@ -37,7 +37,7 @@ extern "C" void THC_M1_KerrBCs(CCTK_ARGUMENTS) {
     }
 
     tensor::slicing_geometry_const geom(alp, betax, betay, betaz, gxx, gxy, gxz,
-            gyy, gyz, gzz, kxx, kxy, kxz, kyy, kyz, kzz, volform);
+            gyy, gyz, gzz, kxx, kxy, kxz, kyy, kyz, kzz, psi_bssn);
 
     if (cctk_bbox[0]) {
         for (int k = 0; k < cctk_lsh[2]; ++k)
@@ -64,12 +64,16 @@ extern "C" void THC_M1_KerrBCs(CCTK_ARGUMENTS) {
             CCTK_REAL const a = (-beta_x + sqrt(SQ(beta_x) - beta2 +
                         SQ(alp[ijk])*(1 - eps)))/g_xx;
 
+						//
+						// Get det(g)
+						double volform = std::pow(psi_bssn[ijk], 6);
+
             for (int ig = 0; ig < ngroups*nspecies; ++ig) {
                 int const i4D = CCTK_VectGFIndex3D(cctkGH, i, j, k, ig);
                 if (abs(y[ijk]) <= kerr_beam_width &&
                         z[ijk] >= kerr_beam_position &&
                         z[ijk] <= kerr_beam_position + kerr_beam_width) {
-                    CCTK_REAL const E = volform[ijk];
+                    CCTK_REAL const E = volform;
 
                     tensor::generic<CCTK_REAL, 4, 1> F_u;
                     F_u(0) = 0;
