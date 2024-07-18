@@ -424,8 +424,8 @@ IllinoisGRMHD::igm_eos_table_ceiling_safety_factor = 1
 IllinoisGRMHD::igm_eos_table_floor_safety_factor   = 1
 
 IllinoisGRMHD::igm_PPM_reconstructed_variable = "pressure"
-IllinoisGRMHD::igm_con2prim_routine           = "Newman1D"
-IllinoisGRMHD::igm_con2prim_backup_routine[0] = "Palenzuela1D"
+IllinoisGRMHD::igm_con2prim_routine           = "Palenzuela1D"
+IllinoisGRMHD::igm_con2prim_backup_routine[0] = "Newman1D"
 IllinoisGRMHD::igm_eos_type                   = "Tabulated"
 IllinoisGRMHD::igm_evolve_temperature         = "yes"
 IllinoisGRMHD::igm_evolve_entropy             = "yes"
