@@ -215,6 +215,11 @@ extern "C" void THC_M1_SetupTest_Hydro(CCTK_ARGUMENTS) {
         CCTK_INFO("THC_M1_SetupTest_Hydro");
     }
 
+  // Prepare for EOS function calls
+  	const CCTK_INT  havetemp     = 1;
+    const CCTK_INT  eoskey       = EOS_Omni_GetHandle(igm_eos_type);
+    const CCTK_REAL rf_precision = 1e-10; // This is a dummy variable
+  
     CCTK_REAL dx = CCTK_DELTA_SPACE(0);
     CCTK_REAL dy = CCTK_DELTA_SPACE(1);
     CCTK_REAL dz = CCTK_DELTA_SPACE(2);
@@ -231,6 +236,25 @@ extern "C" void THC_M1_SetupTest_Hydro(CCTK_ARGUMENTS) {
                 vel[CCTK_VectGFIndex3D(cctkGH, i, j, k, 0)] = 0.0;
                 vel[CCTK_VectGFIndex3D(cctkGH, i, j, k, 1)] = 0.0;
                 vel[CCTK_VectGFIndex3D(cctkGH, i, j, k, 2)] = 0.0;
+
+        				// Prepare for EoS function calls
+        				CCTK_REAL dummy        = 0.0;
+                CCTK_INT  keyerr       = 0;
+                CCTK_INT  anyerr       = 0;
+								CCTK_REAL xrho     		 = rho[ijk];
+								CCTK_REAL xye     		 = igm_Ye_atm;
+								CCTK_REAL xtemp   		 = igm_T_atm;
+								CCTK_REAL xpress  		 = 0.0;
+								CCTK_REAL xeps    		 = 0.0;
+								CCTK_REAL xent    		 = 0.0;
+								dummy             		 = 0.0;
+        
+								EOS_Omni_press(eoskey,havetemp,rf_precision,1,
+															 &xrho,&xeps,&xtemp,&xye,&xpress,
+															 &keyerr,&anyerr);
+
+								press[ijk] = xpress;
+								eps[ijk] = xeps;
             }
             else {
                 char msg[BUFSIZ];
