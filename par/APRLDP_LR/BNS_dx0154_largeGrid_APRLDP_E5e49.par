@@ -598,6 +598,7 @@ particle_tracerET::output_four_velocity_u4U           = "yes"
 particle_tracerET::output_four_velocity_u4D           = "yes"
 particle_tracerET::output_hydro                       = "yes"
 particle_tracerET::output_freq                          = 128
+particle_tracerET::output_file_format                   = "binary"
 particle_tracerET::update_RK4_freq                      = 16
 particle_tracerET::verbose                              = 1
 
