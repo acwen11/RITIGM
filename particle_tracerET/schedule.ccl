@@ -7,7 +7,7 @@ STORAGE: num_active
 STORAGE: particle_position_arrays
 STORAGE: particle_velocity_arrays
 STORAGE: particle_position_aux_arrays
-STORAGE: velocity_consistent_with_MHD_induction_equations
+# STORAGE: velocity_consistent_with_MHD_induction_equations
 
 STORAGE: ADMBase::metric[metric_timelevels], ADMBase::curv[metric_timelevels], ADMBase::lapse[lapse_timelevels], ADMBase::shift[shift_timelevels]
 STORAGE: HydroBase::rho[timelevels],HydroBase::press[timelevels],HydroBase::eps[timelevels],HydroBase::vel[timelevels],HydroBase::Bvec[timelevels]
@@ -31,6 +31,7 @@ if( output_hydro )
 if( output_metric )
 {
 	STORAGE: particle_metric_arrays
+	STORAGE: IllinoisGRMHD::BSSN_quantities
 } 
 ###################################
 ##### INITIALIZATION ROUTINES #####
@@ -54,12 +55,12 @@ SCHEDULE particle_tracerET_file_output_routine_Startup IN particle_tracerET_Init
 } "Create directory for file output."
 ############################################
 
-##### CONVERT TO MHD 3 VELOCITY #####
-SCHEDULE convert_to_MHD_3velocity AT CCTK_ANALYSIS BEFORE particle_tracerET
-{
-  LANG: C
-  OPTIONS: GLOBAL-EARLY,loop-local
-} "Convert to MHD 3 velocity"
+##### CONVERT TO MHD 3 VELOCITY ##### ----> No longer needed if I convert to HydroBase at every iteration
+# SCHEDULE convert_to_MHD_3velocity AT CCTK_ANALYSIS BEFORE particle_tracerET
+# {
+#   LANG: C
+#   OPTIONS: GLOBAL-EARLY,loop-local
+# } "Convert to MHD 3 velocity"
 #########################################
 
 ###############################
