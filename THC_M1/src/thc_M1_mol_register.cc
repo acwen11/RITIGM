@@ -50,9 +50,9 @@ void THC_M1_MoLRegister(CCTK_ARGUMENTS) {
     ierr |= MoLRegisterConstrained(CCTK_VarIndex("HydroBase::temperature"));
     ierr |= MoLRegisterConstrained(CCTK_VarIndex("HydroBase::Y_e"));
 
-    ierr |= MoLRegisterConstrained(CCTK_VarIndex("THC_Core::zvec[0]"));
-    ierr |= MoLRegisterConstrained(CCTK_VarIndex("THC_Core::zvec[1]"));
-    ierr |= MoLRegisterConstrained(CCTK_VarIndex("THC_Core::zvec[2]"));
+    // ierr |= MoLRegisterConstrained(CCTK_VarIndex("THC_Core::zvec[0]"));
+    // ierr |= MoLRegisterConstrained(CCTK_VarIndex("THC_Core::zvec[1]"));
+    // ierr |= MoLRegisterConstrained(CCTK_VarIndex("THC_Core::zvec[2]"));
 
     if(ierr) {
         CCTK_ERROR("Could not register with MoL");

@@ -26,6 +26,8 @@ extern "C" void set_IllinoisGRMHD_metric_GRMHD_variables_based_on_HydroBase_and_
     CCTK_VError(VERR_DEF_PARAMS, "You MUST set rho_b_atm_max to some reasonable value in your param.ccl file.\n");
   }
 
+	CCTK_VINFO("Converting ADM -> BSSN");
+
   // Convert ADM variables (from ADMBase) to the BSSN-based variables expected by this routine.
   IllinoisGRMHD_convert_ADM_to_BSSN__enforce_detgtij_eq_1__and_compute_gtupij(cctkGH,cctk_lsh,  gxx,gxy,gxz,gyy,gyz,gzz,alp,
                                                                               gtxx,gtxy,gtxz,gtyy,gtyz,gtzz,
@@ -37,6 +39,8 @@ extern "C" void set_IllinoisGRMHD_metric_GRMHD_variables_based_on_HydroBase_and_
    ***************/
   igm_eos_parameters eos;
   initialize_igm_eos_parameters_from_input(igm_eos_key,cctk_time,eos);
+
+	CCTK_VINFO("Setting Avec = 0");
 
   if(pure_hydro_run) {
 #pragma omp parallel for
@@ -52,6 +56,8 @@ extern "C" void set_IllinoisGRMHD_metric_GRMHD_variables_based_on_HydroBase_and_
   // Check whether or not to apply a pressure depletion to the initial data
   bool apply_pressure_depletion = false;
   if( ID_converter_ILGRMHD_pressure_depletion_factor != 0.0 ) apply_pressure_depletion = true;
+
+	CCTK_VINFO("Converting HB -> IGM");
 
 #pragma omp parallel for
   for(int k=0;k<cctk_lsh[2];k++) for(int j=0;j<cctk_lsh[1];j++) for(int i=0;i<cctk_lsh[0];i++) {
@@ -205,6 +211,8 @@ extern "C" void set_IllinoisGRMHD_metric_GRMHD_variables_based_on_HydroBase_and_
   double dxi = 1.0/CCTK_DELTA_SPACE(0);
   double dyi = 1.0/CCTK_DELTA_SPACE(1);
   double dzi = 1.0/CCTK_DELTA_SPACE(2);
+  
+	CCTK_VINFO("Computing B, Bstagger");
 
 #pragma omp parallel for
   for(int k=0;k<cctk_lsh[2];k++)
@@ -339,7 +347,7 @@ extern "C" void set_IllinoisGRMHD_metric_GRMHD_variables_based_on_HydroBase_and_
         Bz[actual_index] = 0.5 * ( Bz_stagger[index] + Bz_stagger[indexkm1] );
       }
 
-	// CCTK_VINFO("Enforcing limits on prims in ID_converter.");
+	CCTK_VINFO("Enforcing limits on prims in ID_converter.");
   // Finally, enforce limits on primitives & compute conservative variables.
 #pragma omp parallel for
   for(int k=0;k<cctk_lsh[2];k++)
@@ -448,4 +456,5 @@ extern "C" void set_IllinoisGRMHD_metric_GRMHD_variables_based_on_HydroBase_and_
           eTzz[index] = TDNMUNU[ww];
         }
       }
+	CCTK_VINFO("Done.");
 }

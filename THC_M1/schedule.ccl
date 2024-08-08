@@ -59,7 +59,7 @@ SCHEDULE THC_M1_Reset AT CCTK_INITIAL \
     LANG: C
 } "Initialize everything to zero"
 
-SCHEDULE THC_M1_FiducialVelocity AT CCTK_INITIAL AFTER HydroBase_Prim2ConInitial
+SCHEDULE THC_M1_FiducialVelocity AT CCTK_INITIAL AFTER (HydroBase_Prim2ConInitial IllinoisGRMHD_ID_Converter)
 {
     LANG: C
 } "Compute the fiducial velocity"
@@ -135,7 +135,7 @@ SCHEDULE THC_M1_InitialCopy AT CCTK_EVOL \
 SCHEDULE GROUP THC_M1_WRAP AT CCTK_EVOL \
     AFTER (MoL_Evolution MoL_PseudoEvolution MoL_PostStep THC_M1_InitialCopy)
 {
-} "This group wrapps all THC_M1 updates"
+} "This group wraps all THC_M1 updates"
 
 SCHEDULE GROUP THC_M1_EVOL IN THC_M1_WRAP
 {
@@ -157,7 +157,7 @@ SCHEDULE THC_M1_FinalizeTimeIntegrator IN THC_M1_EVOL \
 {
     LANG: C
     OPTIONS: LEVEL
-} "Clenups after the time integration"
+} "Cleanups after the time integration"
 
 #------------------------------------------------------------------------------
 SCHEDULE GROUP THC_M1_TimeStep IN THC_M1_EVOL \
@@ -215,7 +215,8 @@ if (backreact) {
     {
     } "Apply BCs and synchronize hydro variables"
 
-    SCHEDULE GROUP HydroBase_Con2Prim IN THC_M1_WRAP AFTER HydroBase_Boundaries
+    # SCHEDULE GROUP HydroBase_Con2Prim IN THC_M1_WRAP AFTER HydroBase_Boundaries
+    SCHEDULE GROUP IllinoisGRMHD_conserv_to_prims IN THC_M1_WRAP AFTER HydroBase_Boundaries
     {
         LANG: C
     } "Computes the primitives from the conservatives"
