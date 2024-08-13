@@ -214,21 +214,17 @@ void read_hydro(int num_batches){
 			double* pt_T = new double[np];
 			double* pt_Ye = new double[np];
 			double* pt_W = new double[np];
-			double* pt_eps = new double[np];
-			double* pt_P = new double[np];
 
 			fread(pt_rho, sizeof(double), np, in_file);
 			fread(pt_T, sizeof(double), np, in_file);
 			fread(pt_Ye, sizeof(double), np, in_file);
 			fread(pt_W, sizeof(double), np, in_file);
-			fread(pt_eps, sizeof(double), np, in_file);
-			fread(pt_P, sizeof(double), np, in_file);
 
 			// Write to ascii
 			//cout << "Writing file..."  << endl;
 			sprintf(buffer, "%e", time);	
 			for(int ip=0; ip<np; ip++){
-				sprintf(buffer, "%s %e %e %e %e %e %e", buffer, pt_rho[ip], pt_T[ip], pt_Ye[ip], pt_W[ip], pt_eps[ip], pt_P[ip]);
+				sprintf(buffer, "%s %e %e %e %e", buffer, pt_rho[ip], pt_T[ip], pt_Ye[ip], pt_W[ip]);
 			}
     	fprintf(out_file, "%s\n", buffer);
 
@@ -236,8 +232,6 @@ void read_hydro(int num_batches){
 			free(pt_T);
 			free(pt_Ye);
 			free(pt_W);
-			free(pt_eps);
-			free(pt_P);
 		}
 
     fclose(out_file);
@@ -276,36 +270,21 @@ void read_metric(int num_batches){
 		double time;
 		while(fread(&time, sizeof(double), 1, in_file) != 0) {
 			//cout << "Reading file..."  << endl;
-			double* gxx = new double[np];
-			double* gxy = new double[np];
-			double* gxz = new double[np];
-			double* gyy = new double[np];
-			double* gyz = new double[np];
-			double* gzz = new double[np];
+			double* psi = new double[np];
 			double* alp = new double[np];
 
-			fread(gxx, sizeof(double), np, in_file);
-			fread(gxy, sizeof(double), np, in_file);
-			fread(gxz, sizeof(double), np, in_file);
-			fread(gyy, sizeof(double), np, in_file);
-			fread(gyz, sizeof(double), np, in_file);
-			fread(gzz, sizeof(double), np, in_file);
+			fread(psi, sizeof(double), np, in_file);
 			fread(alp, sizeof(double), np, in_file);
 
 			// Write to ascii
 			//cout << "Writing file..."  << endl;
 			sprintf(buffer, "%e", time);	
 			for(int ip=0; ip<np; ip++){
-				sprintf(buffer, "%s %e %e %e %e %e %e %e", buffer, gxx[ip], gxy[ip], gxz[ip], gyy[ip], gyz[ip], gzz[ip], alp[ip]);
+				sprintf(buffer, "%s %e %e", buffer, psi[ip], alp[ip]);
 			}
     	fprintf(out_file, "%s\n", buffer);
 
-			free(gxx);
-			free(gxy);
-			free(gxz);
-			free(gyy);
-			free(gyz);
-			free(gzz);
+			free(psi);
 			free(alp);
 		}
 
