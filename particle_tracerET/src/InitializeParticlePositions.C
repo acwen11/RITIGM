@@ -89,13 +89,11 @@ void InitializeParticlePositions(CCTK_ARGUMENTS)
 				}
 
 				else if(CCTK_EQUALS(seeding_prescription, "uniform")){
-					if(random_number_zero_to_one < 0.5) {
-						// Accept particle!
-						particle_position_x[which_particle] = particle_x_temp[i];
-						particle_position_y[which_particle] = particle_y_temp[i];
-						particle_position_z[which_particle] = particle_z_temp[i];
-						which_particle++;
-					}
+					// Accept particle!
+					particle_position_x[which_particle] = particle_x_temp[i];
+					particle_position_y[which_particle] = particle_y_temp[i];
+					particle_position_z[which_particle] = particle_z_temp[i];
+					which_particle++;
 				}
 
 				total_trials++;
