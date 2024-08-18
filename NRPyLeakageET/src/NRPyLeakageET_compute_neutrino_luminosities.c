@@ -1,6 +1,7 @@
 #include "cctk.h"
 #include "cctk_Arguments.h"
 #include "cctk_Parameters.h"
+#include <math.h>
 
 #include "NRPyLeakageET.h"
 
@@ -27,7 +28,11 @@ void NRPyLeakageET_compute_neutrino_luminosities(CCTK_ARGUMENTS) {
           const int index = CCTK_GFINDEX3D(cctkGH,i,j,k);
 
           const CCTK_REAL rhoL = rho[index];
-          if( rhoL < rho_min_threshold || rhoL > rho_max_threshold ) {
+					const CCTK_REAL r_atmo        = MAX(rho_min_r, r[index]);
+					const CCTK_REAL r_pow         = rho_min_falloff ? r_power : 0.;
+					const CCTK_REAL rho_min_atm     = MAX(rho_min_threshold*pow(r_atmo / rho_min_r, r_pow), *tabeos_rhomin);
+
+          if( rhoL < rho_min_atm * (1 + thresh_tol) || rhoL > rho_max_threshold ) {
             lum_nue[index] = lum_anue[index] = lum_nux[index] = 0.0;
           }
           else {
@@ -83,7 +88,11 @@ void NRPyLeakageET_compute_neutrino_luminosities(CCTK_ARGUMENTS) {
           const int index = CCTK_GFINDEX3D(cctkGH,i,j,k);
 
           const CCTK_REAL rhoL = rho[index];
-          if( rhoL < rho_min_threshold || rhoL > rho_max_threshold ) {
+          const CCTK_REAL r_atmo        = MAX(rho_min_r, r[index]);
+          const CCTK_REAL r_pow         = rho_min_falloff ? r_power : 0.;
+          const CCTK_REAL rho_min_atm     = MAX(rho_min_threshold*pow(r_atmo / rho_min_r, r_pow), *tabeos_rhomin);
+
+          if( rhoL < rho_min_atm * (1 + thresh_tol) || rhoL > rho_max_threshold ) {
             lum_nue[index] = lum_anue[index] = lum_nux[index] = 0.0;
           }
           else {

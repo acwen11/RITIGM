@@ -1,6 +1,7 @@
 #include "cctk.h"
 #include "cctk_Arguments.h"
 #include "cctk_Parameters.h"
+#include <math.h>
 
 #include "NRPyLeakageET.h"
 
@@ -38,8 +39,12 @@ void NRPyLeakageET_optical_depths_PathOfLeastResistance(CCTK_ARGUMENTS) {
         const int i_j_km1 = CCTK_GFINDEX3D(cctkGH,i,j  ,k-1);
 
         const CCTK_REAL rhoL = rho[i_j_k];
+				const CCTK_REAL r_atmo        = MAX(rho_min_r, r[i_j_k]);
+				const CCTK_REAL r_pow         = rho_min_falloff ? r_power : 0.;
+				const CCTK_REAL rho_min_atm     = MAX(rho_min_threshold*pow(r_atmo / rho_min_r, r_pow), *tabeos_rhomin);
+
         // Only compute optical depths if density is above a threshold
-        if( rhoL < rho_min_threshold_init_tau || rhoL > rho_max_threshold ) {
+        if( rhoL < rho_min_atm * (1 + thresh_tol) || rhoL > rho_max_threshold ) {
           tau_0_nue [i_j_k] = 0.0;
           tau_1_nue [i_j_k] = 0.0;
           tau_0_anue[i_j_k] = 0.0;

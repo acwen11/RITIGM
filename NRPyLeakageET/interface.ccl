@@ -36,6 +36,11 @@ CCTK_REAL NRPyLeakageET_luminosities type=GF Timelevels=1 TAGS='tensortypealias=
 # ------------------------------------------------------
 
 # ------------------------------------------------------
+# Helper var
+# ------------------------------------------------------
+CCTK_REAL tabeos_rhomin type=SCALAR 
+
+# ------------------------------------------------------
 # Aliased functions used by this thorn
 # ------------------------------------------------------
 void FUNCTION WVU_EOS_mue_mup_mun_muhat_Xn_and_Xp_from_rho_Ye_T( CCTK_REAL IN rho,    \
