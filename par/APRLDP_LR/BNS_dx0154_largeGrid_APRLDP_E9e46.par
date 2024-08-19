@@ -550,7 +550,10 @@ NRPyLeakageET::numberOfIterations           = 8192
 NRPyLeakageET::optical_depth_evolution_type = "PathOfLeastResistance"
 NRPyLeakageET::psi6_threshold               = 60
 NRPyLeakageET::rho_max_threshold            = 0.0040000000000000000833
-NRPyLeakageET::rho_min_threshold_init_tau   = IllinoisGRMHD::rho_b_atm_max * 1.01
+NRPyLeakageET::rho_min_threshold            = IllinoisGRMHD::rho_b_atm_max * 1.01
+NRPyLeakageET::rho_min_falloff              = "yes"
+NRPyLeakageET::rho_min_r                    = IllinoisGRMHD::r_atmo_min
+NRPyLeakageET::r_power                      = IllinoisGRMHD::r_power
 NRPyLeakageET::verbosity_level              = 1
 NRPyLeakageET::compute_luminosities_every   = 512
 

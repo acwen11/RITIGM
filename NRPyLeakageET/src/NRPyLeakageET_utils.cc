@@ -6,6 +6,7 @@
 #include "carpet.hh"
 #include "loopcontrol.h"
 #include "NRPyLeakageET.h"
+#include "WVU_EOS_Tabulated_headers.hh"
 
 #ifdef CCTK_MPI
 #  include <mpi.h>
@@ -180,103 +181,107 @@ void NRPyLeakageET_Initialize(CCTK_ARGUMENTS) {
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
 
-  // Step 1: Initialize all optical depth gridfunctions to zero
-  if(verbosity_level>0) CCTK_INFO("Initializing optical depths gridfunctions to zero...");
-  BEGIN_REFLEVEL_LOOP(cctkGH) {
-    BEGIN_MAP_LOOP(cctkGH,CCTK_GF) {
-      BEGIN_COMPONENT_LOOP(cctkGH, CCTK_GF) {
-        NRPyLeakageET_optical_depths_initialize_to_zero(CCTK_PASS_CTOC);
-      } END_COMPONENT_LOOP;
-    } END_MAP_LOOP;
-  } END_REFLEVEL_LOOP;
-  if(verbosity_level>0) CCTK_INFO("Initialized all optical depths gridfunctions to zero");
+	// Step 0: Get EOS rhomin
+	using namespace nuc_eos;
+	*tabeos_rhomin = eos_rhomin;	
 
-  if( CCTK_EQUALS(initial_optical_depth,"PathOfLeastResistance") ) {
+	// Step 1: Initialize all optical depth gridfunctions to zero
+	if(verbosity_level>0) CCTK_INFO("Initializing optical depths gridfunctions to zero...");
+	BEGIN_REFLEVEL_LOOP(cctkGH) {
+		BEGIN_MAP_LOOP(cctkGH,CCTK_GF) {
+			BEGIN_COMPONENT_LOOP(cctkGH, CCTK_GF) {
+				NRPyLeakageET_optical_depths_initialize_to_zero(CCTK_PASS_CTOC);
+			} END_COMPONENT_LOOP;
+		} END_MAP_LOOP;
+	} END_REFLEVEL_LOOP;
+	if(verbosity_level>0) CCTK_INFO("Initialized all optical depths gridfunctions to zero");
 
-    const int startRefLev = MIN(MAX(minInitRefLevel,0),Carpet::reflevels-1);
-    const int endRefLev   = maxInitRefLevel == 0 ? Carpet::reflevels-1 : MIN(maxInitRefLevel,Carpet::reflevels-1);
+	if( CCTK_EQUALS(initial_optical_depth,"PathOfLeastResistance") ) {
 
-    if(verbosity_level>0) {
-      CCTK_VINFO("Optical depths will be initialized on levels %d through %d with the path of least resistance algorithm",startRefLev,endRefLev);
-      CCTK_VINFO("Number of iterations to be performed on each refinement level: %d",numberOfIterations);
-    }
+		const int startRefLev = MIN(MAX(minInitRefLevel,0),Carpet::reflevels-1);
+		const int endRefLev   = maxInitRefLevel == 0 ? Carpet::reflevels-1 : MIN(maxInitRefLevel,Carpet::reflevels-1);
 
-    // Step 2: Now perform iterations of the path of least resistance algorithm
-    int counter = 0;
-    int RemainingIterations = numberOfIterations;
+		if(verbosity_level>0) {
+			CCTK_VINFO("Optical depths will be initialized on levels %d through %d with the path of least resistance algorithm",startRefLev,endRefLev);
+			CCTK_VINFO("Number of iterations to be performed on each refinement level: %d",numberOfIterations);
+		}
 
-    for(int i=1;i<=numberOfIterations;i++) {
-      // Step 2.a: First perform the iteration on refinement level startRefLev
-      if( verbosity_level>1 ) CCTK_VINFO("Beginning iteration %d...",counter+1);
+		// Step 2: Now perform iterations of the path of least resistance algorithm
+		int counter = 0;
+		int RemainingIterations = numberOfIterations;
 
-      // Step 2.b: Now loop over remaining refinement levels, performing the
-      //           path of least resistance (POLR) algorithm
-      for(int rl=startRefLev;rl<=endRefLev;rl++) {
-        ENTER_LEVEL_MODE(cctkGH,rl) {
-          // Step 2.b.i: Prolongate results from the previous refinement level
-          if( rl > startRefLev ) NRPyLeakageET_Prolongate(CCTK_PASS_CTOC,"NRPyLeakageET::NRPyLeakageET_optical_depths");
-          BEGIN_MAP_LOOP(cctkGH,CCTK_GF) {
-            BEGIN_COMPONENT_LOOP(cctkGH, CCTK_GF) {
-              // Step 2.b.i: Compute opacities
-              NRPyLeakageET_compute_opacities(CCTK_PASS_CTOC);
-              // Step 2.b.ii: Perform POLR algorithm on every grid component at this level
-              NRPyLeakageET_optical_depths_PathOfLeastResistance(CCTK_PASS_CTOC);
-            } END_COMPONENT_LOOP;
-          } END_MAP_LOOP;
-          // Step 2.b.iii: Synchronize optical depths gridfunctions
-          //               at this refinement level
-          NRPyLeakageET_SyncOpticalDepths(CCTK_PASS_CTOC);
-        } LEAVE_LEVEL_MODE;
-      }
+		for(int i=1;i<=numberOfIterations;i++) {
+			// Step 2.a: First perform the iteration on refinement level startRefLev
+			if( verbosity_level>1 ) CCTK_VINFO("Beginning iteration %d...",counter+1);
 
-      // Step 2.c: Perform a reduction of the L2-norm among all processors
-      CCTK_REAL l2norm_global;
-      NRPyLeakageET_getGlobalL2norm(CCTK_PASS_CTOC, startRefLev, endRefLev, i, &l2norm_global);
+			// Step 2.b: Now loop over remaining refinement levels, performing the
+			//           path of least resistance (POLR) algorithm
+			for(int rl=startRefLev;rl<=endRefLev;rl++) {
+				ENTER_LEVEL_MODE(cctkGH,rl) {
+					// Step 2.b.i: Prolongate results from the previous refinement level
+					if( rl > startRefLev ) NRPyLeakageET_Prolongate(CCTK_PASS_CTOC,"NRPyLeakageET::NRPyLeakageET_optical_depths");
+					BEGIN_MAP_LOOP(cctkGH,CCTK_GF) {
+						BEGIN_COMPONENT_LOOP(cctkGH, CCTK_GF) {
+							// Step 2.b.i: Compute opacities
+							NRPyLeakageET_compute_opacities(CCTK_PASS_CTOC);
+							// Step 2.b.ii: Perform POLR algorithm on every grid component at this level
+							NRPyLeakageET_optical_depths_PathOfLeastResistance(CCTK_PASS_CTOC);
+						} END_COMPONENT_LOOP;
+					} END_MAP_LOOP;
+					// Step 2.b.iii: Synchronize optical depths gridfunctions
+					//               at this refinement level
+					NRPyLeakageET_SyncOpticalDepths(CCTK_PASS_CTOC);
+				} LEAVE_LEVEL_MODE;
+			}
 
-      // Step 2.d: Increment counter; check convergence
-      counter++;
-      if( l2norm_global < tauChangeThreshold ) {
-        // Step 2.d.i: Converged!
-        RemainingIterations = 0;
-        i = numberOfIterations*10;
-        if( verbosity_level>0 ) CCTK_VINFO("Algorithm converged! l2norm_tau_change = %e (threshold = %e)",l2norm_global,tauChangeThreshold);
-      }
-      else {
-        // Step 2.d.ii: Have not converged. Restrict current solution from the
-        // finest to the coarsest initialized refinement levels; Decrement
-        // number of iterations remaining; continue.
-        if( RemainingIterations > 1 ) {
-          for(int rl=endRefLev-1;rl>=startRefLev;rl--) {
-            ENTER_LEVEL_MODE(cctkGH,rl) {
-              NRPyLeakageET_Restrict(CCTK_PASS_CTOC,"NRPyLeakageET::NRPyLeakageET_optical_depths");
-            } LEAVE_LEVEL_MODE;
-          }
-          RemainingIterations--;
-          if( verbosity_level>0 ) CCTK_VINFO("Completed iteration %d. Global change: %e. Remaining iterations: %4d",counter,l2norm_global,RemainingIterations);
-        }
-        else {
-          CCTK_WARN(CCTK_WARN_ALERT,"Maximum iterations reached, but convergence threshold not met.");
-        }
-      }
-    }
+			// Step 2.c: Perform a reduction of the L2-norm among all processors
+			CCTK_REAL l2norm_global;
+			NRPyLeakageET_getGlobalL2norm(CCTK_PASS_CTOC, startRefLev, endRefLev, i, &l2norm_global);
 
-    // Step 3: All done! Now loop over the refinement levels backwards, restricting the result
-    for(int rl=endRefLev-1;rl>=0;rl--) {
-      ENTER_LEVEL_MODE(cctkGH,rl) {
-        NRPyLeakageET_Restrict(CCTK_PASS_CTOC,"NRPyLeakageET::NRPyLeakageET_optical_depths");
-      } LEAVE_LEVEL_MODE;
-    }
-    if(verbosity_level>0) CCTK_INFO("Completed path of least resistance algorithm!");
-  }
+			// Step 2.d: Increment counter; check convergence
+			counter++;
+			if( l2norm_global < tauChangeThreshold ) {
+				// Step 2.d.i: Converged!
+				RemainingIterations = 0;
+				i = numberOfIterations*10;
+				if( verbosity_level>0 ) CCTK_VINFO("Algorithm converged! l2norm_tau_change = %e (threshold = %e)",l2norm_global,tauChangeThreshold);
+			}
+			else {
+				// Step 2.d.ii: Have not converged. Restrict current solution from the
+				// finest to the coarsest initialized refinement levels; Decrement
+				// number of iterations remaining; continue.
+				if( RemainingIterations > 1 ) {
+					for(int rl=endRefLev-1;rl>=startRefLev;rl--) {
+						ENTER_LEVEL_MODE(cctkGH,rl) {
+							NRPyLeakageET_Restrict(CCTK_PASS_CTOC,"NRPyLeakageET::NRPyLeakageET_optical_depths");
+						} LEAVE_LEVEL_MODE;
+					}
+					RemainingIterations--;
+					if( verbosity_level>0 ) CCTK_VINFO("Completed iteration %d. Global change: %e. Remaining iterations: %4d",counter,l2norm_global,RemainingIterations);
+				}
+				else {
+					CCTK_WARN(CCTK_WARN_ALERT,"Maximum iterations reached, but convergence threshold not met.");
+				}
+			}
+		}
 
-  // Step 4: Now copy the optical depths and opacities to all time levels
-  if(verbosity_level>0) CCTK_INFO("Copying initial data to all time levels...");
-  BEGIN_REFLEVEL_LOOP(cctkGH) {
-    BEGIN_MAP_LOOP(cctkGH,CCTK_GF) {
-      BEGIN_COMPONENT_LOOP(cctkGH, CCTK_GF) {
-        NRPyLeakageET_copy_opacities_and_optical_depths_to_previous_time_levels(CCTK_PASS_CTOC);
-      } END_COMPONENT_LOOP;
-    } END_MAP_LOOP;
-  } END_REFLEVEL_LOOP;
-  if(verbosity_level>0) CCTK_INFO("Finished copying initial data to all time levels");
+		// Step 3: All done! Now loop over the refinement levels backwards, restricting the result
+		for(int rl=endRefLev-1;rl>=0;rl--) {
+			ENTER_LEVEL_MODE(cctkGH,rl) {
+				NRPyLeakageET_Restrict(CCTK_PASS_CTOC,"NRPyLeakageET::NRPyLeakageET_optical_depths");
+			} LEAVE_LEVEL_MODE;
+		}
+		if(verbosity_level>0) CCTK_INFO("Completed path of least resistance algorithm!");
+	}
+
+	// Step 4: Now copy the optical depths and opacities to all time levels
+	if(verbosity_level>0) CCTK_INFO("Copying initial data to all time levels...");
+	BEGIN_REFLEVEL_LOOP(cctkGH) {
+		BEGIN_MAP_LOOP(cctkGH,CCTK_GF) {
+			BEGIN_COMPONENT_LOOP(cctkGH, CCTK_GF) {
+				NRPyLeakageET_copy_opacities_and_optical_depths_to_previous_time_levels(CCTK_PASS_CTOC);
+			} END_COMPONENT_LOOP;
+		} END_MAP_LOOP;
+	} END_REFLEVEL_LOOP;
+	if(verbosity_level>0) CCTK_INFO("Finished copying initial data to all time levels");
 }

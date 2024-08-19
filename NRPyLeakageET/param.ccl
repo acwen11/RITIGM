@@ -61,10 +61,28 @@ CCTK_REAL rho_min_threshold "Only leak for rho > rho_min_threshold" STEERABLE = 
   0:* :: "Any non-negative number"
 } 0.0
 
-CCTK_REAL rho_min_threshold_init_tau "Only initialize tau for rho > rho_min_threshold" STEERABLE = ALWAYS
+restricted:
+CCTK_BOOLEAN rho_min_falloff "If true, rho_atmo(r) = rho_b_atm_max*r^r_power outside a radius 'rho_min_r' (see below)" STEERABLE=ALWAYS
+{
+} false
+
+restricted:
+CCTK_REAL rho_min_r "Sets radius at which rho_min_threshold is variable" STEERABLE = ALWAYS
 {
   0:* :: "Any non-negative number"
 } 0.0
+
+restricted:
+CCTK_REAL r_power "Exponent of atmospheric density falloff." STEERABLE=ALWAYS
+{
+  *:0.] :: "Any non-positive number"
+} -1.5
+
+restricted:
+CCTK_REAL thresh_tol "Tolerance on threshold" STEERABLE = ALWAYS
+{
+  0:* :: "Any non-negative number"
+} 1e-3
 
 restricted:
 CCTK_REAL rho_max_threshold "Only leak for rho < rho_max_threshold" STEERABLE = ALWAYS

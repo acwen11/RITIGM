@@ -1,6 +1,7 @@
 #include "cctk.h"
 #include "cctk_Arguments.h"
 #include "cctk_Parameters.h"
+#include <math.h>
 
 #include "NRPyLeakageET.h"
 
@@ -28,11 +29,15 @@ void NRPyLeakageET_compute_opacities(CCTK_ARGUMENTS) {
 
           // Step 2: Declare variables
           const CCTK_REAL rhoL = rho[index];
+          const CCTK_REAL r_atmo        = MAX(rho_min_r, r[index]);
+          const CCTK_REAL r_pow         = rho_min_falloff ? r_power : 0.;
+          const CCTK_REAL rho_min_atm     = MAX(rho_min_threshold*pow(r_atmo / rho_min_r, r_pow), *tabeos_rhomin);
+
           CCTK_REAL kappa_nue[2], kappa_anue[2], kappa_nux[2];
           CCTK_REAL tau_nue[2], tau_anue[2], tau_nux[2];
 
           // Step 3: Check density threshold, compute opacities
-          if( rhoL <  rho_min_threshold_init_tau || rhoL > rho_max_threshold ) {
+          if( rhoL <  rho_min_atm * (1 + thresh_tol) || rhoL > rho_max_threshold ) {
             // Step 3.a: Below density threshold; set opacities and optical
             // depths to zero
             kappa_nue[0] = kappa_anue[0] = kappa_nux[0] = 0.0;
@@ -108,11 +113,15 @@ void NRPyLeakageET_compute_opacities(CCTK_ARGUMENTS) {
 
           // Step 2: Declare variables
           const CCTK_REAL rhoL = rho[index];
+          const CCTK_REAL r_atmo        = MAX(rho_min_r, r[index]);
+          const CCTK_REAL r_pow         = rho_min_falloff ? r_power : 0.;
+          const CCTK_REAL rho_min_atm     = MAX(rho_min_threshold*pow(r_atmo / rho_min_r, r_pow), *tabeos_rhomin);
+
           CCTK_REAL kappa_nue[2], kappa_anue[2], kappa_nux[2];
           CCTK_REAL tau_nue[2], tau_anue[2], tau_nux[2];
 
           // Step 3: Check density threshold, compute opacities
-          if( rhoL < rho_min_threshold || rhoL > rho_max_threshold ) {
+          if( rhoL < rho_min_atm * (1 + thresh_tol) || rhoL > rho_max_threshold ) {
             // Step 3.a: Below density threshold; set opacities and optical
             // depths to zero
             kappa_nue[0] = kappa_anue[0] = kappa_nux[0] = 0.0;

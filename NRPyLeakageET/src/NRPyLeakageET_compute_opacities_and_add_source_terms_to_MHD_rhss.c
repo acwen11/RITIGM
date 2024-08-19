@@ -1,5 +1,7 @@
 #include "cctk.h"
 #include "cctk_Parameters.h"
+#include <math.h>
+
 #include "NRPyLeakageET.h"
 
 #define velx (&vel[0*cctk_lsh[0]*cctk_lsh[1]*cctk_lsh[2]])
@@ -54,7 +56,11 @@ void NRPyLeakageET_compute_opacities_and_add_source_terms_to_MHD_rhss(CCTK_ARGUM
 
         // Step 3.b: Check if we are within the threshold
         CCTK_REAL rhoL = rho[index];
-        if( rhoL < rho_min_threshold || rhoL > rho_max_threshold ) {
+				const CCTK_REAL r_atmo        = MAX(rho_min_r, r[index]);
+				const CCTK_REAL r_pow         = rho_min_falloff ? r_power : 0.;
+				const CCTK_REAL rho_min_atm     = MAX(rho_min_threshold*pow(r_atmo / rho_min_r, r_pow), *tabeos_rhomin);
+
+        if( rhoL < rho_min_atm * (1 + thresh_tol) || rhoL > rho_max_threshold ) {
           // Step 3.b.i: Below density threshold.
           //             Set opacities to zero; don't add anything to the RHSs
           kappa_0_nue [index] = 0.0;
