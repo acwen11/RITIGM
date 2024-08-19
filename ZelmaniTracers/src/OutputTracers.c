@@ -455,12 +455,9 @@ void ZelmaniTracers_OutputTracers(CCTK_ARGUMENTS)
     {"Masses",                  tmass},
     {"SmoothingLength",         thsml},
     {"Density",                 trho},
-    {"InternalEnergy",          teps},
-    {"Pressure",                tpress},
-    {"Entropy",                 tentropy},
     {"Temperature",             ttemp},
     {"Ye",                      tye},
-    {"Abar",                    tabar}
+    {"Lapse",                   talp},
   };
   int const n_fields_base = length(fields_base);
 
@@ -475,7 +472,10 @@ void ZelmaniTracers_OutputTracers(CCTK_ARGUMENTS)
   int const n_fields_leak = length(fields_leak);
 
   Field fields_extra[] = {
-    {"Lapse",                   talp},
+    {"InternalEnergy",          teps},
+    {"Pressure",                tpress},
+    {"Entropy",                 tentropy},
+    {"Abar",                    tabar}
     {"gxx",                     tgxx},
     {"gxy",                     tgxy},
     {"gxz",                     tgxz},
