@@ -1,0 +1,173 @@
+# Parameter definitions for thorn ZelmaniTracers
+
+RESTRICTED:
+
+CCTK_INT ntracers "how many tracers do we want to use" STEERABLE=RECOVER
+{
+ 0:* :: ""
+} 0
+
+
+BOOLEAN tracers_with_leakage "interpolate leakage quantities on the tracer particles" STEERABLE=ALWAYS
+{
+} "yes"
+
+BOOLEAN reset_tracers_on_recover "start with clean tracers upon recover" STEERABLE=ALWAYS
+{
+} "no"
+
+BOOLEAN manual_pos_tracers "position manually the tracers from file" STEERABLE=ALWAYS
+{
+} "no"
+
+BOOLEAN manual_tracers_mass "set the mass for each tracers from file" STEERABLE=ALWAYS
+{
+} "no"
+
+KEYWORD evolution_method "Evolution method used to update the tracers position" STEERABLE=ALWAYS
+{
+    "Euler" :: "First order Euler"
+    "AB2"   :: "2nd order Adams Bashforth"
+} "Euler"
+
+CCTK_INT evolve_every "evolve every evolve_every timesteps" STEERABLE=ALWAYS
+{
+ -1   :: "do nothing"
+  1:* :: "every evolve_every timesteps"
+} 1
+
+STRING interpolator "Interpolator" STEERABLE=always
+{
+  "" :: "must be a registered interpolator"
+} "Lagrange polynomial interpolation"
+
+STRING interpolator_options "Options for the interpolator" STEERABLE=always
+{
+  "" :: "must be a valid options specification"
+} "order=1"
+
+STRING coordinate_system "Coordinate system" STEERABLE=always
+{
+  "" :: "must be a registered coordinate system"
+} "cart3d"
+
+KEYWORD TracerProblem "What kind of tracer setup do we want?" STEERABLE=always
+{
+  "BinaryNS" :: "Setup for NS binaries"
+  "StellarCore" :: "Setup for stellar cores"
+} "BinaryNS"
+
+
+####### parameters for binaries
+REAL center_ns1[3] "Center of neutron star 1 [x,y,z]" STEERABLE=ALWAYS
+{
+ *:* :: "Some number"
+} 0.0
+
+REAL center_ns2[3] "Center of neutron star 2 [x,y,z]" STEERABLE=ALWAYS
+{
+ *:* :: "Some number"
+} 0.0
+
+REAL rad_max[2] "Maxium radius of both stars" STEERABLE=ALWAYS
+{
+ 0.0:* :: "Some number"
+} 0.0
+
+REAL rad_min[2] "Inner radius outside which we place tracers" STEERABLE=ALWAYS
+{
+ 0.0:* :: "Some number"
+} 0.0
+
+
+####### tracer placement
+INT nradialshells "Number of radial shells" STEERABLE=ALWAYS
+{
+ 1:* :: "Some number"
+} 1
+
+INT ntheta "number of theta angles" STEERABLE=ALWAYS
+{
+ 1:* :: "Some number"
+} 20
+
+INT nphi "number of phi angles" STEERABLE=ALWAYS
+{
+ 2:* :: "Some number"
+} 20
+
+KEYWORD symm "Symmetry"  STEERABLE=always
+{
+ "octant"   :: "Octant symmetry"
+ "quadrant" :: "Only the x>=0,z>=0 quadrant"
+ "bitant"   :: "Bitant symmetry"
+ "full"     :: "Full grid"
+} "full"
+
+# If this is false, then the tracers are placed on a regular, spherical grid as
+# specified by the other parameters. Otherwise the initialization proceeds in
+# two steps.
+# 1. Initially the effective density, D = \rho W \sqrt{gamma}, is sampled on a
+#    regular grid
+# 2. Tracers are randomly placed on the grid with a probability distribution
+#    function proportional to D
+# If random placing is enabled, the tracer particles will have equal masses,
+# otherwise the masses might be significantly different.
+BOOLEAN randomize "Place the tracers in random positions"
+{
+} "yes"
+
+
+BOOLEAN BH_puncture "do additional treatment near BH puncture, needs non-vanishing lapse_excision of IllinoisGRMHD"
+{
+} "no"
+
+####### control output
+
+# The smoothing length, h, is computed from
+#    4/3 pi h^3 \rho^3 = N_nb m
+# where "m" is the mass of the particles and N_nb is the number of neighbours
+CCTK_REAL hsml_num_neighbours "Effective number of neighbours used to estimate the smoothing length"
+{
+  (0:*) :: "Any positive real number"
+} 32.0
+
+STRING tracersfile "basename for output file, actual name will depend on the other options set"
+{
+  ".+" :: "any valid filename"
+} "tracers"
+
+STRING tracers_pos_file "Input file with the initial position of the tracers" STEERABLE=always
+{
+  ".+" :: "any valid filename"
+} "tracers_position.h5"
+
+CCTK_INT outTracers_every "how often to write to disk" STEERABLE=always
+{
+   0   :: "never output regularly"
+   1:* :: "every so many iterations"
+} 1
+
+CCTK_INT outTracers_iteration "specific iteration to write to disk" STEERABLE=always
+{
+   -1  :: "no output for a specific iteration"
+   0:* :: "any iteration"
+} -1
+
+BOOLEAN write_VisIt_file "create a VisIt virtual database file to simplify importing into VisIt"
+{
+} "no"
+
+BOOLEAN one_file_per_timestep "collect data from all MPI processes before writing"
+{
+} "yes"
+
+BOOLEAN output_extra_fields "Output auxiliary fields"
+{
+} "no"
+
+SHARES: IO
+
+USES STRING out_dir
+
+
