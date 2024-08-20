@@ -12,7 +12,7 @@
 
 #define SQ(X) ((X)*(X))
 
-extern void Interpolate_density_many_pts(cGH *cctkGH,int interp_num_points,double *particle_x_temp,double *particle_y_temp,double *particle_z_temp, double *particle_density_temp);
+// extern void Interpolate_density_many_pts(cGH *cctkGH,int interp_num_points,double *particle_x_temp,double *particle_y_temp,double *particle_z_temp, double *particle_density_temp);
 
 void get_random_position(double *x,double *y,double *z, const int fam) {
   DECLARE_CCTK_PARAMETERS;
@@ -412,7 +412,7 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
         tracers_out_of_domain[i] = 0 ;
     }
 
-    if(randomize) {
+    if(CCTK_Equals(seed_method, "randomize_dens")) {
         srand(CCTK_MyProc(cctkGH));
         for(int d = 0; d < ndomains; ++d) {
             ddist_init(d);
@@ -436,9 +436,6 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
 
                 CCTK_REAL const prob = ddist_eval(rad, theta,
                         phi)*SQ(rad)*sin(theta)*inorm;
-								//CCTK_VINFO("prob = %e; ddist_dens = %e; r^2 = %e, sin(th) = %e; inorm = %e", prob,ddist_eval(rad, theta,
-                //        phi),SQ(rad),sin(theta),inorm);
-
                 assert(prob >= 0);
                 assert(prob <= 1);
                 if(rr < prob) {
@@ -455,7 +452,7 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
             ddist_free();
         }
     }
-		else if (randomize_in_vol){
+		else if (CCTK_Equals(seed_method, "randomize_vol")){
 
 				srand(CCTK_MyProc(cctkGH));
         for(int d = 0; d < ndomains; ++d) {
@@ -463,6 +460,7 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
 						double *particle_y_temp  = (double *)malloc(sizeof(double)*siz);
 						double *particle_z_temp  = (double *)malloc(sizeof(double)*siz);
 						double *particle_density_temp = (double *)malloc(sizeof(double)*siz);
+						double *particle_volform_temp = (double *)malloc(sizeof(double)*siz);
 
 						int which_particle = d * siz;
 						int total_trials = 0;
@@ -472,16 +470,14 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
 										// Find all particles whose positions still need to be set:
 										get_random_position(&particle_x_temp[i],&particle_y_temp[i],&particle_z_temp[i],d);
 								}
-								Interpolate_density_many_pts(cctkGH,siz,particle_x_temp,particle_y_temp,particle_z_temp, particle_density_temp);	
+								Interpolate_density_many_pts(cctkGH,siz,particle_x_temp,particle_y_temp,particle_z_temp, particle_density_temp, particle_volform_temp);	
 								for(int i=0;i<siz;i++) {
 										if(particle_density_temp[i] > init_dens_min){
 												// Accept particle!
 												tx[which_particle] = particle_x_temp[i];
 												ty[which_particle] = particle_y_temp[i];
 												tz[which_particle] = particle_z_temp[i];
-												tmass[which_particle] = particle_density_temp[i];
-												if (isnan(tx[which_particle]*ty[which_particle]*tz[which_particle] ))
-														CCTK_VINFO("NaN found in seeding! x = %e; y = %e, z = %e", tx[which_particle], ty[which_particle], tz[which_particle] );
+												tmass[which_particle] = particle_density_temp[i] * particle_volform_temp[i];
 												which_particle++;
 										}
 										total_trials++;
@@ -504,7 +500,7 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
 						free(particle_density_temp);
 				}
 		}
-    else {
+    else if (CCTK_Equals(seed_method, "on_grid")){
         for(int d = 0; d < ndomains; ++d) {
             ddist_init(d);
             ddist_calc(CCTK_PASS_CTOC);
@@ -518,5 +514,10 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
 
             ddist_free();
         }
+    }
+    else {
+        char msg[BUFSIZ];
+        snprintf(msg, BUFSIZ, "Unkown seeding method: \"%s\"", seed_method);
+        CCTK_ERROR(msg);
     }
 }

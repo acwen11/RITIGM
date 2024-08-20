@@ -105,6 +105,18 @@ inline CCTK_REAL compute_sqrtgamma(const int index,
 }
 
 
+/* Coord Volume: */
+inline void CoordVol_integrand(double *VolIntegrand1, const int index, const CCTK_REAL *restrict rho0, const CCTK_REAL dens_1) {
+
+	const CCTK_REAL my_rho = rho0[index];
+  if ( my_rho > dens_1 ) {
+  	VolIntegrand1[index] = 1.0;
+	}
+	else {
+  	VolIntegrand1[index] = 0.0;
+	}
+}
+
 /* Center of Mass: */
 inline void CoM_integrand(double *VolIntegrand1,double *VolIntegrand2,double *VolIntegrand3,double *VolIntegrand4, const int index,
                           const CCTK_REAL *restrict w_lorentz, const CCTK_REAL *restrict rho0,

@@ -206,8 +206,8 @@ extern "C" void ZelmaniTracers_InterpExtra(CCTK_ARGUMENTS)
   // Fields to interpolate in any case
   Field const fields_base[] = {
     {"HydroBase::rho",         trho},
-    {"HydroBase::eps",         teps},
-    {"HydroBase::press",       tpress},
+    // {"HydroBase::eps",         teps},
+    // {"HydroBase::press",       tpress},
     {"ADMBase::gxx",           tgxx},
     {"ADMBase::gxy",           tgxy},
     {"ADMBase::gxz",           tgxz},
@@ -220,10 +220,10 @@ extern "C" void ZelmaniTracers_InterpExtra(CCTK_ARGUMENTS)
   // Thermodynamics fields (might not have storage)
   Field const fields_tdm[] = {
     // Optional fields go here
-    {"HydroBase::entropy",     tentropy},
+    // {"HydroBase::entropy",     tentropy},
     {"HydroBase::temperature", ttemp},
     {"HydroBase::Y_e",         tye},
-    {"HydroBase::Abar",        tabar},
+    // {"HydroBase::Abar",        tabar},
   };
   int const nfields_tdm = length(fields_tdm);
 
@@ -279,20 +279,20 @@ extern "C" void ZelmaniTracers_InterpExtra(CCTK_ARGUMENTS)
 
   // Compute derived quantities
   for(int i = 0; i < myntracers; ++i) {
-    CCTK_REAL const v_x = tgxx[i]*tvx[i] + tgxy[i]*tvy[i] + tgxz[i]*tvz[i];
-    CCTK_REAL const v_y = tgxy[i]*tvx[i] + tgyy[i]*tvy[i] + tgyz[i]*tvz[i];
-    CCTK_REAL const v_z = tgxz[i]*tvx[i] + tgyz[i]*tvy[i] + tgzz[i]*tvz[i];
-    CCTK_REAL const v2  = v_x*tvx[i] + v_y*tvy[i] + v_z*tvz[i];
-    tw_lorentz[i] = 1.0/sqrt(1.0 - v2);
-    teninf[i] = - tw_lorentz[i]*(v_x*tbetax[i] + v_y*tbetay[i] +
-            v_z*tbetaz[i] - talp[i]) - 1.0;
+    // CCTK_REAL const v_x = tgxx[i]*tvx[i] + tgxy[i]*tvy[i] + tgxz[i]*tvz[i];
+    // CCTK_REAL const v_y = tgxy[i]*tvx[i] + tgyy[i]*tvy[i] + tgyz[i]*tvz[i];
+    // CCTK_REAL const v_z = tgxz[i]*tvx[i] + tgyz[i]*tvy[i] + tgzz[i]*tvz[i];
+    // CCTK_REAL const v2  = v_x*tvx[i] + v_y*tvy[i] + v_z*tvz[i];
+    // tw_lorentz[i] = 1.0/sqrt(1.0 - v2);
+    // teninf[i] = - tw_lorentz[i]*(v_x*tbetax[i] + v_y*tbetay[i] +
+    //         v_z*tbetaz[i] - talp[i]) - 1.0;
     CCTK_REAL const hsml3 = hsml_num_neighbours * tmass[i] /
         ( 4.0/3.0 * M_PI * trho[i] );
     thsml[i] = pow(hsml3, 1.0/3.0);
 
-    CCTK_REAL const det = spatialdet(tgxx[i], tgxy[i], tgxz[i], tgyy[i],
-            tgyz[i], tgzz[i]);
-    tdens[i] = trho[i]*tw_lorentz[i]*sqrt(det);
+    // CCTK_REAL const det = spatialdet(tgxx[i], tgxy[i], tgxz[i], tgyy[i],
+    //         tgyz[i], tgzz[i]);
+    // tdens[i] = trho[i]*tw_lorentz[i]*sqrt(det);
   }
 
   return;

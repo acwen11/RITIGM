@@ -35,14 +35,19 @@ CCTK_REAL tracervel_old TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="yes"'
   twx_old, twy_old, twz_old
 } "Old advection velocity for the tracers"
 
-# NOTE: teninf = - u_t - 1
 CCTK_REAL tracervars TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="no"'
 {
-  tw_lorentz, teninf,
-  thsml,
-  trho, teps, tpress,
-  tentropy, ttemp, tye, tabar
+  thsml, trho, ttemp, tye
 } "Hydro quantities interpolated at the tracer locations"
+
+# NOTE: teninf = - u_t - 1
+# CCTK_REAL tracervars TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="no"'
+# {
+#   tw_lorentz, teninf,
+#   thsml,
+#   trho, teps, tpress,
+#   tentropy, ttemp, tye, tabar
+# } "Hydro quantities interpolated at the tracer locations"
 
 CCTK_REAL tracerleak TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="no"'
 {
@@ -52,8 +57,13 @@ CCTK_REAL tracerleak TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="no"'
 
 CCTK_REAL tracerextra TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="no"'
 {
-  tgxx, tgxy, tgxz, tgyy, tgyz, tgzz, tdens
+  tgxx, tgxy, tgxz, tgyy, tgyz, tgzz
 } "Optional fields"
+
+# CCTK_REAL tracerextra TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="no"'
+# {
+#   tgxx, tgxy, tgxz, tgyy, tgyz, tgzz, tdens
+# } "Optional fields"
 
 PRIVATE:
 

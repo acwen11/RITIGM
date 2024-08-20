@@ -104,6 +104,11 @@ KEYWORD symm "Symmetry"  STEERABLE=always
  "full"     :: "Full grid"
 } "full"
 
+CCTK_REAL init_dens_min "Don't place particles below this density"
+{
+  *:* :: "Any number"
+} 1e-13
+
 # If this is false, then the tracers are placed on a regular, spherical grid as
 # specified by the other parameters. Otherwise the initialization proceeds in
 # two steps.
@@ -113,10 +118,12 @@ KEYWORD symm "Symmetry"  STEERABLE=always
 #    function proportional to D
 # If random placing is enabled, the tracer particles will have equal masses,
 # otherwise the masses might be significantly different.
-BOOLEAN randomize "Place the tracers in random positions"
+KEYWORD seed_method "How should initial positions be selected?"
 {
-} "yes"
-
+    "randomize_dens" :: "probability distribution proportional to density"
+    "randomize_vol"   :: "uniform spatial distribution"
+    "on_grid" :: "regular, spherical grid"
+} "randomize_vol"
 
 BOOLEAN BH_puncture "do additional treatment near BH puncture, needs non-vanishing lapse_excision of IllinoisGRMHD"
 {
