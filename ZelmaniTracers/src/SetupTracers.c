@@ -8,8 +8,44 @@
 #include "cctk_Arguments.h"
 #include "cctk_Parameters.h"
 #include <util_Table.h>
+#include <Interpolate_density_many_pts.h>
 
 #define SQ(X) ((X)*(X))
+
+extern void Interpolate_density_many_pts(cGH *cctkGH,int interp_num_points,double *particle_x_temp,double *particle_y_temp,double *particle_z_temp, double *particle_density_temp);
+
+void get_random_position(double *x,double *y,double *z, const int fam) {
+  DECLARE_CCTK_PARAMETERS;
+
+  const double rmin = rad_min[fam];
+  const double rmax = rad_max[fam];
+  // const double thmin = seed_particles_theta_min[fam] * M_PI / 180; // convert to radians
+  // const double thmax = seed_particles_theta_max[fam] * M_PI / 180;
+	const double thmin = 0.0;
+	const double thmax = M_PI;
+	// We want to uniformly sample in space:
+	double r3 = drand48() * (pow(rmax,3) - pow(rmin,3)) + pow(rmin,3);
+	double costh = drand48() * (cos(thmax) - cos(thmin)) + cos(thmin);
+	double phi = drand48() * 2 * M_PI;
+
+	double r = pow(r3, 1.0/3.0);
+	double theta = acos(costh);
+
+	*x = r * sin(theta) * cos(phi);
+	*y = r * sin(theta) * sin(phi);
+	*z = r * costh;
+
+	if (fam == 0){
+		*x += center_ns1[0];
+		*y += center_ns1[1];
+		*z += center_ns1[2];
+	}
+	else {
+		*x += center_ns2[0];
+		*y += center_ns2[1];
+		*z += center_ns2[2];
+	}
+}
 
 static inline void spher2cart(CCTK_REAL const rad, CCTK_REAL const theta,
         CCTK_REAL const phi, CCTK_REAL * x, CCTK_REAL * y, CCTK_REAL * z,
@@ -351,6 +387,7 @@ static void ddist_free() {
     ddist = NULL;
 }
 
+
 void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
     DECLARE_CCTK_ARGUMENTS
     DECLARE_CCTK_PARAMETERS
@@ -399,11 +436,17 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
 
                 CCTK_REAL const prob = ddist_eval(rad, theta,
                         phi)*SQ(rad)*sin(theta)*inorm;
+								//CCTK_VINFO("prob = %e; ddist_dens = %e; r^2 = %e, sin(th) = %e; inorm = %e", prob,ddist_eval(rad, theta,
+                //        phi),SQ(rad),sin(theta),inorm);
+
                 assert(prob >= 0);
                 assert(prob <= 1);
                 if(rr < prob) {
                     spher2cart(rad, theta, phi, &tx[i], &ty[i], &tz[i],
                             ddist->x0, ddist->y0, ddist->z0);
+										CCTK_VINFO("rad = %e; theta = %e; phi = %e; x = %e; y = %e, z = %e; x0 = %e, y0 = %e, z0 = %e",
+                    		rad, theta, phi, tx[i], ty[i], tz[i],
+                        ddist->x0, ddist->y0, ddist->z0);
                     tmass[i] = pmass;
                     ++i;
                 }
@@ -412,6 +455,55 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
             ddist_free();
         }
     }
+		else if (randomize_in_vol){
+
+				srand(CCTK_MyProc(cctkGH));
+        for(int d = 0; d < ndomains; ++d) {
+						double *particle_x_temp  = (double *)malloc(sizeof(double)*siz);
+						double *particle_y_temp  = (double *)malloc(sizeof(double)*siz);
+						double *particle_z_temp  = (double *)malloc(sizeof(double)*siz);
+						double *particle_density_temp = (double *)malloc(sizeof(double)*siz);
+
+						int which_particle = d * siz;
+						int total_trials = 0;
+						//Technically, this algorithm is nondeterministic. However it should complete within a few iterations.
+						for(int iter=0;iter<100000;iter++) {
+								for(int i=0;i<siz;i++) {
+										// Find all particles whose positions still need to be set:
+										get_random_position(&particle_x_temp[i],&particle_y_temp[i],&particle_z_temp[i],d);
+								}
+								Interpolate_density_many_pts(cctkGH,siz,particle_x_temp,particle_y_temp,particle_z_temp, particle_density_temp);	
+								for(int i=0;i<siz;i++) {
+										if(particle_density_temp[i] > init_dens_min){
+												// Accept particle!
+												tx[which_particle] = particle_x_temp[i];
+												ty[which_particle] = particle_y_temp[i];
+												tz[which_particle] = particle_z_temp[i];
+												tmass[which_particle] = particle_density_temp[i];
+												if (isnan(tx[which_particle]*ty[which_particle]*tz[which_particle] ))
+														CCTK_VINFO("NaN found in seeding! x = %e; y = %e, z = %e", tx[which_particle], ty[which_particle], tz[which_particle] );
+												which_particle++;
+										}
+										total_trials++;
+										if(which_particle == (d + 1) * siz) {
+												// If we've already seeded all the particles, break out of the loop!
+												iter=1000000;
+												i=siz+100;
+												CCTK_INFO("SHOULD BE ALL DONE!");
+										}
+								}
+								if(iter!=1000000)
+									CCTK_VINFO("Iteration #%d: Need to specify %d more particle location(s). Success rate = %.2e. Need ~ %d more iterations.",
+														 iter,siz-which_particle,(double)which_particle/(double)total_trials, (int)((double)total_trials/(double)which_particle) - iter - 1);
+								if(iter==99999)
+									CCTK_WARN(CCTK_WARN_ABORT, "Hit iteration limit.");
+						}
+						free(particle_x_temp);
+						free(particle_y_temp);
+						free(particle_z_temp);
+						free(particle_density_temp);
+				}
+		}
     else {
         for(int d = 0; d < ndomains; ++d) {
             ddist_init(d);

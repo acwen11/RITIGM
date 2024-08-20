@@ -6,7 +6,7 @@ void ZelmaniTracers_ParamCheck(CCTK_ARGUMENTS) {
     DECLARE_CCTK_ARGUMENTS
     DECLARE_CCTK_PARAMETERS
 
-    if(!randomize) {
+    if(!randomize && !randomize_in_vol) {
         if(CCTK_Equals(TracerProblem, "BinaryNS") &&
                 !CCTK_Equals(symm, "quadrant")) {
             if(ntracers != 2*nradialshells*ntheta*nphi) {

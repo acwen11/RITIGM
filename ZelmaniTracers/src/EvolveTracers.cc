@@ -307,20 +307,25 @@ extern "C" void ZelmaniTracers_EvolveTracers(CCTK_ARGUMENTS)
   CCTK_REAL dtime = evolve_every * CCTK_DELTA_TIME;
 
   CCTK_REAL lapse_excision_hydro;
-  lapse_excision_hydro = *(const CCTK_REAL *) CCTK_ParameterGet("lapse_excision", "IllinoisGRMHD", NULL);
+  // lapse_excision_hydro = *(const CCTK_REAL *) CCTK_ParameterGet("lapse_excision", "IllinoisGRMHD", NULL);
+  // Parameter no longer exists, disabling for now
+  lapse_excision_hydro = 0.0;
 
   // figure out how many tracers each process has
+  CCTK_INFO("Getting myntracers...");
   int group = CCTK_GroupIndex("ZelmaniTracers::tracerevol");
   cGroupDynamicData data;
   int retval = CCTK_GroupDynamicData (cctkGH, group, &data); (void)retval;
   int myntracers = data.lsh[0];
 
   // rotate timelevels
+  CCTK_INFO("Rotating tlevels...");
   memcpy(twx_old, twx, myntracers*sizeof(CCTK_REAL));
   memcpy(twy_old, twy, myntracers*sizeof(CCTK_REAL));
   memcpy(twz_old, twz, myntracers*sizeof(CCTK_REAL));
 
   if(*first_step == 1 || CCTK_Equals(evolution_method, "Euler")) {
+  	CCTK_INFO("Evolving tracers...");
 #pragma omp parallel for
     for(int i = 0; i < myntracers; ++i) {
       // initialize tracers_out_of_domain // move initialization to setup routines

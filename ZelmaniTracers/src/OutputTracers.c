@@ -475,7 +475,7 @@ void ZelmaniTracers_OutputTracers(CCTK_ARGUMENTS)
     {"InternalEnergy",          teps},
     {"Pressure",                tpress},
     {"Entropy",                 tentropy},
-    {"Abar",                    tabar}
+    {"Abar",                    tabar},
     {"gxx",                     tgxx},
     {"gxy",                     tgxy},
     {"gxz",                     tgxz},
