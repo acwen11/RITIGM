@@ -28,6 +28,7 @@ static inline int VI_GRMHD_number_of_reductions(int which_integral) {
   if(CCTK_EQUALS(Integration_quantity_keyword[which_integral],"kinetic_energy_total")) return 1;
   if(CCTK_EQUALS(Integration_quantity_keyword[which_integral],"em_energy_ab")) return 2;
   if(CCTK_EQUALS(Integration_quantity_keyword[which_integral],"em_energy_cd")) return 2;
+  if(CCTK_EQUALS(Integration_quantity_keyword[which_integral],"coordvolume")) return 2;
 
   printf("VolumeIntegrals ERROR: You forgot to specify the number of reductions for Integration_quantity_keyword=%s!\n",Integration_quantity_keyword[which_integral]); 
   exit(1); 

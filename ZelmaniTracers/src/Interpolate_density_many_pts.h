@@ -32,11 +32,11 @@ void Interpolate_density_many_pts(cGH *cctkGH,int interp_num_points,double *part
   if(param_table_handle < 0)
     CCTK_VWARN(CCTK_WARN_ABORT, "bad interpolator parameter(s) \"%s\"!", interpolator_options);
 
-  CCTK_INT operand_indices[1] = {0};
-  Util_TableSetIntArray(param_table_handle, 1, operand_indices, "operand_indices");
+  // CCTK_INT operand_indices[1] = {0};
+  // Util_TableSetIntArray(param_table_handle, 1, operand_indices, "operand_indices");
 
-  CCTK_INT operation_codes[1] = {0};
-  Util_TableSetIntArray(param_table_handle, 1, operation_codes, "operation_codes");
+  // CCTK_INT operation_codes[1] = {0};
+  // Util_TableSetIntArray(param_table_handle, 1, operation_codes, "operation_codes");
 
   const void* interp_coords[3]
     = { (const void *) particle_x_temp,
