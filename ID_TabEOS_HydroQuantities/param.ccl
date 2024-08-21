@@ -59,6 +59,11 @@ CCTK_STRING id_entropy_type "Type of initial entropy"
   "from table" :: "Set initial entropy from (rho,Ye,T) using the EOS table"
 } "from table"
 
+CCTK_REAL id_entropy "Initial entropy (constant everywhere)"
+{
+  0:* :: "Should be positive"
+} 1.0
+
 #------ Initial temperature (constant type only) ------
 # restricted:
 # CCTK_REAL id_temperature "Initial temperature (constant everywhere on the grid)"

@@ -145,11 +145,21 @@ extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const 
 					CCTK_REAL xent    = 0.0;
 					dummy             = 0.0;
 					if( initialize_entropy ) {
-						// Only call EOS_Omni_short() if we need the entropy.
-						EOS_Omni_short(eoskey,havetemp,rf_precision,1,
-													 &xrho,&xeps,&xtemp,&xye,&xpress,&xent,
-													 &dummy,&dummy,&dummy,&dummy,&dummy,
-													 &keyerr,&anyerr);
+						if (CCTK_Equals(id_entropy_type, "constant")) {
+							xent = id_entropy;
+							// use havetemp = 2 to get T from S
+							EOS_Omni_short(eoskey,2,rf_precision,1,
+														 &xrho,&xeps,&xtemp,&xye,&xpress,&xent,
+														 &dummy,&dummy,&dummy,&dummy,&dummy,
+														 &keyerr,&anyerr);
+						}
+						else if (CCTK_Equals(id_entropy_type, "from table")) {
+							// Only call EOS_Omni_short() if we need the entropy.
+							EOS_Omni_short(eoskey,havetemp,rf_precision,1,
+														 &xrho,&xeps,&xtemp,&xye,&xpress,&xent,
+														 &dummy,&dummy,&dummy,&dummy,&dummy,
+														 &keyerr,&anyerr);
+						}
 					}
 					else {
 						// Otherwise use EOS_Omni_press(), which performs fewer
@@ -161,6 +171,7 @@ extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const 
 					// Now set press, eps, and entropy gridfunctions.
 					press[    index] = xpress;
 					eps[      index] = xeps;
+					temperature[      index] = xtemp;
 					if( initialize_entropy )
 						entropy[index] = xent;
 				}
