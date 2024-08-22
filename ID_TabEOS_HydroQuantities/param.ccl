@@ -18,6 +18,11 @@ EXTENDS KEYWORD initial_entropy
   "ID_TabEOS_HydroQuantities" :: "Initial entropy"
 }
 
+EXTENDS KEYWORD initial_hydro
+{
+  "ID_TabEOS_HydroQuantities" :: "Initial hydro vars"
+}
+
 #---------------- IllinoisGRMHD parameters ----------------
 shares: IllinoisGRMHD
 USES BOOLEAN atmo_falloff
@@ -58,6 +63,31 @@ CCTK_STRING id_entropy_type "Type of initial entropy"
   "constant"   :: "Constant initial entropy"
   "from table" :: "Set initial entropy from (rho,Ye,T) using the EOS table"
 } "from table"
+
+restricted:
+CCTK_STRING id_type "What type of simulation?"
+{
+	"NS" :: "Some other ID thorn has filled in rho"
+	"Spherical Shock" :: "Specify inner and outer region"
+} "NS"
+
+restricted:
+CCTK_REAL r_shock "For Sph Shock: radius of inner region"
+{
+	0.0:*	:: "Any positive value"	
+} 30.0
+
+restricted:
+CCTK_REAL rho_in "For Sph Shock: rho inside inner region"
+{
+	0.0:*	:: "Any positive value"	
+} 1e-3
+
+restricted:
+CCTK_REAL temp_in "For Sph Shock: T inside inner region"
+{
+	0.0:*	:: "Any positive value"	
+} 1e-2
 
 #------ Initial temperature (constant type only) ------
 # restricted:

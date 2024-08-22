@@ -29,6 +29,14 @@ void VI_GRMHD_ComputeIntegrand(CCTK_ARGUMENTS)
 	  CoM_integrand(VolIntegrand1,VolIntegrand2,VolIntegrand3,VolIntegrand4, index,w_lorentz, rho, gxx,gxy,gxz, gyy,gyz,gzz,x,y,z); 
     
     }
+  } else if(CCTK_EQUALS(Integration_quantity_keyword[which_integral],"coordvolume")) { 
+#pragma omp parallel for
+    for (int k=0;k<cctk_lsh[2];k++) for (int j=0;j<cctk_lsh[1];j++) for (int i=0;i<cctk_lsh[0];i++) { 
+	  
+	  int index = CCTK_GFINDEX3D(cctkGH,i,j,k);
+	  CoordVol_integrand(VolIntegrand1, index, rho, dens_atmo); 
+    
+    }
   } else if(CCTK_EQUALS(Integration_quantity_keyword[which_integral],"restmass")) {
 #pragma omp parallel for
     for (int k=0;k<cctk_lsh[2];k++) for (int j=0;j<cctk_lsh[1];j++) for (int i=0;i<cctk_lsh[0];i++) { 

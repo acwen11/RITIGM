@@ -1,0 +1,7 @@
+# Configuration definitions for thorn ZelmaniTracers
+
+REQUIRES HDF5 MPI
+
+PROVIDES ZelmaniTracers
+{
+}

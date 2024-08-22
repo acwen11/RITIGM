@@ -65,9 +65,10 @@ void Interpolate_velocities_at_particle_positions(cGH *cctkGH,int interp_num_poi
 
   // 3d input arrays
   CCTK_STRING input_array_names[NUM_INPUT_ARRAYS]
-    = { "particle_tracerET::MHDvx",
-	"particle_tracerET::MHDvy",
-	"particle_tracerET::MHDvz" };
+  //   = { "particle_tracerET::MHDvx",
+	// "particle_tracerET::MHDvy",
+	// "particle_tracerET::MHDvz" };
+	= { "IllinoisGRMHD::vx", "IllinoisGRMHD::vy", "IllinoisGRMHD::vz"};
 
   CCTK_INT input_array_indices[NUM_INPUT_ARRAYS];
   for(int i=0; i<NUM_INPUT_ARRAYS; i++) {

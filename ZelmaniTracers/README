@@ -1,0 +1,15 @@
+Cactus Code Thorn ZelmaniTracers
+Author(s)    : Christian D. Ott <cott@tapir.caltech.edu>
+Maintainer(s): Christian D. Ott <cott@tapir.caltech.edu>
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+not documented
+
+2. Comments
+
+You should know that the mass of the fluid elements tracked by the tracers is
+computed using an approximation that really only holds if w_lorentz = 1 when
+the tracers are created.

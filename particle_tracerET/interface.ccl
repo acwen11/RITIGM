@@ -2,7 +2,7 @@
 # $Header:$
 
 implements: particle_tracerET
-inherits: grid HydroBase ADMBase
+inherits: grid HydroBase ADMBase IllinoisGRMHD
 
 CCTK_INT particle_family type=SCALAR DISTRIB=CONSTANT
 
@@ -38,11 +38,11 @@ CCTK_REAL particle_position_aux_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=ma
   particle_position_x_k4,particle_position_y_k4,particle_position_z_k4,
 } "RK4 coefficients k1,k2,k3,k4 of each particle"
 
-#vvvvvvv u^i/u^0 3-velocity must be used here, as it is used in MHD induction equations. This way fluid flow is consistent with MHD frozen-in condition vvvvvvv#
-CCTK_REAL velocity_consistent_with_MHD_induction_equations type = GF TAGS='InterpNumTimelevels=1 prolongation="none" Checkpoint="no"'
-{
-  MHDvx,MHDvy,MHDvz
-}
+#vvvvvvv u^i/u^0 3-velocity must be used here, as it is used in MHD induction equations. This way fluid flow is consistent with MHD frozen-in condition vvvvvvv# ----> I'm just gonna interpolate IGM vels
+# CCTK_REAL velocity_consistent_with_MHD_induction_equations type = GF TAGS='InterpNumTimelevels=1 prolongation="none" Checkpoint="no"'
+# {
+#   MHDvx,MHDvy,MHDvz
+# }
 #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^#
 
 #########################################
@@ -78,16 +78,16 @@ CCTK_REAL particle_four_velocity_u4D_gridfunctions TYPE=GF TAGS='InterpNumTimele
 # Hydro quantities at particles' positions
 CCTK_REAL particle_hydro_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=max_num_particles
 {
-  particle_rho,particle_T,particle_Ye,particle_W,particle_eps,particle_P
+  particle_rho,particle_T,particle_Ye,particle_W
 } "Particle hydrodynamics quantities arrays"
 
 #########################################
-###  ADMBase Interp quantities      ###
+###  Spacetime Interp quantities      ###
 #########################################
 # Metric quantities at particles' positions, for mass flux calculation
 CCTK_REAL particle_metric_arrays TYPE=ARRAY DISTRIB=CONSTANT DIM=1 SIZE=max_num_particles
 {
-  particle_gxx,particle_gxy,particle_gxz,particle_gyy,particle_gyz,particle_gzz,particle_alp
+  particle_psi_bssn,particle_alp
 } "Particle metric quantities arrays"
 
 #########################################

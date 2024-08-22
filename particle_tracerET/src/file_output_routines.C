@@ -33,9 +33,7 @@ void Interpolate_hydro_vars_at_particle_positions(
       double *particle_rho,
       double *particle_T,
       double *particle_Ye,
-      double *particle_W,
-      double *particle_eps,
-      double *particle_P);
+      double *particle_W);
 
 void Interpolate_metric_vars_at_particle_positions(
       cGH *cctkGH,
@@ -43,12 +41,7 @@ void Interpolate_metric_vars_at_particle_positions(
       double *particle_x,
       double *particle_y,
       double *particle_z,
-      double *particle_gxx,
-      double *particle_gxy,
-      double *particle_gxz,
-      double *particle_gyy,
-      double *particle_gyz,
-      double *particle_gzz,
+      double *particle_psi_bssn,
       double *particle_alp);
 
 /********************************************************************
@@ -190,10 +183,10 @@ void particle_tracerET_file_output_ascii(CCTK_ARGUMENTS) {
 		if( output_hydro ) {
 			sprintf(filename, "%sparticles_batch%d_hydro.asc", actual_dir,pf);
 			if(!(file = fopen(filename, "a+"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
-			add_header_if_file_is_empty(file, "# Col. 1: Time (cctk_time). Subsequent columns: rho, T, Ye, W, eps, P of particle i\n");
+			add_header_if_file_is_empty(file, "# Col. 1: Time (cctk_time). Subsequent columns: rho, T, Ye, W of particle i\n");
 			sprintf(buffer,"%e",cctk_time);
 			for(int which_particle=np_tot;which_particle<np_tot+np;which_particle++) {
-				sprintf(buffer, "%s %e %e %e %e %e %e", buffer, particle_rho[which_particle], particle_T[which_particle], particle_Ye[which_particle], particle_W[which_particle], particle_eps[which_particle], particle_P[which_particle]);
+				sprintf(buffer, "%s %e %e %e %e", buffer, particle_rho[which_particle], particle_T[which_particle], particle_Ye[which_particle], particle_W[which_particle]);
 			}
 			fprintf(file, "%s\n", buffer);
 			fclose(file);
@@ -202,10 +195,10 @@ void particle_tracerET_file_output_ascii(CCTK_ARGUMENTS) {
 		if( output_metric ) {
 			sprintf(filename, "%sparticles_batch%d_metric.asc", actual_dir,pf);
 			if(!(file = fopen(filename, "a+"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
-			add_header_if_file_is_empty(file, "# Col. 1: Time (cctk_time). Subsequent columns: gxx, gxy, gxz, gyy, gyz, gzz, lapse of particle i\n");
+			add_header_if_file_is_empty(file, "# Col. 1: Time (cctk_time). Subsequent columns: psi_bssn, lapse of particle i\n");
 			sprintf(buffer,"%e",cctk_time);
 			for(int which_particle=np_tot;which_particle<np_tot+np;which_particle++) {
-				sprintf(buffer, "%s %e %e %e %e %e %e %e", buffer, particle_gxx[which_particle], particle_gxy[which_particle], particle_gxz[which_particle], particle_gyy[which_particle], particle_gyz[which_particle], particle_gzz[which_particle], particle_alp[which_particle]);
+				sprintf(buffer, "%s %e %e", buffer, particle_psi_bssn[which_particle], particle_alp[which_particle]);
 			}
 			fprintf(file, "%s\n", buffer);
 			fclose(file);
@@ -263,6 +256,7 @@ void particle_tracerET_file_output_binary(CCTK_ARGUMENTS) {
 			fclose(file);
 		}
 		if( output_hydro ) {
+			num_quantities = 4;
 			sprintf(filename, "%sparticles_batch%d_hydro.bin", actual_dir,pf);
 			if(!(file = fopen(filename, "a+b"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
 			add_number_of_particles_and_quantities_if_file_is_empty(file, np, num_quantities);
@@ -271,21 +265,15 @@ void particle_tracerET_file_output_binary(CCTK_ARGUMENTS) {
 			fwrite(particle_T   + np_tot, sizeof(CCTK_REAL), np, file);
 			fwrite(particle_Ye  + np_tot, sizeof(CCTK_REAL), np, file);
 			fwrite(particle_W   + np_tot, sizeof(CCTK_REAL), np, file);
-			fwrite(particle_eps + np_tot, sizeof(CCTK_REAL), np, file);
-			fwrite(particle_P   + np_tot, sizeof(CCTK_REAL), np, file);
 			fclose(file);
 		}
 		if( output_metric ) {
+			num_quantities = 2;
 			sprintf(filename, "%sparticles_batch%d_metric.bin", actual_dir,pf);
 			if(!(file = fopen(filename, "a+b"))) CCTK_VWARN(CCTK_WARN_ABORT, "Cannot open output file '%s'", filename);
 			add_number_of_particles_and_quantities_if_file_is_empty(file, np, num_quantities);
 			fwrite(&cctk_time   , sizeof(CCTK_REAL), 1 , file);
-			fwrite(particle_gxx + np_tot, sizeof(CCTK_REAL), np, file);
-			fwrite(particle_gxy + np_tot, sizeof(CCTK_REAL), np, file);
-			fwrite(particle_gxz + np_tot, sizeof(CCTK_REAL), np, file);
-			fwrite(particle_gyy + np_tot, sizeof(CCTK_REAL), np, file);
-			fwrite(particle_gyz + np_tot, sizeof(CCTK_REAL), np, file);
-			fwrite(particle_gzz + np_tot, sizeof(CCTK_REAL), np, file);
+			fwrite(particle_psi_bssn + np_tot, sizeof(CCTK_REAL), np, file);
 			fwrite(particle_alp + np_tot, sizeof(CCTK_REAL), np, file);
 			fclose(file);
 		}
@@ -329,9 +317,7 @@ void particle_tracerET_file_output(CCTK_ARGUMENTS) {
 						particle_rho,
 						particle_T,
 						particle_Ye,
-						particle_W,
-						particle_eps,
-						particle_P);
+						particle_W);
 		}
 
 		if ( output_metric ) {
@@ -342,12 +328,7 @@ void particle_tracerET_file_output(CCTK_ARGUMENTS) {
 						particle_position_x,
 						particle_position_y,
 						particle_position_z,
-						particle_gxx,
-						particle_gxy,
-						particle_gxz,
-						particle_gyy,
-						particle_gyz,
-						particle_gzz,
+						particle_psi_bssn,
 						particle_alp);
 		}
 

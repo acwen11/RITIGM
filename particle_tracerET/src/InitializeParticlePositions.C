@@ -78,13 +78,24 @@ void InitializeParticlePositions(CCTK_ARGUMENTS)
 
 			for(int i=0;i<np;i++) {
 				double random_number_zero_to_one = drand48();
-				if(random_number_zero_to_one < pow(particle_density_temp[i]/density_max,central_condensation_parameter)) {
+				if(CCTK_EQUALS(seeding_prescription, "Zenati23")){
+					if(random_number_zero_to_one < pow(particle_density_temp[i]/density_max,central_condensation_parameter)) {
+						// Accept particle!
+						particle_position_x[which_particle] = particle_x_temp[i];
+						particle_position_y[which_particle] = particle_y_temp[i];
+						particle_position_z[which_particle] = particle_z_temp[i];
+						which_particle++;
+					}
+				}
+
+				else if(CCTK_EQUALS(seeding_prescription, "uniform")){
 					// Accept particle!
 					particle_position_x[which_particle] = particle_x_temp[i];
 					particle_position_y[which_particle] = particle_y_temp[i];
 					particle_position_z[which_particle] = particle_z_temp[i];
 					which_particle++;
 				}
+
 				total_trials++;
 				if(which_particle == *num_active + np) {
 					// If we've already seeded all the particles, break out of the loop!
