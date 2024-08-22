@@ -362,13 +362,20 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 						CCTK_REAL eps_atm;
 						CCTK_REAL S_atm = eos.S_atm_max;
 
-						if( eos.evolve_entropy ) {
-							WVU_EOS_P_eps_and_S_from_rho_Ye_T( rho_b_atm,eos.Ye_atm,T_atm,
-																								 &P_atm,&eps_atm,&S_atm );
+						if( eos.is_Tabulated) {
+							if( eos.evolve_entropy ) {
+								WVU_EOS_P_eps_and_S_from_rho_Ye_T( rho_b_atm,eos.Ye_atm,T_atm,
+																									 &P_atm,&eps_atm,&S_atm );
+							}
+							else {
+								WVU_EOS_P_and_eps_from_rho_Ye_T( rho_b_atm,eos.Ye_atm,T_atm,
+																								 &P_atm,&eps_atm );
+							}
 						}
+
 						else {
-							WVU_EOS_P_and_eps_from_rho_Ye_T( rho_b_atm,eos.Ye_atm,T_atm,
-																							 &P_atm,&eps_atm );
+							P_atm = eos.P_atm_max;
+							eps_atm = eos.eps_atm_max;
 						}
 
 						// Atmospheric tau
@@ -488,7 +495,9 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 								rho    [index] = PRIMS[RHOB        ];
 								press  [index] = PRIMS[PRESSURE    ];
 								eps    [index] = PRIMS[EPSILON     ];
-								entropy[index] = PRIMS[ENTROPY     ];
+								if( eos.evolve_entropy ) {
+									entropy[index] = PRIMS[ENTROPY     ];
+								}
 
 								Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,0)] = PRIMS[BX_CENTER];
 								Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,1)] = PRIMS[BY_CENTER];
@@ -540,7 +549,7 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 								//FIXME: Instead of >1.0, should be one_minus_one_over_alpha_u0_squared > ONE_MINUS_ONE_OVER_GAMMA_SPEED_LIMIT_SQUARED, for consistency with conserv_to_prims routines
 
 								 if(one_minus_one_over_alpha_u0_squared > 1.0) {
-								 	CCTK_VInfo(CCTK_THORNSTRING,"WARNING: Found superluminal velocity. This should have been caught by IllinoisGRMHD.");
+								   CCTK_VInfo(CCTK_THORNSTRING,"WARNING: Found superluminal velocity. This should have been caught by IllinoisGRMHD.");
 								 }
 
 								 // A = 1.0-one_minus_one_over_alpha_u0_squared = 1-(1-1/(al u0)^2) = 1/(al u0)^2

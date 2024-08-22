@@ -1,0 +1,188 @@
+ActiveThorns = "
+ADMBase
+ADMCoupling
+ADMMacros
+AEILocalInterp
+Boundary
+Carpet
+CarpetIOASCII
+CarpetIOBasic
+CarpetIOHDF5
+CarpetIOScalar
+CarpetInterp
+CarpetLib
+CarpetReduce
+CarpetSlab
+CartGrid3d
+CoordBase
+CoordGauge
+FakeRates
+GenericFD
+HydroBase
+HRSCCore
+EOS_Thermal
+EOS_Thermal_Idealgas
+InitBase
+IOUtil
+LoopControl
+MoL
+Periodic
+Slab
+StaticConformal
+SymBase
+THC_Core
+THC_InitialData
+THC_M1
+THC_Tracer
+Time
+TmunuBase
+"
+
+Cactus::terminate			= "time"
+Cactus::cctk_final_time		= 1
+
+# =============================================================================
+# Grid
+# =============================================================================
+Grid::avoid_origin			= "no"
+Grid::domain			= "full"
+Grid::type			= "coordbase"
+
+CoordBase::xmin			= -2
+CoordBase::xmax			= 2
+CoordBase::ymin			= -0.1
+CoordBase::ymax			= 0.1
+CoordBase::zmin			= -0.1
+CoordBase::zmax			= 0.1
+
+CoordBase::spacing			= "numcells"
+CoordBase::ncells_x			= 100
+CoordBase::ncells_y			= 1
+CoordBase::ncells_z			= 1
+
+CoordBase::boundary_size_x_lower		= 2
+CoordBase::boundary_size_x_upper		= 2
+CoordBase::boundary_shiftout_x_lower		= 1
+CoordBase::boundary_shiftout_x_upper		= 1
+
+CoordBase::boundary_size_y_lower		= 2
+CoordBase::boundary_size_y_upper		= 2
+CoordBase::boundary_shiftout_y_lower		= 0
+CoordBase::boundary_shiftout_y_upper		= 1
+
+CoordBase::boundary_size_z_lower		= 2
+CoordBase::boundary_size_z_upper		= 2
+CoordBase::boundary_shiftout_z_lower		= 0
+CoordBase::boundary_shiftout_z_upper		= 1
+
+Driver::ghost_size			= 2
+Driver::ghost_size_x		= 2
+Driver::ghost_size_y		= 2
+Driver::ghost_size_z		= 2
+
+Periodic::periodic_y		= "yes"
+Periodic::periodic_z		= "yes"
+
+Carpet::domain_from_coordbase		= "yes"
+
+InitBase::initial_data_setup_method		= "init_all_levels"
+
+Carpet::max_refinement_levels		= 1
+Carpet::prolongation_order_space		= 3
+Carpet::prolongation_order_time		= 2
+Carpet::use_buffer_zones		= "yes"
+Carpet::enable_all_storage		= "no"
+
+Carpet::grid_coordinates_filename		= "grid.carpet"
+
+# =============================================================================
+# Initial data
+# =============================================================================
+HydroBase::initial_hydro		= "THC_Initial"
+HydroBase::initial_Y_e		= "THC_Initial"
+HydroBase::initial_temperature		= "zero"
+HydroBase::initial_entropy		= "zero"
+HydroBase::timelevels		= 1
+
+# =============================================================================
+# Templated hydrodynamics code
+# =============================================================================
+Time::timestep_method		= "given"
+Time::timestep			= 0.005
+
+THC_InitialData::id_type		= "shocktube"
+THC_InitialData::shocktube_case		= "collision"
+THC_InitialData::collision_w_lorentz		= 2.0
+
+TmunuBase::support_old_CalcTmunu_mechanism	= "no"
+
+EOS_Thermal::evol_eos_name		= "IdealGas"
+
+FakeRates::eta_nue			= 0.0
+FakeRates::eta_nua			= 0.0
+FakeRates::eta_nux			= 0.0
+FakeRates::kappa_scat_nue		= 0.0
+FakeRates::kappa_scat_nua		= 0.0
+FakeRates::kappa_scat_nux		= 0.0
+FakeRates::kappa_abs_nue		= 0.0
+FakeRates::kappa_abs_nua		= 0.0
+
+THC_M1::backreact			= "no"
+THC_M1::copy_levels			= "yes"
+THC_M1::closure			= "Minerbo"
+THC_M1::fiducial_velocity		= "fluid"
+THC_M1::include_GR_sources		= "yes"
+
+THC_M1::thc_m1_test			= "beam"
+THC_M1::beam_position		= -0.5
+
+THC_Core::verbose			= "no"
+
+# =============================================================================
+# Spacetime evolution
+# =============================================================================
+ADMBase::evolution_method		= "static"
+ADMBase::lapse_evolution_method		= "static"
+ADMBase::shift_evolution_method		= "static"
+ADMBase::dtlapse_evolution_method		= "static"
+ADMBase::dtshift_evolution_method		= "static"
+
+# =============================================================================
+# Output
+# =============================================================================
+IOUtil::out_dir			= $parfile
+IOUtil::out_fileinfo		= "none"
+IOUtil::strict_io_parameter_check		= "yes"
+IOUtil::parfile_write		= "no"
+
+CarpetIOBasic::outinfo_vars		= "
+    THC_M1::rE[0]
+    THC_M1::chi[0]
+"
+
+CarpetIOScalar::outscalar_reductions		= "
+    minimum maximum norm1 norm2
+"
+CarpetIOScalar::outscalar_vars		= "
+    THC_M1::rE[0]
+"
+
+CarpetIOASCII::out1d_vars		= "
+    THC_M1::chi[0]
+    THC_M1::rN[0]
+    THC_M1::rE[0]
+    THC_M1::rFx[0]
+    THC_M1::rPxx[0]
+    THC_M1::rJ[0]
+    THC_M1::rHt[0]
+    THC_M1::rHx[0]
+"
+
+CarpetIOBasic::outinfo_every		= 10
+CarpetIOScalar::outscalar_every		= 10
+CarpetIOASCII::out0D_every		= 10
+CarpetIOASCII::out1D_every		= 10
+CarpetIOHDF5::out2d_every		= -1
+CarpetIOHDF5::out_every		= -1
+
+# vim: set ft=sh tabstop=20 noexpandtab :
