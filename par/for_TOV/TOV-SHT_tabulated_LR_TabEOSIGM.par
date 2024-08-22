@@ -36,10 +36,10 @@ ActiveThorns = "
   IllinoisGRMHD
   InitBase
   IOUtil
+  LORENE
   LocalInterp
   LocalReduce
   LoopControl
-	MHD_Diagnostics
   MoL
   MPI
   NaNChecker
@@ -56,15 +56,14 @@ ActiveThorns = "
   Time
   TmunuBase
   Vectors
-  # VolumeIntegrals_GRMHD_TOV
-	VolumeIntegrals_vacuum
+
 "
 
 #---------Cactus---------
-Cactus::cctk_run_title     = "Baikal_IGM_APR4_TOV"
+Cactus::cctk_run_title     = "Baikal_IGM_SHT_TOV"
 Cactus::cctk_full_warnings = "yes"
 Cactus::terminate          = "time"
-Cactus::cctk_final_time    = 1400000 #more or less 6 ms # divide by ~203 to get ms
+Cactus::cctk_final_time    = 100 #more or less 0.5 ms # divide by ~203 to get ms
 
 #---------ADMBase---------
 ADMBase::evolution_method         = "Baikal"
@@ -87,7 +86,7 @@ ADMMacros::spatial_order = 4
 
 #---------Baikal---------
 Baikal::diss_strength = 0.2
-Baikal::eta           = 1.0/1.35 # M_ADM = 1.35
+Baikal::eta           = 1.0/2.782293851369 # M_ADM = 2.782293851369 (from LORENE)
 
 #---------Boundary---------
 Boundary::radpower = 2
@@ -108,7 +107,7 @@ Carpet::ghost_size               = 3
 Carpet::output_timers_every      = 512
 Carpet::prolongation_order_space = 5
 Carpet::prolongation_order_time  = 2
-Carpet::max_refinement_levels    = 3 # <- This will set the regrid/output frequency
+Carpet::max_refinement_levels    = 4 # <- This will set the regrid/output frequency
 #Carpet::time_refinement_factors  = "[1,2,4,8,16]"
 
 #---------CarpetInterp---------
@@ -158,6 +157,9 @@ CoordBase::ymax = CoordBase::xmax
 CoordBase::zmin = CoordBase::xmin
 CoordBase::zmax = CoordBase::xmax
 
+#---------Convert_to_HydroBase---------
+Convert_to_HydroBase::Convert_to_HydroBase_every = 2**Carpet::max_refinement_levels
+
 #---------EOS_Omni---------
 EOS_Omni::nuceos_read_table = "yes"
 EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/GShen_NL3EOS_rho280_temp180_ye52_version_1.1_20120817_adj_mineps0.h5"
@@ -175,46 +177,33 @@ ID_TabEOS_HydroQuantities::id_temperature_type = "constant"
 ID_TabEOS_HydroQuantities::id_entropy_type     = "constant"
 ID_TabEOS_HydroQuantities::id_entropy          = 1.0
 ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_SHT_5e-1.txt"
+ID_TabEOS_HydroQuantities::id_temperature      = 1e-2
+ID_TabEOS_HydroQuantities::id_rho_atm          = 1e-12
+ID_TabEOS_HydroQuantities::id_Y_e_atm          = 0.5
+ID_TabEOS_HydroQuantities::id_temperature_atm  = ID_TabEOS_HydroQuantities::id_temperature
 
 #---------IllinoisGRMHD---------
 # Setting up the EOS parameters like this
 # ensures compatibility with EOS_Omni.
-IllinoisGRMHD::igm_eos_table_ceiling_safety_factor = 1
-IllinoisGRMHD::igm_eos_table_floor_safety_factor   = 1
-
 IllinoisGRMHD::igm_PPM_reconstructed_variable = "pressure"
 IllinoisGRMHD::igm_con2prim_routine           = "Palenzuela1D"
 IllinoisGRMHD::igm_con2prim_backup_routine[0] = "Newman1D"
 IllinoisGRMHD::igm_eos_type                   = "Tabulated"
 IllinoisGRMHD::igm_evolve_temperature         = "yes"
 IllinoisGRMHD::igm_evolve_entropy             = "yes"
+IllinoisGRMHD::rho_b_atm                      = ID_TabEOS_HydroQuantities::id_rho_atm
+IllinoisGRMHD::igm_Ye_atm                     = ID_TabEOS_HydroQuantities::id_Y_e_atm
+IllinoisGRMHD::igm_T_atm                      = ID_TabEOS_HydroQuantities::id_temperature_atm
 IllinoisGRMHD::conserv_to_prims_debug         = 0
 IllinoisGRMHD::Psi6threshold                  = 60 # This value should only be reached far inside the horizon! Verify this!
 IllinoisGRMHD::damp_lorenz                    = 0.0
-
 IllinoisGRMHD::palenzuela_depsdT_threshold    = 1e-100 # Set to 1e100/1e-100 to only use entropy/energy equation
-IllinoisGRMHD::tau_atm_hybrid                 = 1e-20
-
-# Graded Atmo params
-IllinoisGRMHD::atmo_falloff                   = "no"
-IllinoisGRMHD::atmo_falloff_T                 = "no"
-IllinoisGRMHD::r_power                        = -2
-IllinoisGRMHD::r_power_T                      = -0.44846722248800275
-IllinoisGRMHD::rho_b_atm_max                  = 1e-13
-IllinoisGRMHD::igm_Ye_atm                     = 0.5
-IllinoisGRMHD::igm_T_atm                      = 1e-2
-IllinoisGRMHD::r_atmo_min                     = 50
-IllinoisGRMHD::atmo_tol                       = 1e-3
-
-IllinoisGRMHD::update_HydroBase               = yes
+IllinoisGRMHD::igm_eos_table_floor_safety_factor = 1.0
+IllinoisGRMHD::igm_eos_table_ceiling_safety_factor = 1.0
+IllinoisGRMHD::tau_atm                        = -9.553427062636353e-15
 
 #---------InitBase---------
 InitBase::initial_data_setup_method = "init_some_levels"
-
-# Parameters of thorn MHD_Diagnostics
-MHD_Diagnostics::diagnostics_compute_every = 2**Carpet::max_refinement_levels
-MHD_Diagnostics::derivatives_compute_every = 2**Carpet::max_refinement_levels
-#MHD_Diagnostics::rho_cutoff = 1.e-10
 
 #---------MoL---------
 MoL::run_MoL_PostStep_in_Post_Recover_Variables = "no"
@@ -234,20 +223,17 @@ NRPyLeakageET::optical_depth_evolution_type = "PathOfLeastResistance"
 NRPyLeakageET::numberOfIterations           = 2048
 NRPyLeakageET::minInitRefLevel              = Carpet::max_refinement_levels-1 # Only initialize finest refinement level
 NRPyLeakageET::maxInitRefLevel              = Carpet::max_refinement_levels-1 # Only initialize finest refinement level
-NRPyLeakageET::rho_min_threshold            = IllinoisGRMHD::rho_b_atm_max
-NRPyLeakageET::compute_luminosities_every   = 8
+NRPyLeakageET::compute_luminosities_every   = 64
 
 #---------NRPyPlusTOVID---------
 NRPyPlusTOVID::TOV_filename     = "/work2/09319/acw6923/frontera/EOS/outputTOV_tabulated_SHT.txt"
-NRPyPlusTOVID::rho_atmosphere   = IllinoisGRMHD::rho_b_atm_max
+NRPyPlusTOVID::rho_atmosphere   = IllinoisGRMHD::rho_b_atm
 NRPyPlusTOVID::K_atmosphere     = 1
 NRPyPlusTOVID::Gamma_atmosphere = 1
 
 #---------Seed_Magnetic_Fields---------
 Seed_Magnetic_Fields::enable_IllinoisGRMHD_staggered_A_fields = "yes"
 Seed_Magnetic_Fields::A_b                                     = 0.0
-Seed_Magnetic_Fields::n_s                                     = 3
-Seed_Magnetic_Fields::P_cut                                   = 0.04 * 0.00016629
 
 #---------SpaceMask---------
 SpaceMask::use_mask = "yes"
@@ -362,36 +348,6 @@ CarpetIOHDF5::out2D_vars                    = "
   Baikal::MU0GF
   Baikal::MU1GF
   Baikal::MU2GF
-  MHD_Diagnostics::smallb2
-
-  MHD_Diagnostics::expansion_scalar
-
-	MHD_Diagnostics::kin_acceleration_spatial_x
-	MHD_Diagnostics::kin_acceleration_spatial_y
-	MHD_Diagnostics::kin_acceleration_spatial_z
-	#
-	MHD_Diagnostics::shear_spatial_tensor_xx
-	MHD_Diagnostics::shear_spatial_tensor_xy
-	MHD_Diagnostics::shear_spatial_tensor_xz
-	MHD_Diagnostics::shear_spatial_tensor_yy
-	MHD_Diagnostics::shear_spatial_tensor_yz
-	MHD_Diagnostics::shear_spatial_tensor_zz
-	#
-	MHD_Diagnostics::sigma4Trace
-	#
-	MHD_Diagnostics::kin_vorticity_spatial_xy
-	MHD_Diagnostics::kin_vorticity_spatial_xz
-	MHD_Diagnostics::kin_vorticity_spatial_yz
-	MHD_Diagnostics::sigma4Trace
-
-	MHD_Diagnostics::kin_vorticity_spatial_xy
-	MHD_Diagnostics::kin_vorticity_spatial_xz
-	MHD_Diagnostics::kin_vorticity_spatial_yz
-	#
-	MHD_Diagnostics::sigma4bb
-	MHD_Diagnostics::normB
-	MHD_Diagnostics::normcurlB
-	MHD_Diagnostics::a4sq
 	NRPyLeakageET::NRPyLeakageET_optical_depths
 	NRPyLeakageET::NRPyLeakageET_opacities
 	NRPyLeakageET::NRPyLeakageET_luminosities
@@ -421,75 +377,6 @@ CarpetIOScalar::outScalar_vars       = "
   Baikal::MU0GF
   Baikal::MU1GF
   Baikal::MU2GF
-  # MHD_Diagnostics::normB{ reductions = 'maximum' }
-  # MHD_Diagnostics::normcurlB{ reductions = 'maximum' }
-  # MHD_Diagnostics::smallb2{ reductions = 'maximum' }
-  # MHD_Diagnostics::sigma4Trace{ reductions = 'minimum maximum' }
-  # MHD_Diagnostics::sigma4bb{ reductions = 'minimum maximum' }
 	NRPyLeakageET::NRPyLeakageET_optical_depths
 	NRPyLeakageET::NRPyLeakageET_opacities
 "
-
-# Parameters of thorn VolumeIntegrals_GRMHD_TOV (implementing VolumeIntegrals_GRMHD_TOV)
-# VolumeIntegrals_GRMHD_TOV::NumIntegrals = 14
-# VolumeIntegrals_GRMHD_TOV::VolIntegral_out_every = 2**Carpet::max_refinement_levels
-# 
-# VolumeIntegrals_GRMHD_TOV::enable_file_output = 1
-# VolumeIntegrals_GRMHD_TOV::outVolIntegral_dir = "$parfile/volume_integration"
-# VolumeIntegrals_GRMHD_TOV::verbose = 1
-# 
-# #   The AMR centre will only track the first referenced integration quantities that track said centre.
-# #   Thus, centeroflapse output will not feed back into the AMR centre positions.
-# 
-# VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[1] = "thermal_energy"
-# VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[2] = "kinetic_energy"
-# VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[3] = "kinetic_energy_palenzuela"
-# VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[4] = "kinetic_energy_shibata"
-# VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[5] = "kinetic_energy_total"
-# VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[6] = "magnetic_energy_total"
-# VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[7] = "magnetic_energy_comov"
-# VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[8] = "density_weighted_norm_B_field"
-# VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[9] = "volume_average_norm_B_ab"
-# VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[10]  = "volume_average_norm_B_cd"
-# VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[11]  = "em_energy_ab"
-# VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[12]  = "em_energy_cd"
-# VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[13]  = "centerofmass"
-# VolumeIntegrals_GRMHD_TOV::Integration_quantity_keyword[14]  = "restmass"
-# 
-# VolumeIntegrals_GRMHD_TOV::dens_a = 1.6193138848638947e-08
-# VolumeIntegrals_GRMHD_TOV::dens_b = 1.6193138848638947e-05
-# VolumeIntegrals_GRMHD_TOV::dens_c = 1.6193138848638947e-05
-#VolumeIntegrals_GRMHD_TOV::dens_d = 10
-
-# Parameters of thorn VolumeIntegrals_vacuum (implementing VolumeIntegrals_vacuum)
-VolumeIntegrals_vacuum::enable_file_output                     = 1
-VolumeIntegrals_vacuum::enable_time_reparameterization         = "no"
-VolumeIntegrals_vacuum::HamiltonianVarString                   = "Baikal::HGF"
-VolumeIntegrals_vacuum::Integration_quantity_keyword[1]        = "H_M_CnstraintsL2"
-VolumeIntegrals_vacuum::Integration_quantity_keyword[2]        = "H_M_CnstraintsL2"
-VolumeIntegrals_vacuum::Integration_quantity_keyword[3]        = "H_M_CnstraintsL2"
-VolumeIntegrals_vacuum::Integration_quantity_keyword[4]        = "H_M_CnstraintsL2"
-VolumeIntegrals_vacuum::Integration_quantity_keyword[5]        = "H_M_CnstraintsL2"
-VolumeIntegrals_vacuum::Integration_quantity_keyword[6]        = "H_M_CnstraintsL2"
-VolumeIntegrals_vacuum::Integration_quantity_keyword[7]        = "H_M_CnstraintsL2"
-VolumeIntegrals_vacuum::Integration_quantity_keyword[8]        = "H_M_CnstraintsL2"
-VolumeIntegrals_vacuum::Integration_quantity_keyword[9]        = "H_M_CnstraintsL2"
-VolumeIntegrals_vacuum::Integration_quantity_keyword[10]       = "ADM_Mass"
-VolumeIntegrals_vacuum::Integration_quantity_keyword[11]       = "ADM_Mass"
-VolumeIntegrals_vacuum::Integration_quantity_keyword[12]       = "ADM_Mass"
-VolumeIntegrals_vacuum::Integration_quantity_keyword[13]       = "ADM_Mass"
-VolumeIntegrals_vacuum::Momentum0VarString                     = "Baikal::MU0GF"
-VolumeIntegrals_vacuum::Momentum1VarString                     = "Baikal::MU1GF"
-VolumeIntegrals_vacuum::Momentum2VarString                     = "Baikal::MU2GF"
-VolumeIntegrals_vacuum::NumIntegrals                           = 13
-VolumeIntegrals_vacuum::outVolIntegral_dir                     = "$parfile/volume_integration"
-VolumeIntegrals_vacuum::verbose                                = 1
-VolumeIntegrals_vacuum::VIv_time_reparam_t0                    = 10
-VolumeIntegrals_vacuum::VIv_time_reparam_w                     = 5
-VolumeIntegrals_vacuum::VolIntegral_out_every                  = 2**Carpet::max_refinement_levels
-VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[2]  = 4
-VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[3]  = 8
-VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[4]  = 16
-VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[5]  = 32
-VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[6]  = 64
-VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[7]  = 128
