@@ -130,6 +130,19 @@ void FUNCTION WVU_EOS_mue_mup_mun_muhat_Xn_and_Xp_from_rho_Ye_T( CCTK_REAL IN rh
                                                                  CCTK_REAL OUT X_n,   \
                                                                  CCTK_REAL OUT X_p )
 PROVIDES FUNCTION WVU_EOS_mue_mup_mun_muhat_Xn_and_Xp_from_rho_Ye_T WITH WVU_EOS_mue_mup_mun_muhat_Xn_and_Xp_from_rho_Ye_T_impl LANGUAGE C
+# ------------------------------------------------------
+void FUNCTION WVU_EOS_THC_WeakRates_from_rho_Ye_T( CCTK_REAL IN rho,    \
+                                                                 CCTK_REAL IN Ye,     \
+                                                                 CCTK_REAL IN T,      \
+                                                                 CCTK_REAL OUT mu_e,  \
+                                                                 CCTK_REAL OUT mu_p,  \
+                                                                 CCTK_REAL OUT mu_n,  \
+                                                                 CCTK_REAL OUT X_n,   \
+                                                                 CCTK_REAL OUT X_p,   \
+                                                                 CCTK_REAL OUT X_h,   \
+                                                                 CCTK_REAL OUT Abar,   \
+                                                                 CCTK_REAL OUT Zbar)
+PROVIDES FUNCTION WVU_EOS_THC_WeakRates_from_rho_Ye_T WITH WVU_EOS_THC_WeakRates_from_rho_Ye_T_impl LANGUAGE C
 
 # ------------------------------------------------------
 # --- EOS_Omni functions. Used only by the unit test ---
