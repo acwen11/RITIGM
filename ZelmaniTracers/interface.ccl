@@ -1,0 +1,88 @@
+# Interface definition for thorn ZelmaniTracers
+
+implements: ZelmaniTracers
+
+inherits: HydroBase
+
+CCTK_INT FUNCTION IO_TruncateOutputFiles \
+  (CCTK_POINTER_TO_CONST IN GH)
+
+USES FUNCTION IO_TruncateOutputFiles
+
+# Get access to communicators
+CCTK_POINTER_TO_CONST \
+FUNCTION GetMPICommWorld (CCTK_POINTER_TO_CONST IN cctkGH)
+
+USES FUNCTION GetMPICommWorld
+
+PUBLIC:
+
+CCTK_REAL tmass TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="yes"'
+
+CCTK_REAL tracerevol TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="yes"'
+{
+  tx, ty, tz, tvx, tvy, tvz
+  talp, tbetax, tbetay, tbetaz,
+} "Quantities needed for the evolution of the tracers"
+
+CCTK_REAL tracervel TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="yes"'
+{
+  twx, twy, twz
+} "Advection velocity for the tracers"
+
+CCTK_REAL tracervel_old TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="yes"'
+{
+  twx_old, twy_old, twz_old
+} "Old advection velocity for the tracers"
+
+CCTK_REAL tracervars TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="no"'
+{
+  thsml, trho, ttemp, tye
+} "Hydro quantities interpolated at the tracer locations"
+
+# NOTE: teninf = - u_t - 1
+# CCTK_REAL tracervars TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="no"'
+# {
+#   tw_lorentz, teninf,
+#   thsml,
+#   trho, teps, tpress,
+#   tentropy, ttemp, tye, tabar
+# } "Hydro quantities interpolated at the tracer locations"
+
+CCTK_REAL tracerleak TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="no"'
+{
+  tlum0, tlum1, tlum2,
+  teave0, teave1,teave2
+} "Quantities from ZelmaniLeakage"
+
+CCTK_REAL tracerextra TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="no"'
+{
+  tgxx, tgxy, tgxz, tgyy, tgyz, tgzz
+} "Optional fields"
+
+# CCTK_REAL tracerextra TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="no"'
+# {
+#   tgxx, tgxy, tgxz, tgyy, tgyz, tgzz, tdens
+# } "Optional fields"
+
+PRIVATE:
+
+# This parameter is used to switch from forward Euler to Adams-Bashforth
+CCTK_INT first_step TYPE=SCALAR "Stage of the simulation"
+# 0 : the previous RHS has been initialized and can be used for the AB2 integrator
+# 1 : the previous RHS has not been initialized so we have to use forward Euler
+
+CCTK_INT tracers_out_of_domain TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="yes"'
+"store the info that if the tracers is out-of-domain"
+
+CCTK_INT FUNCTION 
+  GetDomainSpecification \
+    (CCTK_INT IN size, \
+     CCTK_REAL OUT ARRAY physical_min, \
+     CCTK_REAL OUT ARRAY physical_max, \
+     CCTK_REAL OUT ARRAY interior_min, \
+     CCTK_REAL OUT ARRAY interior_max, \
+     CCTK_REAL OUT ARRAY exterior_min, \
+     CCTK_REAL OUT ARRAY exterior_max, \
+     CCTK_REAL OUT ARRAY spacing)
+USES FUNCTION GetDomainSpecification

@@ -6,12 +6,12 @@
 #include "util_Table.h"
 #include "util_String.h"
 
-// Interpolate rho, T, Ye, W, eps, and P in the same manner as this thorn
+// Interpolate rho, T, Ye, W in the same manner as this thorn
 // handles outputting 4-velocities.
 //
-// We will interpolate a total of 6 quantities:
-#define NUM_INPUT_ARRAYS  6
-#define NUM_OUTPUT_ARRAYS 6
+// We will interpolate a total of 4 quantities:
+#define NUM_INPUT_ARRAYS  4
+#define NUM_OUTPUT_ARRAYS 4
 
 void Interpolate_hydro_vars_at_particle_positions(
       cGH *cctkGH,
@@ -22,9 +22,7 @@ void Interpolate_hydro_vars_at_particle_positions(
       double *particle_rho,
       double *particle_T,
       double *particle_Ye,
-      double *particle_W,
-      double *particle_eps,
-      double *particle_P) {
+      double *particle_W) {
 
   DECLARE_CCTK_PARAMETERS;
 
@@ -46,9 +44,7 @@ void Interpolate_hydro_vars_at_particle_positions(
     = { "HydroBase::rho",
 				"HydroBase::temperature",
 				"HydroBase::Y_e",
-				"HydroBase::w_lorentz",
-				"HydroBase::eps",
-        "HydroBase::press" };
+				"HydroBase::w_lorentz"};
 
   CCTK_INT input_array_indices[NUM_INPUT_ARRAYS];
   for(int i=0; i<NUM_INPUT_ARRAYS; i++) {
@@ -65,9 +61,7 @@ void Interpolate_hydro_vars_at_particle_positions(
     = { (void *) particle_rho,
         (void *) particle_T,
         (void *) particle_Ye,
-        (void *) particle_W,
-        (void *) particle_eps,
-        (void *) particle_P };
+        (void *) particle_W };
 
   CCTK_INT num_arrays = NUM_INPUT_ARRAYS;
 

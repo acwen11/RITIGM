@@ -10,8 +10,8 @@
 // handles outputting 4-velocities.
 //
 // We will interpolate a total of 7 quantities:
-#define NUM_INPUT_ARRAYS  7
-#define NUM_OUTPUT_ARRAYS 7
+#define NUM_INPUT_ARRAYS  2
+#define NUM_OUTPUT_ARRAYS 2
 
 void Interpolate_metric_vars_at_particle_positions(
       cGH *cctkGH,
@@ -19,12 +19,7 @@ void Interpolate_metric_vars_at_particle_positions(
       double *particle_x,
       double *particle_y,
       double *particle_z,
-      double *particle_gxx,
-      double *particle_gxy,
-      double *particle_gxz,
-      double *particle_gyy,
-      double *particle_gyz,
-      double *particle_gzz,
+      double *particle_psi_bssn,
       double *particle_alp) {
 
   DECLARE_CCTK_PARAMETERS;
@@ -44,12 +39,7 @@ void Interpolate_metric_vars_at_particle_positions(
         (const void *) particle_z };
 
   CCTK_STRING input_array_names[NUM_INPUT_ARRAYS]
-    = { "ADMBase::gxx",
-				"ADMBase::gxy",
-				"ADMBase::gxz",
-				"ADMBase::gyy",
-				"ADMBase::gyz",
-				"ADMBase::gzz",
+    = { "IllinoisGRMHD::psi_bssn",
         "ADMBase::alp" };
 
   CCTK_INT input_array_indices[NUM_INPUT_ARRAYS];
@@ -64,12 +54,7 @@ void Interpolate_metric_vars_at_particle_positions(
     output_array_types[i] = CCTK_VARIABLE_REAL;
 
   void *output_arrays[NUM_OUTPUT_ARRAYS]
-    = { (void *) particle_gxx,
-        (void *) particle_gxy,
-        (void *) particle_gxz,
-        (void *) particle_gyy,
-        (void *) particle_gyz,
-        (void *) particle_gzz,
+    = { (void *) particle_psi_bssn,
         (void *) particle_alp };
 
   CCTK_INT num_arrays = NUM_INPUT_ARRAYS;
