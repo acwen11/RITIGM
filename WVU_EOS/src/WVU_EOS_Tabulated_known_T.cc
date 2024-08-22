@@ -293,3 +293,54 @@ void WVU_EOS_mue_mup_mun_muhat_Xn_and_Xp_from_rho_Ye_T_impl( const CCTK_REAL rho
   *X_n   = outvars[4];
   *X_p   = outvars[5];
 }
+
+// -------------------------------------
+// ----------  mu_e(rho,Ye,T) ----------
+// ----------  mu_p(rho,Ye,T) ----------
+// ----------  mu_n(rho,Ye,T) ----------
+// ----------   X_p(rho,Ye,T) ----------
+// ----------   X_n(rho,Ye,T) ----------
+// ----------   X_h(rho,Ye,T) ----------
+// ----------  Abar(rho,Ye,T) ----------
+// ----------  Zbar(rho,Ye,T) ----------
+// -------------------------------------
+extern "C"
+void WVU_EOS_THC_WeakRates_from_rho_Ye_T_impl( const CCTK_REAL rho,
+                                                             const CCTK_REAL Ye,
+                                                             const CCTK_REAL T,
+                                                             CCTK_REAL *restrict mu_e,
+                                                             CCTK_REAL *restrict mu_p,
+                                                             CCTK_REAL *restrict mu_n,
+                                                             CCTK_REAL *restrict X_n,
+                                                             CCTK_REAL *restrict X_p,
+                                                             CCTK_REAL *restrict X_h,
+                                                             CCTK_REAL *restrict Abar,
+                                                             CCTK_REAL *restrict Zbar) {
+  // Number of interpolated quantities: 8
+  const CCTK_INT n = 8;
+  // Table variables keys
+  const CCTK_INT keys[n] = {WVU_EOS::mu_e_key, WVU_EOS::mu_p_key, WVU_EOS::mu_n_key, WVU_EOS::Xn_key, WVU_EOS::Xp_key, WVU_EOS::Xh_key, WVU_EOS::Abar_key, WVU_EOS::Zbar_key};
+  // Declare error variable
+  WVU_EOS::eos_error_report report;
+  // Set output variable array
+  CCTK_REAL outvars[n];
+
+  // Get composition
+  WVU_EOS_from_rho_Ye_T_interpolate_n_quantities( n,rho,Ye,T, keys,outvars, &report );
+
+  // Error handling
+  if( report.error ) {
+    CCTK_VINFO("Inside WVU_EOS_THC_WeakRates_from_rho_Ye_T. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
+    // May want to terminate depending on the error. We'll just warn for now.
+  }
+
+  // Then update mu_e, mu_p, mu_n, mu_hat, X_p, and X_n
+  *mu_e  = outvars[0];
+  *mu_p  = outvars[1];
+  *mu_n  = outvars[2];
+  *X_n   = outvars[3];
+  *X_p   = outvars[4];
+  *X_h   = outvars[5];
+  *Abar  = outvars[6];
+  *Zbar  = outvars[7];
+}
