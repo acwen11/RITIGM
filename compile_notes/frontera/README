@@ -17,3 +17,11 @@ To use FUKA with simfactory, I needed to compile with this particular order of o
 2) delete the executable
 3) run the gmake command above
 4) manually link as detailed above
+
+General process for generating ID on Frontera:
+FUKA tends to crash when trying to generate res=13 data from the beginning.
+1) Make sure COs directory is empty.
+2) Run res = 11 par file. One successful run used 32 nodes, 28 OMP threads per node, ~8 hrs
+3) Use BNS_TOTAL...info/dat (and this file only!!!) as new starting point (eg. rename to initbin.info/dat) 
+4) Change initial_resolution to 11. Change res to 13. Change sequence controls as necessary.
+5) Run res = 13 par file. One successful run used 32 nodes, 28 OMP threads per node, ~15 hrs.
