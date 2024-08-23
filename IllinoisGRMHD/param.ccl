@@ -321,6 +321,11 @@ CCTK_BOOLEAN igm_con2prim_failure_verbose "Print information message if con2prim
 } "yes"
 
 restricted:
+CCTK_BOOLEAN neutrino_sources "Copy values to HydroBase after RHS eval for neutrino calc" STEERABLE=ALWAYS
+{
+} "yes"
+
+restricted:
 int IGM_stencil "Width of the stencil"
 {
   0: :: "Must be positive"

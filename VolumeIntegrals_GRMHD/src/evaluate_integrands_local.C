@@ -292,6 +292,15 @@ void VI_GRMHD_ComputeIntegrand(CCTK_ARGUMENTS)
                  smallb2,w_lorentz,
                  gxx,gxy,gxz,gyy,gyz,gzz);
     }
+  } else if(CCTK_EQUALS(Integration_quantity_keyword[which_integral],"neutrino_lum")) {
+#pragma omp parallel for
+    for (int k=0;k<cctk_lsh[2];k++) for (int j=0;j<cctk_lsh[1];j++) for (int i=0;i<cctk_lsh[0];i++) { 
+	
+			int index  = CCTK_GFINDEX3D(cctkGH,i,j,k);    
+					
+			Neutrino_lum_integrand(VolIntegrand1,VolIntegrand2,VolIntegrand3,
+						index,luminosity_nue,luminosity_nua,luminosity_nux);
+    }
   } else {
     /* Print a warning if no integrand is computed because Integration_quantity_keyword unrecognized. */
     printf("VolumeIntegrals: WARNING: Integrand not computed. Did not understand Integration_quantity_keyword[%d] = %s\n",which_integral,Integration_quantity_keyword[which_integral]);

@@ -565,7 +565,7 @@ extern "C" void IllinoisGRMHD_driver_evaluate_MHD_rhs(CCTK_ARGUMENTS) {
                                                  vxr,vyr,vzr,vxl,vyl,vzl,Pr,Pl,
                                                  psi6phi_rhs,Ax_rhs,Ay_rhs,Az_rhs);
 
-   if( CCTK_IsThornActive("NRPyLeakageET") ) {
+   if( neutrino_sources ) {
      // Convert rho, Y_e, T, and velocities to HydroBase
      // because they are needed by NRPyLeakage
 #pragma omp parallel for
