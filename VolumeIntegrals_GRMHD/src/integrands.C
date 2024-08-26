@@ -917,11 +917,11 @@ inline void magnetic_tot_12(double *VolIntegrand1, double *VolIntegrand2, const 
 }
 
 /* Neutrino Luminosity: */
-inline void Neutrino_lum_integrand(double *VolIntegrand1, double *VolIntegrand1,double *VolIntegrand1,const int index,
-                          const CCTK_REAL *restrict lum_nue,const CCTK_REAL *restrict lum_nua,const CCTK_REAL *restrict lum_nux) {
-  VolIntegrand1[index] = lum_nue[index];
-  VolIntegrand2[index] = lum_nua[index];
-  VolIntegrand3[index] = lum_nux[index];
-}
+//inline void Neutrino_lum_integrand(double *VolIntegrand1, double *VolIntegrand2,double *VolIntegrand3,const int index,
+//                          const CCTK_REAL *restrict lum_nue,const CCTK_REAL *restrict lum_nua,const CCTK_REAL *restrict lum_nux) {
+//  VolIntegrand1[index] = lum_nue[index];
+//  VolIntegrand2[index] = lum_nua[index];
+//  VolIntegrand3[index] = lum_nux[index];
+//}
 
 #endif
