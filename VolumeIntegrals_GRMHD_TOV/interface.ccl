@@ -2,7 +2,7 @@
 # $Header:$
 
 implements: VolumeIntegrals_GRMHD
-inherits: grid ADMBase CarpetRegrid2 HydroBase ADMBase IllinoisGRMHD MHD_Diagnostics
+inherits: grid ADMBase CarpetRegrid2 HydroBase ADMBase IllinoisGRMHD MHD_Diagnostics THC_LeakageBase
 
 private:
 real VolIntegrands TYPE=GF TIMELEVELS=1 tags='InterpNumTimelevels=1 prolongation="none" Checkpoint="no"'

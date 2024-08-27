@@ -74,6 +74,7 @@ keyword Integration_quantity_keyword[101] "Which quantity to integrate" STEERABL
 "volume_average_norm_B_cd"      :: "Volume average of norm B in density interval (dens_c,dens_d]"
 "em_energy_ab"                  :: "Total energy in electro-magnetic sector in density interval (dens_a,dens_b]"       
 "em_energy_cd"                  :: "Total energy in electro-magnetic sector in density interval (dens_c,dens_d]"
+"neutrino_lum"                  :: "Neutrino 'source luminosity' from THC Leakage (see Galeazzi et al 2013)"
 } "nothing"
 
 ########################################
