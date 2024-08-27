@@ -143,6 +143,20 @@ void FUNCTION WVU_EOS_THC_WeakRates_from_rho_Ye_T( CCTK_REAL IN rho,    \
                                                                  CCTK_REAL OUT Abar,   \
                                                                  CCTK_REAL OUT Zbar)
 PROVIDES FUNCTION WVU_EOS_THC_WeakRates_from_rho_Ye_T WITH WVU_EOS_THC_WeakRates_from_rho_Ye_T_impl LANGUAGE C
+# ------------------------------------------------------
+void FUNCTION WVU_EOS_share_nuc_eos( CCTK_INT OUT nrho,    \
+																		 CCTK_INT OUT ntemp,  \
+																		 CCTK_INT OUT nye,  \
+																		 CCTK_REAL OUT eos_rhomin,  \
+																		 CCTK_REAL OUT eos_rhomax,   \
+																		 CCTK_REAL OUT eos_tempmin,  \
+																		 CCTK_REAL OUT eos_tempmax,   \
+																		 CCTK_REAL OUT eos_yemin,  \
+																		 CCTK_REAL OUT eos_yemax,   \
+																		 CCTK_REAL OUT drho,   \
+																		 CCTK_REAL OUT dtemp,   \
+																		 CCTK_REAL OUT dye)
+PROVIDES FUNCTION WVU_EOS_share_nuc_eos WITH WVU_EOS_share_nuc_eos_impl LANGUAGE C
 
 # ------------------------------------------------------
 # --- EOS_Omni functions. Used only by the unit test ---
