@@ -53,7 +53,6 @@ NaNChecker
 NewRad 
 NRPyLeakageET 
 Outflow
-particle_tracerET 
 QuasiLocalMeasures 
 Seed_Magnetic_Fields_BNS 
 Slab 
@@ -74,6 +73,7 @@ VolumeIntegrals_GRMHD
 VolumeIntegrals_vacuum 
 WeylScal4 
 WVU_EOS 
+ZelmaniTracers
 zlib
 "
 
@@ -468,7 +468,7 @@ IllinoisGRMHD::tau_atm_hybrid                 = 1e-20
 IllinoisGRMHD::atmo_falloff                   = "yes"
 IllinoisGRMHD::atmo_falloff_T                 = "yes"
 IllinoisGRMHD::r_power 			                  = -6
-IllinoisGRMHD::r_power_T 			                = -0.7304370330237778
+IllinoisGRMHD::r_power_T 			                = -0.4111701437845368
 IllinoisGRMHD::rho_b_atm_max                  = 1e-13
 IllinoisGRMHD::igm_Ye_atm                     = 0.5
 IllinoisGRMHD::igm_T_atm                      = 1e-2
@@ -549,7 +549,10 @@ NRPyLeakageET::numberOfIterations           = 8192
 NRPyLeakageET::optical_depth_evolution_type = "PathOfLeastResistance"
 NRPyLeakageET::psi6_threshold               = 60
 NRPyLeakageET::rho_max_threshold            = 0.0040000000000000000833
-NRPyLeakageET::rho_min_threshold_init_tau   = IllinoisGRMHD::rho_b_atm_max * 1.01
+NRPyLeakageET::rho_min_threshold            = IllinoisGRMHD::rho_b_atm_max * 1.01
+NRPyLeakageET::rho_min_falloff              = "yes"
+NRPyLeakageET::rho_min_r                    = IllinoisGRMHD::r_atmo_min
+NRPyLeakageET::r_power                      = IllinoisGRMHD::r_power
 NRPyLeakageET::verbosity_level              = 1
 NRPyLeakageET::compute_luminosities_every   = 512
 
@@ -589,45 +592,6 @@ HydroBase::entropy
 HydroBase::Y_e
 "
 
-# Parameters of thorn particle_tracerET (implementing particle_tracerET)
-particle_tracerET::density_max                          = 0.0013705362390320999927
-particle_tracerET::max_num_particles                    = 200000
-particle_tracerET::out_of_bounds_xyz                    = 800
-particle_tracerET::output_four_velocity_u4U           = "yes"
-particle_tracerET::output_four_velocity_u4D           = "yes"
-particle_tracerET::output_hydro                       = "yes"
-particle_tracerET::output_freq                          = 128
-particle_tracerET::update_RK4_freq                      = 16
-particle_tracerET::verbose                              = 1
-
-# Seed particles in the crust from the beginning.
-particle_tracerET::start_tracing_particles_iteration[0] = 0
-particle_tracerET::start_tracing_particles_iteration[1] = 0
-particle_tracerET::num_particles[0]                        = 25000
-particle_tracerET::num_particles[1]                        = 25000
-particle_tracerET::seed_particles_inside_sphere__radius[0] = 8
-particle_tracerET::seed_particles_outside_sphere__radius[0] = 5.506706706706705 # 8.1 km
-particle_tracerET::seed_particles_inside_sphere__x_coord[0] = -15.2 # Adjust according to ID. Corresponds to ~45 km sep.
-particle_tracerET::seed_particles_inside_sphere__radius[1] = 8
-particle_tracerET::seed_particles_outside_sphere__radius[1] = 5.506706706706705 # 8.1 km
-particle_tracerET::seed_particles_inside_sphere__x_coord[1] = 15.2 # Adjust according to ID. Corresponds to ~45 km sep.
-
-# Seed particles to test for unbound material from inner regions.
-particle_tracerET::start_tracing_particles_iteration[2] = 0
-particle_tracerET::start_tracing_particles_iteration[3] = 0
-particle_tracerET::num_particles[2]                        = 5000
-particle_tracerET::num_particles[3]                        = 5000
-particle_tracerET::seed_particles_inside_sphere__radius[2] = 2.7087127838436773 # 4 km
-particle_tracerET::seed_particles_outside_sphere__radius[2] = 2.031534587882758 # 3 km
-particle_tracerET::seed_particles_inside_sphere__x_coord[2] = -15.2 # Adjust according to ID. Corresponds to ~45 km sep.
-particle_tracerET::seed_particles_inside_sphere__radius[3] = 2.7087127838436773 # 4 km
-particle_tracerET::seed_particles_outside_sphere__radius[3] = 2.031534587882758 # 3 km
-particle_tracerET::seed_particles_inside_sphere__x_coord[3] = 15.2 # Adjust according to ID. Corresponds to ~45 km sep.
-
-# Seed particles at merger
-particle_tracerET::start_tracing_particles_iteration[4]    = 334848
-particle_tracerET::num_particles[4]                        = 25000
-particle_tracerET::seed_particles_inside_sphere__radius[4] = 30
 
 # Parameters of thorn QuasiLocalMeasures (implementing QuasiLocalMeasures)
 QuasiLocalMeasures::interpolator         = "Lagrange polynomial interpolation"
@@ -646,10 +610,10 @@ quasilocalmeasures::surface_index[8]     = 11
 quasilocalmeasures::surface_index[9]     = 12
 
 # Parameters of thorn Seed_Magnetic_Fields_BNS (implementing Seed_Magnetic_Fields_Privt)
-Seed_Magnetic_Fields_BNS::A_b                                     = 806476251.5114067 # E_mag = 5e49
+Seed_Magnetic_Fields_BNS::A_b                                     = 94079.23592602537 # E_mag = 5e49
 Seed_Magnetic_Fields_BNS::enable_IllinoisGRMHD_staggered_A_fields = "yes"
 Seed_Magnetic_Fields_BNS::have_two_NSs_along_x_axis               = "yes"
-Seed_Magnetic_Fields_BNS::n_s                                     = 3
+Seed_Magnetic_Fields_BNS::n_s                                     = 2
 Seed_Magnetic_Fields_BNS::P_cut                                   = 0.04 * 0.00016629
 
 # Parameters of thorn SpaceMask (implementing SpaceMask)
@@ -841,6 +805,33 @@ VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[13] = 300
 
 # Parameters of thorn WeylScal4 (implementing WeylScal4)
 WeylScal4::fd_order = "4th"
+
+#--------ZelmaniTracers----------------------
+ZelmaniTracers::tracers_with_leakage    = "no"
+ZelmaniTracers::ntracers    = 100000
+Zelmanitracers::interpolator_options = "order=2"
+ZelmaniTracers::reset_tracers_on_recover                    = "no"
+
+ZelmaniTracers::seed_method = "randomize_vol"
+ZelmaniTracers::init_dens_min = IllinoisGRMHD::rho_b_atm_max * 1.01
+
+zelmanitracers::tracerproblem = "BinaryNS"
+zelmanitracers::center_ns1[0] = 15.2
+zelmanitracers::center_ns1[1] = 0.0
+zelmanitracers::center_ns1[2] = 0.0
+
+zelmanitracers::center_ns2[0] = -15.2
+zelmanitracers::center_ns2[1] = 0.0
+zelmanitracers::center_ns2[2] = 0.0
+
+zelmanitracers::rad_max[0] = 10.0
+zelmanitracers::rad_min[0] = 0.0
+
+zelmanitracers::rad_max[1] = 10.0
+zelmanitracers::rad_min[1] = 0.0
+
+ZelmaniTracers::outTracers_every    = 128
+ZelmaniTracers::output_extra_fields   = "yes"
 
 # TimerReport ################################################
 

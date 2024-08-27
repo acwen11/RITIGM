@@ -3,7 +3,6 @@
 
 # Source files in this directory
 SRCS = compute_particles_four_velocities.C \
-       convert_to_MHD_3velocity.C \
        DoOneRK4StepForParticleTracer.C \
        file_output_routines.C \
        InitializeParticlePositions.C \
@@ -14,5 +13,7 @@ SRCS = compute_particles_four_velocities.C \
        Interpolate_metric_vars_at_particle_positions.C \
        Interpolate_velocities_at_particle_positions.C
 
+       #convert_to_MHD_3velocity.C \
+       
 # Subdirectories containing source files
 SUBDIRS =
