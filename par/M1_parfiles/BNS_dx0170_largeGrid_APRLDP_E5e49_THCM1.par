@@ -53,7 +53,6 @@ Multipole
 NaNChecker 
 NewRad 
 Outflow
-# particle_tracerET 
 QuasiLocalMeasures 
 Seed_Magnetic_Fields_BNS 
 Slab 
@@ -66,6 +65,7 @@ SystemStatistics
 TerminationTrigger 
 TGRtensor 
 THC_M1
+THC_UtilsLite
 Time 
 TimerReport 
 Timers 
@@ -423,11 +423,11 @@ CoordBase::boundary_size_y_upper = 3
 CoordBase::boundary_size_z_upper = 3
 CoordBase::domainsize            = "minmax"
 CoordBase::spacing               = "gridspacing"
-CoordBase::dx                    = 315.392
+CoordBase::dx                    = 348.16
 CoordBase::dy                    = CoordBase::dx
 CoordBase::dz                    = CoordBase::dx
-CoordBase::xmin                  = -35008.512 
-CoordBase::xmax                  = 35008.512 
+CoordBase::xmin                  = -34816
+CoordBase::xmax                  = 34816 
 CoordBase::ymin                  = CoordBase::xmin
 CoordBase::zmin                  = CoordBase::xmin
 CoordBase::ymax                  = CoordBase::xmax
@@ -475,7 +475,7 @@ IllinoisGRMHD::tau_atm_hybrid                 = 1e-20
 IllinoisGRMHD::atmo_falloff                   = "yes"
 IllinoisGRMHD::atmo_falloff_T                 = "yes"
 IllinoisGRMHD::r_power 			                  = -6
-IllinoisGRMHD::r_power_T 			                = -0.7304370330237778
+IllinoisGRMHD::r_power_T 			                = -0.4111701437845368
 IllinoisGRMHD::rho_b_atm_max                  = 1e-13
 IllinoisGRMHD::igm_Ye_atm                     = 0.5
 IllinoisGRMHD::igm_T_atm                      = 1e-2
@@ -583,6 +583,9 @@ HydroBase::eps
 HydroBase::press
 HydroBase::entropy
 HydroBase::Y_e
+THC_M1::rFx[0]
+THC_M1::rFy[0]
+THC_M1::rFz[0]
 "
 
 # Parameters of thorn particle_tracerET (implementing particle_tracerET)
@@ -642,10 +645,10 @@ quasilocalmeasures::surface_index[8]     = 11
 quasilocalmeasures::surface_index[9]     = 12
 
 # Parameters of thorn Seed_Magnetic_Fields_BNS (implementing Seed_Magnetic_Fields_Privt)
-Seed_Magnetic_Fields_BNS::A_b                                     = 806476251.5114067 # E_mag = 5e49
+Seed_Magnetic_Fields_BNS::A_b                                     = 94079.23592602537 # E_mag = 5e49
 Seed_Magnetic_Fields_BNS::enable_IllinoisGRMHD_staggered_A_fields = "yes"
 Seed_Magnetic_Fields_BNS::have_two_NSs_along_x_axis               = "yes"
-Seed_Magnetic_Fields_BNS::n_s                                     = 3
+Seed_Magnetic_Fields_BNS::n_s                                     = 2
 Seed_Magnetic_Fields_BNS::P_cut                                   = 0.04 * 0.00016629
 
 # Parameters of thorn SpaceMask (implementing SpaceMask)
@@ -762,10 +765,6 @@ THC_M1::backreact                                           = "yes"
 THC_M1::closure                                             = "minerbo"
 THC_M1::fiducial_velocity                                   = "fluid"
 THC_M1::include_GR_sources                                  = "yes"
-THC_M1::source_epsrel																				= 1e-10
-THC_M1::source_limiter                                      = -1.0
-THC_M1::source_thick_limit                                  = -1.0
-THC_M1::opacity_tau_trap                                    = -1.0
 
 THC_M1::verbose                                             = "yes"
 
