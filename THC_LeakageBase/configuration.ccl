@@ -1,7 +1,0 @@
-# Configuration definitions for thorn THC_LeakageBase
-REQUIRES CPPUtils
-PROVIDES THC_LeakageBase
-{
-    SCRIPT
-    LANG
-}

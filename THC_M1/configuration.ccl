@@ -1,3 +1,0 @@
-# Configuration definitions for thorn THC_M1
-
-REQUIRES Carpet CPPUtils GSL HDF5
