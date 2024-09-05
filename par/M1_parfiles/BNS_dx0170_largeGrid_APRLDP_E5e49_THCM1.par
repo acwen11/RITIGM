@@ -584,9 +584,23 @@ HydroBase::eps
 HydroBase::press
 HydroBase::entropy
 HydroBase::Y_e
+THC_M1::rE[0] # For neutrino luminosity vvvvvv
 THC_M1::rFx[0]
 THC_M1::rFy[0]
 THC_M1::rFz[0]
+THC_M1::rE[1]
+THC_M1::rFx[1]
+THC_M1::rFy[1]
+THC_M1::rFz[1]
+THC_M1::rE[2]
+THC_M1::rFx[2]
+THC_M1::rFy[2]
+THC_M1::rFz[2]
+ADMBase::betax
+ADMBase::betay
+ADMBase::betaz
+ADMBase::alp
+IllinoisGRMHD::psi_bssn
 "
 
 
