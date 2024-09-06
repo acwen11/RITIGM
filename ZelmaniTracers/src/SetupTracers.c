@@ -454,7 +454,7 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
     }
 		else if (CCTK_Equals(seed_method, "randomize_vol")){
 
-				srand(CCTK_MyProc(cctkGH));
+				srand48(CCTK_MyProc(cctkGH));
         for(int d = 0; d < ndomains; ++d) {
 						double *particle_x_temp  = (double *)malloc(sizeof(double)*siz);
 						double *particle_y_temp  = (double *)malloc(sizeof(double)*siz);
@@ -464,7 +464,7 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
 
 						int which_particle = d * siz;
 						int total_trials = 0;
-						//Technically, this algorithm is nondeterministic. However it should complete within a few iterations.
+						// Technically, this algorithm is nondeterministic. However it should complete within a few iterations.
 						for(int iter=0;iter<100000;iter++) {
 								for(int i=0;i<siz;i++) {
 										// Find all particles whose positions still need to be set:
@@ -478,6 +478,7 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
 												ty[which_particle] = particle_y_temp[i];
 												tz[which_particle] = particle_z_temp[i];
 												tmass[which_particle] = particle_density_temp[i] * particle_volform_temp[i];
+												CCTK_VINFO("Accepting particle at (%e, %e, %e) with mass %e.", tx[which_particle],ty[which_particle],tz[which_particle],tmass[which_particle]);
 												which_particle++;
 										}
 										total_trials++;
@@ -486,6 +487,7 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
 												iter=1000000;
 												i=siz+100;
 												CCTK_INFO("SHOULD BE ALL DONE!");
+												CCTK_VINFO("Seeded %d particles.", which_particle);
 										}
 								}
 								if(iter!=1000000)
@@ -499,6 +501,7 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
 						free(particle_z_temp);
 						free(particle_density_temp);
 				}
+				CCTK_VINFO("Done seeding rand in vol");
 		}
     else if (CCTK_Equals(seed_method, "on_grid")){
         for(int d = 0; d < ndomains; ++d) {

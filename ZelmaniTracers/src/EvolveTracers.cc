@@ -41,6 +41,8 @@ extern "C" void ZelmaniTracers_InterpBase(CCTK_ARGUMENTS)
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
 
+	CCTK_VINFO("In InterpBase");
+
   if( (cctk_iteration-1) % evolve_every != 0) return;
 
   // figure out how many tracers each process has
@@ -60,6 +62,7 @@ extern "C" void ZelmaniTracers_InterpBase(CCTK_ARGUMENTS)
   assert (coords_handle >= 0);
 
   int npoints = myntracers;
+	CCTK_VINFO("I own %d tracers.", npoints);
 
   void const *const interp_coords[] = {
       reinterpret_cast<void *>(tx),
@@ -138,12 +141,14 @@ extern "C" void ZelmaniTracers_InterpBase(CCTK_ARGUMENTS)
 
 
   // Actual interpolation
+	CCTK_VINFO("InterpBase interp call");
   int const ierr =
     CCTK_InterpGridArrays (cctkGH, 3,
                            interp_handle, options_handle, coords_handle,
                            npoints, CCTK_VARIABLE_REAL, interp_coords,
                            ninputs, input_array_indices,
                            ninputs, output_array_types, output_arrays);
+	CCTK_VINFO("Done with InterpBase interp call");
   // debug
   // if (ierr==CCTK_ERROR_INTERP_POINT_OUTSIDE) {
   //   for (int i = 0; i < myntracers; i++) {
@@ -267,6 +272,7 @@ extern "C" void ZelmaniTracers_InterpExtra(CCTK_ARGUMENTS)
   int const ninputs = input_array_indices.size();
 
   // Actual interpolation
+	CCTK_VINFO("InterpExtra interp call");
   int const ierr =
     CCTK_InterpGridArrays (cctkGH, 3,
                            interp_handle, options_handle, coords_handle,
@@ -274,6 +280,7 @@ extern "C" void ZelmaniTracers_InterpExtra(CCTK_ARGUMENTS)
                            ninputs, &input_array_indices[0],
                            ninputs, &output_array_types[0], &output_arrays[0]);
   assert (ierr==0);
+	CCTK_VINFO("Done with InterpExtra interp call");
 
   Util_TableDestroy (options_handle);
 
