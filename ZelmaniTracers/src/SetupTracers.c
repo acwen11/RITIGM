@@ -43,11 +43,8 @@ void get_random_position(double *x,double *y,double *z, const int fam) {
 	const double thmax = M_PI;
 	// We want to uniformly sample in space:
 	double r3 = mkrand(pow(rmin,3), pow(rmax,3));
-	//double r3 = drand48() * (pow(rmax,3) - pow(rmin,3)) + pow(rmin,3);
 	double costh = mkrand(cos(thmin), cos(thmax));
-	// double costh = drand48() * (cos(thmax) - cos(thmin)) + cos(thmin);
 	double phi = mkrand(0, 2 * M_PI);
-	// double phi = drand48() * 2 * M_PI;
 
 	double r = pow(r3, 1.0/3.0);
 	double theta = acos(costh);

@@ -41,7 +41,6 @@ extern "C" void ZelmaniTracers_InterpBase(CCTK_ARGUMENTS)
   DECLARE_CCTK_ARGUMENTS;
   DECLARE_CCTK_PARAMETERS;
 
-
   if( (cctk_iteration-1) % evolve_every != 0) return;
 
   // figure out how many tracers each process has
