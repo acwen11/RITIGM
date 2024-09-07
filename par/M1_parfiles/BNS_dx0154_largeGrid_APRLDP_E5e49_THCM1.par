@@ -424,11 +424,11 @@ CoordBase::boundary_size_y_upper = 3
 CoordBase::boundary_size_z_upper = 3
 CoordBase::domainsize            = "minmax"
 CoordBase::spacing               = "gridspacing"
-CoordBase::dx                    = 348.16
+CoordBase::dx                    = 315.392
 CoordBase::dy                    = CoordBase::dx
 CoordBase::dz                    = CoordBase::dx
-CoordBase::xmin                  = -34816
-CoordBase::xmax                  = 34816 
+CoordBase::xmin                  = -35008.512 
+CoordBase::xmax                  = 35008.512 
 CoordBase::ymin                  = CoordBase::xmin
 CoordBase::zmin                  = CoordBase::xmin
 CoordBase::ymax                  = CoordBase::xmax
@@ -834,12 +834,12 @@ WeylScal4::fd_order = "4th"
 
 #--------ZelmaniTracers----------------------
 ZelmaniTracers::tracers_with_leakage    = "no"
-ZelmaniTracers::ntracers    = 100000
+ZelmaniTracers::ntracers    = 80000
 Zelmanitracers::interpolator_options = "order=2"
 ZelmaniTracers::reset_tracers_on_recover                    = "no"
 
 ZelmaniTracers::seed_method = "randomize_vol"
-ZelmaniTracers::init_dens_min = IllinoisGRMHD::rho_b_atm_max * 1.01
+ZelmaniTracers::init_dens_min = IllinoisGRMHD::rho_b_atm_max * 1e4
 
 zelmanitracers::tracerproblem = "BinaryNS"
 zelmanitracers::center_ns1[0] = 15.2
