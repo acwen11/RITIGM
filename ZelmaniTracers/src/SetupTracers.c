@@ -12,41 +12,6 @@
 
 #define SQ(X) ((X)*(X))
 
-// extern void Interpolate_density_many_pts(cGH *cctkGH,int interp_num_points,double *particle_x_temp,double *particle_y_temp,double *particle_z_temp, double *particle_density_temp);
-
-void get_random_position(double *x,double *y,double *z, const int fam) {
-  DECLARE_CCTK_PARAMETERS;
-
-  const double rmin = rad_min[fam];
-  const double rmax = rad_max[fam];
-  // const double thmin = seed_particles_theta_min[fam] * M_PI / 180; // convert to radians
-  // const double thmax = seed_particles_theta_max[fam] * M_PI / 180;
-	const double thmin = 0.0;
-	const double thmax = M_PI;
-	// We want to uniformly sample in space:
-	double r3 = drand48() * (pow(rmax,3) - pow(rmin,3)) + pow(rmin,3);
-	double costh = drand48() * (cos(thmax) - cos(thmin)) + cos(thmin);
-	double phi = drand48() * 2 * M_PI;
-
-	double r = pow(r3, 1.0/3.0);
-	double theta = acos(costh);
-
-	*x = r * sin(theta) * cos(phi);
-	*y = r * sin(theta) * sin(phi);
-	*z = r * costh;
-
-	if (fam == 0){
-		*x += center_ns1[0];
-		*y += center_ns1[1];
-		*z += center_ns1[2];
-	}
-	else {
-		*x += center_ns2[0];
-		*y += center_ns2[1];
-		*z += center_ns2[2];
-	}
-}
-
 static inline void spher2cart(CCTK_REAL const rad, CCTK_REAL const theta,
         CCTK_REAL const phi, CCTK_REAL * x, CCTK_REAL * y, CCTK_REAL * z,
         CCTK_REAL const x0, CCTK_REAL const y0, CCTK_REAL const z0) {
@@ -65,6 +30,42 @@ static inline CCTK_REAL spatialdet(CCTK_REAL const hxx, CCTK_REAL const hxy,
 static inline CCTK_REAL mkrand(CCTK_REAL const a, CCTK_REAL const b) {
     CCTK_REAL const r = ((CCTK_REAL)rand()) / ((CCTK_REAL)RAND_MAX);
     return (b - a)*r + a;
+}
+
+void get_random_position(double *x,double *y,double *z, const int fam) {
+  DECLARE_CCTK_PARAMETERS;
+
+  const double rmin = rad_min[fam];
+  const double rmax = rad_max[fam];
+  // const double thmin = seed_particles_theta_min[fam] * M_PI / 180; // convert to radians
+  // const double thmax = seed_particles_theta_max[fam] * M_PI / 180;
+	const double thmin = 0.0;
+	const double thmax = M_PI;
+	// We want to uniformly sample in space:
+	double r3 = mkrand(pow(rmin,3), pow(rmax,3));
+	//double r3 = drand48() * (pow(rmax,3) - pow(rmin,3)) + pow(rmin,3);
+	double costh = mkrand(cos(thmin), cos(thmax));
+	// double costh = drand48() * (cos(thmax) - cos(thmin)) + cos(thmin);
+	double phi = mkrand(0, 2 * M_PI);
+	// double phi = drand48() * 2 * M_PI;
+
+	double r = pow(r3, 1.0/3.0);
+	double theta = acos(costh);
+
+	*x = r * sin(theta) * cos(phi);
+	*y = r * sin(theta) * sin(phi);
+	*z = r * costh;
+
+	if (fam == 0){
+		*x += center_ns1[0];
+		*y += center_ns1[1];
+		*z += center_ns1[2];
+	}
+	else {
+		*x += center_ns2[0];
+		*y += center_ns2[1];
+		*z += center_ns2[2];
+	}
 }
 
 // This stores the conserved density on a spherical grid shared across all the
@@ -454,7 +455,7 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
     }
 		else if (CCTK_Equals(seed_method, "randomize_vol")){
 
-				srand48(CCTK_MyProc(cctkGH));
+				srand(CCTK_MyProc(cctkGH));
         for(int d = 0; d < ndomains; ++d) {
 						double *particle_x_temp  = (double *)malloc(sizeof(double)*siz);
 						double *particle_y_temp  = (double *)malloc(sizeof(double)*siz);
@@ -478,7 +479,6 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
 												ty[which_particle] = particle_y_temp[i];
 												tz[which_particle] = particle_z_temp[i];
 												tmass[which_particle] = particle_density_temp[i] * particle_volform_temp[i];
-												CCTK_VINFO("Accepting particle at (%e, %e, %e) with mass %e.", tx[which_particle],ty[which_particle],tz[which_particle],tmass[which_particle]);
 												which_particle++;
 										}
 										total_trials++;
@@ -487,7 +487,6 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
 												iter=1000000;
 												i=siz+100;
 												CCTK_INFO("SHOULD BE ALL DONE!");
-												CCTK_VINFO("Seeded %d particles.", which_particle);
 										}
 								}
 								if(iter!=1000000)
@@ -501,7 +500,6 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
 						free(particle_z_temp);
 						free(particle_density_temp);
 				}
-				CCTK_VINFO("Done seeding rand in vol");
 		}
     else if (CCTK_Equals(seed_method, "on_grid")){
         for(int d = 0; d < ndomains; ++d) {
