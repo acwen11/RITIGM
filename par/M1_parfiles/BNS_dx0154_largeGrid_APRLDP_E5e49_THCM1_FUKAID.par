@@ -767,7 +767,7 @@ TmunuBase::stress_energy_storage = "yes"
 TmunuBase::timelevels            = 1
 
 # Parameters of thorn VolumeIntegrals_GRMHD (implementing VolumeIntegrals_GRMHD)
-VolumeIntegrals_GRMHD::NumIntegrals = 14
+VolumeIntegrals_GRMHD::NumIntegrals = 15
 VolumeIntegrals_GRMHD::VolIntegral_out_every = 256
 
 VolumeIntegrals_GRMHD::enable_file_output = 1
@@ -791,6 +791,9 @@ VolumeIntegrals_GRMHD::Integration_quantity_keyword[11]  = "em_energy_ab"
 VolumeIntegrals_GRMHD::Integration_quantity_keyword[12]  = "em_energy_cd"
 VolumeIntegrals_GRMHD::Integration_quantity_keyword[13]  = "centerofmass"
 VolumeIntegrals_GRMHD::Integration_quantity_keyword[14]  = "restmass"
+VolumeIntegrals_GRMHD::Integration_quantity_keyword[15]  = "coordvolume"
+
+VolumeIntegrals_GRMHD::dens_atmo = IllinoisGRMHD::rho_b_atm_max * 1.01
 
 VolumeIntegrals_GRMHD::dens_a = 1.6193138848638947e-08
 VolumeIntegrals_GRMHD::dens_b = 1.6193138848638947e-05
