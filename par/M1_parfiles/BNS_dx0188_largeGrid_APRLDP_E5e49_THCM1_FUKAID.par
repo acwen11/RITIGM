@@ -133,7 +133,7 @@ AHFinderDirect::which_surface_to_store_info[2]           = 1
 
 # Parameters of thorn Baikal (implementing Baikal)
 Baikal::diss_strength = 0.2000000000000000111
-Baikal::eta           = 1.0/2.7 # M_ADM = 2.67356 (from LORENE, updated APR4 value)
+Baikal::eta           = 1.0/2.67530 # M_ADM = 2.67530 (from FUKA)
 
 # Parameters of thorn Boundary (implementing boundary)
 Boundary::radpower = 2
@@ -285,6 +285,16 @@ CarpetIOHDF5::out2D_vars                    = "
 	THC_M1::rFx[0]
 	THC_M1::rFy[0]
 	THC_M1::rFz[0]
+	THC_M1::rN[1]
+	THC_M1::rE[1]
+	THC_M1::rFx[1]
+	THC_M1::rFy[1]
+	THC_M1::rFz[1]
+	THC_M1::rN[2]
+	THC_M1::rE[2]
+	THC_M1::rFx[2]
+	THC_M1::rFy[2]
+	THC_M1::rFz[2]
   WeylScal4::psi4r
 "
 CarpetIOHDF5::out_dir                       = "$parfile/hdf5_output_3d"
@@ -450,7 +460,7 @@ HydroBase::timelevels          = 3
 # Parameters of thorn ID_TabEOS_HydroQuantities (implementing ID_tabEOS_HydroQuantities)
 ID_TabEOS_HydroQuantities::id_temperature_type = "constant"
 ID_TabEOS_HydroQuantities::id_entropy_type     = "from table"
-ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDPex.txt"
+ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDPex_norad.txt"
 
 # Parameters of thorn IllinoisGRMHD (implementing IllinoisGRMHD)
 IllinoisGRMHD::igm_eos_table_ceiling_safety_factor = 1
@@ -579,9 +589,6 @@ outflow::num_thresholds 			= 1 # default threshold is 0
 outflow::extra_variables			= "
 HydroBase::rho
 HydroBase::temperature 
-HydroBase::eps
-HydroBase::press
-HydroBase::entropy
 HydroBase::Y_e
 THC_M1::rE[0] # For neutrino luminosity vvvvvv
 THC_M1::rFx[0]

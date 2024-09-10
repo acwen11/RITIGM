@@ -286,6 +286,16 @@ CarpetIOHDF5::out2D_vars                    = "
 	THC_M1::rFx[0]
 	THC_M1::rFy[0]
 	THC_M1::rFz[0]
+	THC_M1::rN[1]
+	THC_M1::rE[1]
+	THC_M1::rFx[1]
+	THC_M1::rFy[1]
+	THC_M1::rFz[1]
+	THC_M1::rN[2]
+	THC_M1::rE[2]
+	THC_M1::rFx[2]
+	THC_M1::rFy[2]
+	THC_M1::rFz[2]
   WeylScal4::psi4r
 "
 CarpetIOHDF5::out_dir                       = "$parfile/hdf5_output_3d"
@@ -451,7 +461,7 @@ HydroBase::timelevels          = 3
 # Parameters of thorn ID_TabEOS_HydroQuantities (implementing ID_tabEOS_HydroQuantities)
 ID_TabEOS_HydroQuantities::id_temperature_type = "constant"
 ID_TabEOS_HydroQuantities::id_entropy_type     = "from table"
-ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDPex.txt"
+ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDPex_norad.txt"
 
 # Parameters of thorn IllinoisGRMHD (implementing IllinoisGRMHD)
 IllinoisGRMHD::igm_eos_table_ceiling_safety_factor = 1
@@ -580,9 +590,6 @@ outflow::num_thresholds 			= 1 # default threshold is 0
 outflow::extra_variables			= "
 HydroBase::rho
 HydroBase::temperature 
-HydroBase::eps
-HydroBase::press
-HydroBase::entropy
 HydroBase::Y_e
 THC_M1::rE[0] # For neutrino luminosity vvvvvv
 THC_M1::rFx[0]
