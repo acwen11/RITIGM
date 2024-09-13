@@ -1,0 +1,47 @@
+# Schedule definitions for thorn BNSTrackerGen
+# $Header:$
+
+STORAGE: bns_positions 
+STORAGE: bns_merger_stage
+
+schedule BNSTrackerGen_Startup at STARTUP 
+{
+  LANG: C
+} "Parameter Conversions"
+
+
+schedule BNSTrackerGen_Move_Grids AT PREREGRID 
+{
+   LANG: C
+   OPTIONS: GLOBAL
+} "Update positions of refined regions"
+
+
+schedule BNSTrackerGen_Track_Stars AT Analysis
+{
+  LANG: C
+} "Track the stars"
+
+schedule BNSTrackerGen_Init_State AT CCTK_INITIAL
+{
+  LANG: C
+} "Init BNS tracking state"
+
+schedule BNSTrackerGen_Track_Stars AT CCTK_POSTINITIAL
+{
+  LANG: C
+} "Track the stars"
+
+schedule BNSTrackerGen_Separation AT ANALYSIS after BNSTrackerGen_Track_Stars
+{
+   LANG: C
+   OPTIONS: GLOBAL-LATE
+} "Compute proper separation"
+
+
+SCHEDULE BNSTrackerGen_MoveSurfaces AT poststep BEFORE SphericalSurface_HasBeenSet
+{
+  LANG: C
+  OPTIONS: global
+} "Set surfaces tracking the NS"
+
