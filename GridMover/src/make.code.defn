@@ -1,0 +1,9 @@
+# ===========================================
+# Main make.code.defn file for thorn GridMover
+# ===========================================
+
+# Source files in this directory
+SRCS = gridmover.cc
+
+# Subdirectories containing source files
+SUBDIRS =

@@ -1,0 +1,409 @@
+ActiveThorns = "
+  ADMBase
+  AEILocalInterp
+  Boundary
+  Carpet
+  CarpetInterp
+  CarpetIOASCII
+  CarpetIOHDF5
+  CarpetReduce
+  CarpetRegrid2
+  CartGrid3D
+  Convert_to_HydroBase
+  CoordBase
+  HydroBase
+  InitBase
+  ID_Converter_ILGRMHD
+  IllinoisGRMHD
+  IOUtil
+  MoL
+  NaNChecker
+  Outflow
+  SimpleID
+  smallbPoynET
+  SphericalSurface
+  StaticConformal
+  SummationByParts
+  SymBase
+  TerminationTrigger
+  Time
+  TmunuBase
+"
+
+
+# ==============================================================================
+# User-defined parameters
+# ==============================================================================
+$res = 0.2
+$cfl = 0.25
+
+
+
+# ==============================================================================
+# General setup
+# ==============================================================================
+
+# -------------------- Cactus --------------------------------------------------
+Cactus::cctk_full_warnings         = yes
+Cactus::highlight_warning_messages = yes
+
+Cactus::terminate   = "iteration"  ##"never"  # FIXME
+Cactus::cctk_itlast = 100
+
+
+# ------------------- Carpet ---------------------------------------------------
+Carpet::domain_from_coordbase = yes
+
+Carpet::max_refinement_levels = 1
+Carpet::refinement_centering  = "vertex"  ##"cell"
+
+Carpet::ghost_size = 3
+
+Carpet::prolongation_order_time  = 2
+Carpet::prolongation_order_space = 5
+
+Carpet::init_fill_timelevels  = yes
+
+Carpet::grid_structure_filename   = "carpet-grid-structure"
+Carpet::grid_coordinates_filename = "carpet.grid"
+
+Carpet::verbose = no
+
+
+
+# -------------------- IO ------------------------------------------------------
+# Checkpointing
+IO::checkpoint_dir                  = "../Checkpoint"
+IO::checkpoint_every                = -1  # Disabled, default
+##IO::checkpoint_every_walltime_hours = -1  # Disabled, default
+IO::checkpoint_id                   = no
+IO::checkpoint_keep                 = 1
+IO::checkpoint_on_terminate         = yes
+
+# Miscellaneous options
+IO::out_dir                   = "Miscellaneous"
+IO::abort_on_io_errors        = yes
+IO::parfile_write             = "generate"
+IO::print_timing_info         = yes
+IO::strict_io_parameter_check = yes
+IO::verbose                   = "full"
+
+# Recovery
+# FIXME: not actually needed
+IO::recover     = "autoprobe"
+IO::recover_dir = "../Checkpoint"
+
+# Limit the number of MPI processes dumping 3D output files to disk in order to
+# avoid stressing the filesystem
+#
+# ***** IMPORTANT *****
+# Set this up so that only ONE 3D OUTPUT FILE PER NODE (for each grid function)
+# is dumped to disk. For example, when using 7 OpenMP threads per MPI process
+# (which means, on Frontera, 56/7=8 MPI processes per node), the following setup
+# does the job:
+#     IO::out_mode       = "np"
+#     IO::out_proc_every = 8
+#
+IO::out_mode       = "np"  ##"one_file"
+IO::out_proc_every = 8
+
+
+
+# -------------------- TerminationTrigger --------------------------------------
+TerminationTrigger::create_termination_file = yes
+TerminationTrigger::max_walltime            = 48.
+TerminationTrigger::on_remaining_walltime   = 30.
+TerminationTrigger::termination_file        = "../Terminate"
+TerminationTrigger::termination_from_file   = yes
+
+
+
+
+
+# ==============================================================================
+# Grid
+# ==============================================================================
+
+# -------------------- CoordBase -----------------------------------------------
+CoordBase::domainsize = "minmax"
+CoordBase::spacing    = "gridspacing"  # Default
+
+CoordBase::xmin = -10.
+CoordBase::ymin = -10.
+CoordBase::zmin = -10.
+
+CoordBase::xmax = 10.
+CoordBase::ymax = 10.
+CoordBase::zmax = 10.
+
+CoordBase::dx = $res
+CoordBase::dy = $res
+CoordBase::dz = $res
+
+
+
+# -------------------- CartGrid3D ----------------------------------------------
+CartGrid3D::type = "CoordBase"
+
+
+
+# -------------------- CarpetRegrid2 -------------------------------------------
+CarpetRegrid2::num_centres  = 1
+CarpetRegrid2::num_levels_1 = 1
+
+
+
+
+
+# ==============================================================================
+# Initial data setup
+# ==============================================================================
+
+# -------------------- InitBase ------------------------------------------------
+InitBase::initial_data_setup_method = "init_some_levels"  # Default
+
+
+
+# -------------------- ADMBase -------------------------------------------------
+ADMBase::metric_type  = "physical"
+ADMBase::initial_data = "Cartesian Minkowski"
+
+ADMBase::initial_lapse   = "one"
+ADMBase::initial_shift   = "zero"
+##ADMBase::initial_dtlapse = "none"
+##ADMBase::initial_dtshift = "none"
+
+ADMBase::lapse_timelevels  = 3
+ADMBase::shift_timelevels  = 3
+ADMBase::metric_timelevels = 3
+
+
+
+# -------------------- HydroBase -----------------------------------------------
+# ReadInterpolate ignores the following parameters, which are however required
+# to allocate storage and for the evolution of the interpolated data
+HydroBase::initial_hydro = "zero"
+HydroBase::initial_Aphi  = "zero"
+HydroBase::initial_Avec  = "zero"
+HydroBase::initial_Bvec  = "zero"
+
+HydroBase::timelevels        = 3 ##1
+HydroBase::prolongation_type = "ENO"
+
+
+
+# -------------------- TmunuBase -----------------------------------------------
+TmunuBase::prolongation_type     = "none"
+TmunuBase::stress_energy_at_rhs  = yes
+TmunuBase::stress_energy_storage = yes
+TmunuBase::timelevels            = 1
+
+
+
+# -------------------- ID_converter_ILGRMHD ------------------------------------
+ID_converter_ILGRMHD::K_Initial     = 0.01
+ID_converter_ILGRMHD::Gamma_Initial = 1.66666666666667
+
+
+
+# -------------------- SimpleID ------------------------------------------------
+SimpleID::gl_gamma = 1.66666666666667
+SimpleID::r_shock  = 5.
+
+SimpleID::rho_in  = 2.  # Default
+SimpleID::rho_out = 1.  # Default
+
+SimpleID::press_in  = 2.  # Default
+SimpleID::press_out = 1.  # Default
+
+SimpleID::Bz = 1.
+
+
+
+
+
+# ==============================================================================
+# Evolution
+# ==============================================================================
+
+# -------------------- MoL -----------------------------------------------------
+MoL::ODE_method             = "RK4"
+MoL::MoL_intermediate_steps = 4
+MoL::MoL_num_scratch_levels = 1
+
+
+
+# -------------------- Time ----------------------------------------------------
+Time::dtfac = $cfl
+
+
+
+# ----------------- IllinoisGRMHD ----------------------------------------------
+IllinoisGRMHD::conserv_to_prims_debug = 0
+IllinoisGRMHD::Psi6threshold          = 4.
+IllinoisGRMHD::gamma_speed_limit      = 10.   # Default  ##50.  # As in the SphericalNR run
+IllinoisGRMHD::damp_lorenz            = 1.5/($res*$cfl)  # 1.5/dt_max, As suggested by Zach Etienne
+
+IllinoisGRMHD::atmo_falloff  = no ##yes
+##IllinoisGRMHD::r_atmo_min  = 15. ##0.
+IllinoisGRMHD::rho_b_atm_max = 2.e-10
+IllinoisGRMHD::u_atm_max     = 2.e-12
+IllinoisGRMHD::tau_atm_max   = 2.e-12  # FIXME: same as u_atm_max, not sure it's ok
+##IllinoisGRMHD::rho_b_max   = 0.004   # Disabled
+
+IllinoisGRMHD::Symmetry     = "none"
+IllinoisGRMHD::update_Tmunu = yes  ##no  # Decouple spacetime from matter evolution
+
+IllinoisGRMHD::neos     = 1
+IllinoisGRMHD::K_poly   = 0.01
+IllinoisGRMHD::gamma_th = 1.66666666666667
+
+##IllinoisGRMHD::dampen_vel_outbnds = no ##yes
+##IllinoisGRMHD::r_vel_damp         = [2500., 6208.]
+
+
+
+# -------------------- SummationByParts ----------------------------------------
+SummationByParts::order = 4
+
+
+
+# -------------------- Boundary ------------------------------------------------
+Boundary::radpower = 2
+
+
+
+
+
+# ==============================================================================
+# Analysis
+# ==============================================================================
+
+# -------------------- Convert_to_HydroBase ------------------------------------
+Convert_to_HydroBase::Convert_to_HydroBase_every = 1
+
+
+
+# -------------------- SphericalSurface ----------------------------------------
+SphericalSurface::nsurfaces = 2
+SphericalSurface::maxntheta = 67
+SphericalSurface::maxnphi   = 132
+
+SphericalSurface::set_spherical[0] = yes
+SphericalSurface::radius[0]        = 6.
+SphericalSurface::ntheta[0]        = 63   # Effectively 128-4=128
+SphericalSurface::nphi[0]          = 128  # Effectively 260-4=256
+SphericalSurface::nghoststheta[0]  = 2
+SphericalSurface::nghostsphi[0]    = 2
+
+SphericalSurface::set_spherical[1] = yes
+SphericalSurface::radius[1]        = 6.
+SphericalSurface::ntheta[1]        = 67   # Effectively 67-4=63
+SphericalSurface::nphi[1]          = 132  # Effectively 128-4=128
+SphericalSurface::nghoststheta[1]  = 2
+SphericalSurface::nghostsphi[1]    = 2
+
+
+
+# -------------------- Outflow -------------------------------------------------
+Outflow::compute_every = 1
+Outflow::num_detectors = 2
+
+Outflow::surface_index[0] = 0
+Outflow::surface_index[1] = 1
+
+Outflow::interpolator_name = "Lagrange polynomial interpolation"
+Outflow::interpolator_pars = "order=4"
+
+Outflow::output_2d_data = yes
+Outflow::out_format     = ".10e"
+
+Outflow::verbose = 0
+
+
+
+# -------------------- smallbPoynET --------------------------------------------
+smallbPoynET::smallbPoynET_compute_every = 1
+
+
+
+# -------------------- NaNChecker ----------------------------------------------
+NaNChecker::action_if_found = "terminate"
+NaNChecker::check_after     = 0
+NaNChecker::out_nanmask     = yes
+NaNChecker::check_every     = 1
+NaNChecker::check_vars      = "
+  IllinoisGRMHD::grmhd_primitives_allbutBi
+  IllinoisGRMHD::grmhd_primitives_Bi
+  IllinoisGRMHD::grmhd_conservatives
+"
+
+
+
+
+
+# ==============================================================================
+# Output
+# ==============================================================================
+
+# -------------------- CarpetIOASCII -------------------------------------------
+CarpetIOASCII::out0d_dir       = "Scalars"
+CarpetIOASCII::out0d_criterion = "divisor"
+CarpetIOASCII::out0d_every     = 1
+CarpetIOASCII::out0d_vars      = "
+  Outflow::Outflow_fluxdens[0]
+  Outflow::Outflow_fluxdens[1]
+  Outflow::Outflow_poynvec[0]
+  Outflow::Outflow_poynvec[1]
+  SphericalSurface::sf_active
+  SphericalSurface::sf_valid
+  SphericalSurface::sf_info
+  SphericalSurface::sf_radius
+  SphericalSurface::sf_origin
+  SphericalSurface::sf_coordinate_descriptors
+"
+
+
+
+# -------------------- CarpetIOHDF5 --------------------------------------------
+CarpetIOHDF5::checkpoint                    = yes
+CarpetIOHDF5::compression_level             = 1  # Compress data a bit before output to reduce stress on the filesysytem
+CarpetIOHDF5::open_one_input_file_at_a_time = yes
+CarpetIOHDF5::use_checksums                 = yes
+
+CarpetIOHDF5::out2D_dir       = "HDF5_2D"
+CarpetIOHDF5::out2D_every     = 20
+CarpetIOHDF5::out2D_criterion = "divisor"
+
+CarpetIOHDF5::out2D_vars = "
+  ADMBase::lapse
+  ADMBase::shift
+  ADMBase::metric
+  ADMBase::curv
+  HydroBase::rho
+  HydroBase::press
+  HydroBase::vel
+  HydroBase::Aphi
+  HydroBase::Avec
+  HydroBase::w_lorentz
+  smallbPoynET::smallb2
+"
+
+
+CarpetIOHDF5::out3D_dir       = "HDF5_3D"
+CarpetIOHDF5::out3D_every     = 20
+CarpetIOHDF5::out3D_criterion = "divisor"
+
+CarpetIOHDF5::out3D_vars = "
+  ADMBase::lapse
+  ADMBase::shift
+  ADMBase::metric
+  ADMBase::curv
+  HydroBase::rho
+  HydroBase::press
+  HydroBase::vel
+  HydroBase::Aphi
+  HydroBase::Avec
+  HydroBase::w_lorentz
+  smallbPoynET::smallb2
+"

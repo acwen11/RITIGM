@@ -1,0 +1,9 @@
+# =======================================
+# Schedule definitions for thorn GridMover
+# =======================================
+
+schedule GridMover_Move_Grids AT PREREGRID
+{
+   LANG: C
+   OPTIONS: GLOBAL
+} "Update positions of refined regions"

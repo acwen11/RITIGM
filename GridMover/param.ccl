@@ -1,0 +1,18 @@
+# ========================================
+# Parameter definitions for thorn GridMover
+# ========================================
+
+CCTK_REAL path_freq "Grid path angular velocity"
+{
+  *:* :: "Any number"
+} 0.2
+
+CCTK_REAL path_radius "Grid path radius"
+{
+  *:* :: "Any number"
+} 4
+
+CCTK_INT index_region "CarpetRegrid2 region to move"
+{
+	0:10 :: "0-10"
+} 1
