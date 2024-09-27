@@ -12,7 +12,14 @@ CCTK_REAL path_radius "Grid path radius"
   *:* :: "Any number"
 } 4
 
-CCTK_INT index_region "CarpetRegrid2 region to move"
+CCTK_INT index_region1 "CarpetRegrid2 region to move"
 {
 	0:10 :: "0-10"
+	-1 :: "Disabled"
 } 1
+
+CCTK_INT index_region2 "CarpetRegrid2 region to move"
+{
+	0:10 :: "0-10"
+	-1 :: "Disabled"
+} -1
