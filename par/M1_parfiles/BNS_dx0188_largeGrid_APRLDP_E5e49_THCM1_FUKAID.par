@@ -148,6 +148,8 @@ BNSTrackerGen::analysis_reflevel  = 11
 BNSTrackerGen::analyze_every    = 128
 
 BNSTrackerGen::merge_separation   = 9.0
+BNSTrackerGen::follow_hmns = "yes"
+BNSTrackerGen::move_z = "yes"
 BNSTrackerGen::collapse_separation    = -1
 BNSTrackerGen::add_levels_post_merge    = 2
 BNSTrackerGen::index_region1 = 1
@@ -590,21 +592,12 @@ outflow::extra_variables			= "
 HydroBase::rho
 HydroBase::temperature 
 HydroBase::Y_e
-THC_M1::rE[0] # For neutrino luminosity vvvvvv
-THC_M1::rFx[0]
-THC_M1::rFy[0]
-THC_M1::rFz[0]
-THC_M1::rE[1]
-THC_M1::rFx[1]
-THC_M1::rFy[1]
-THC_M1::rFz[1]
-THC_M1::rE[2]
-THC_M1::rFx[2]
-THC_M1::rFy[2]
-THC_M1::rFz[2]
-ADMBase::betax
-ADMBase::betay
-ADMBase::betaz
+THC_M1::radial_flux_1[0] # vvv For neutrino and EM luminosity vvv
+THC_M1::radial_flux_1[1]
+THC_M1::radial_flux_1[2]
+MHD_Diagnostics::Poynx
+MHD_Diagnostics::Poyny
+MHD_Diagnostics::Poynz
 ADMBase::alp
 IllinoisGRMHD::psi_bssn
 "

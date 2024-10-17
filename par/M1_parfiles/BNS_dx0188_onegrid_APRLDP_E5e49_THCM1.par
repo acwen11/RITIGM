@@ -40,11 +40,12 @@ ID_TabEOS_HydroQuantities
 IllinoisGRMHD 
 InitBase 
 IOUtil 
-KadathImporter
 LAPACK 
 LocalInterp 
 LocalReduce 
 LoopControl 
+LORENE 
+Meudon_Bin_NS 
 MHD_Diagnostics
 MoL 
 MPI 
@@ -63,6 +64,8 @@ SymBase
 SystemStatistics 
 TerminationTrigger 
 TGRtensor 
+THC_M1
+THC_UtilsLite
 Time 
 TimerReport 
 Timers 
@@ -70,8 +73,10 @@ TmunuBase
 Vectors 
 VolumeIntegrals_GRMHD 
 VolumeIntegrals_vacuum 
+WeakRates
 WeylScal4 
 WVU_EOS 
+ZelmaniTracers
 zlib
 "
 
@@ -79,11 +84,11 @@ zlib
 ADMBase::dtlapse_evolution_method = "Baikal"
 ADMBase::dtshift_evolution_method = "Baikal"
 ADMBase::evolution_method         = "Baikal"
-ADMBase::initial_data             = "Kadath"
+ADMBase::initial_data             = "Meudon_Bin_NS"
 ADMBase::initial_dtlapse          = "zero"
 ADMBase::initial_dtshift          = "zero"
-ADMBase::initial_lapse            = "Kadath"
-ADMBase::initial_shift            = "Kadath"
+ADMBase::initial_lapse            = "Meudon_Bin_NS"
+ADMBase::initial_shift            = "zero"
 ADMBase::lapse_evolution_method   = "Baikal"
 ADMBase::lapse_timelevels         = 3
 ADMBase::metric_timelevels        = 3
@@ -129,7 +134,7 @@ AHFinderDirect::which_surface_to_store_info[2]           = 1
 
 # Parameters of thorn Baikal (implementing Baikal)
 Baikal::diss_strength = 0.2000000000000000111
-Baikal::eta           = 1.0/2.67530 # M_ADM = 2.67530 (from FUKA)
+Baikal::eta           = 1.0/2.6781 # M_ADM = 2.6781 (from LORENE, APR4LDP value)
 
 # Parameters of thorn Boundary (implementing boundary)
 Boundary::radpower = 2
@@ -143,15 +148,14 @@ BNSTrackerGen::sym_pi           = "no"
 BNSTrackerGen::analysis_reflevel  = 11
 BNSTrackerGen::analyze_every    = 128
 
-BNSTrackerGen::merge_separation   = 9.0
-BNSTrackerGen::follow_hmns = "yes"
-BNSTrackerGen::move_z = "yes"
-BNSTrackerGen::collapse_separation    = -1
-BNSTrackerGen::add_levels_post_merge    = 2
-BNSTrackerGen::index_region1 = 1
-BNSTrackerGen::index_region2 = 2
-BNSTrackerGen::index_region3 = 0
-#BNSTrackerGen::add_levels_post_collapse   = 0
+BNSTrackerGen::track_only = "yes"
+# BNSTrackerGen::merge_separation   = 9.0
+# BNSTrackerGen::collapse_separation    = -1
+# BNSTrackerGen::add_levels_post_merge    = 2
+# BNSTrackerGen::index_region1 = 1
+# BNSTrackerGen::index_region2 = 2
+# BNSTrackerGen::index_region3 = 0
+# BNSTrackerGen::add_levels_post_collapse   = 0
 
 # Parameters of thorn Cactus (implementing Cactus)
 Cactus::cctk_full_warnings = "yes"
@@ -277,6 +281,22 @@ CarpetIOHDF5::out2D_vars                    = "
 	MHD_Diagnostics::normB
 	MHD_Diagnostics::normcurlB
 	MHD_Diagnostics::a4sq
+	THC_M1::chi[0]
+	THC_M1::rN[0]
+	THC_M1::rE[0]
+	THC_M1::rFx[0]
+	THC_M1::rFy[0]
+	THC_M1::rFz[0]
+	THC_M1::rN[1]
+	THC_M1::rE[1]
+	THC_M1::rFx[1]
+	THC_M1::rFy[1]
+	THC_M1::rFz[1]
+	THC_M1::rN[2]
+	THC_M1::rE[2]
+	THC_M1::rFx[2]
+	THC_M1::rFy[2]
+	THC_M1::rFz[2]
   WeylScal4::psi4r
 "
 CarpetIOHDF5::out_dir                       = "$parfile/hdf5_output_3d"
@@ -324,6 +344,7 @@ CarpetIOScalar::outScalar_vars       = "
 	MHD_Diagnostics::smallb2{ reductions = 'maximum' }
 	MHD_Diagnostics::sigma4Trace{ reductions = 'minimum maximum' }
 	MHD_Diagnostics::sigma4bb{ reductions = 'minimum maximum' }
+	THC_M1::rE[0]
 "
 # Carpet mask
 
@@ -344,14 +365,10 @@ CarpetReduce::verbose = "no"
 # Parameters of thorn CarpetRegrid2 (implementing CarpetRegrid2)
 carpet::time_refinement_factors = "[1, 1, 1, 1, 1, 2,  4,  8,  16,  32,  64,  128,  256, 512]"
 
-carpetregrid2::num_centres               = 3
-carpetregrid2::num_levels_1              = 10 # Levels 0 to 9 already activated. 10 and 11 activate at merger. 12 activates at collapse. 13 can be activated if required
-carpetregrid2::num_levels_2              = 12
-carpetregrid2::num_levels_3              = 12
+carpetregrid2::num_centres               = 1
+carpetregrid2::num_levels_1              = 12
 
 carpetregrid2::position_x_1              = 0
-carpetregrid2::position_x_2              = -15.2 # Adjust according to ID. Corresponds to ~45 km sep.
-carpetregrid2::position_x_3              = 15.2
 
 carpetregrid2::radius_1[1]               = 16384 #dx=192.08
 carpetregrid2::radius_1[2]               = 8192  #dx=96.04
@@ -362,42 +379,12 @@ carpetregrid2::radius_1[6]               = 512   #dx=6.003
 carpetregrid2::radius_1[7]               = 256   #dx=3.002
 carpetregrid2::radius_1[8]               = 128   #dx=1.501
 carpetregrid2::radius_1[9]               = 70    #dx=0.750
-carpetregrid2::radius_1[10]              = 40    #dx=0.375 #activated at merger
-carpetregrid2::radius_1[11]              = 20    #dx=0.188 #activated at merger
+carpetregrid2::radius_1[10]              = 40    #dx=0.375
+carpetregrid2::radius_1[11]              = 27.2    #dx=0.188
 
-carpetregrid2::radius_1[12]               = 3.2  #dx=0.094 #activated just before collapse
-carpetregrid2::radius_1[13]               = 2.4  #disabled
-
-#during inspiral
-
-carpetregrid2::radius_2[1]               = 1944.0 #dx=192.08
-carpetregrid2::radius_2[2]               = 1296   #dx=96.04
-carpetregrid2::radius_2[3]               = 864    #dx=48.02
-carpetregrid2::radius_2[4]               = 576    #dx=24.01
-carpetregrid2::radius_2[5]               = 384    #dx=12.01
-carpetregrid2::radius_2[6]               = 192    #dx=6.003
-carpetregrid2::radius_2[7]               = 96     #dx=3.002
-carpetregrid2::radius_2[8]               = 48     #dx=1.501
-carpetregrid2::radius_2[9]               = 24     #dx=0.750
-carpetregrid2::radius_2[10]               = 18    #dx=0.375 
-carpetregrid2::radius_2[11]               = 12    #dx=0.188 
-
-carpetregrid2::radius_3[1]               = 1944.0 #dx=192.08
-carpetregrid2::radius_3[2]               = 1296   #dx=96.04
-carpetregrid2::radius_3[3]               = 864    #dx=48.02
-carpetregrid2::radius_3[4]               = 576    #dx=24.01
-carpetregrid2::radius_3[5]               = 384    #dx=12.01
-carpetregrid2::radius_3[6]               = 192    #dx=6.003
-carpetregrid2::radius_3[7]               = 96     #dx=3.002
-carpetregrid2::radius_3[8]               = 48     #dx=1.501
-carpetregrid2::radius_3[9]               = 24     #dx=0.750
-carpetregrid2::radius_3[10]               = 18    #dx=0.375 
-carpetregrid2::radius_3[11]               = 12    #dx=0.188 
-
-###
-
-carpetregrid2::regrid_every              = 512
-carpetregrid2::snap_to_coarse            = yes
+carpetregrid2::regrid_every              = -1
+carpetregrid2::snap_to_coarse            = no
+carpetregrid2::freeze_unaligned_levels   = yes
 carpetregrid2::symmetry_rotating180      = no
 carpetregrid2::verbose                   = no
 
@@ -433,7 +420,7 @@ EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APRLDP_3335_rho
 HydroBase::initial_Aphi        = "zero"
 HydroBase::initial_Avec        = "zero"
 HydroBase::initial_entropy     = "ID_TabEOS_HydroQuantities"
-HydroBase::initial_hydro       = "Kadath"
+HydroBase::initial_hydro       = "Meudon_Bin_NS"
 HydroBase::initial_temperature = "ID_TabEOS_HydroQuantities"
 HydroBase::initial_Y_e         = "ID_TabEOS_HydroQuantities"
 HydroBase::timelevels          = 3
@@ -490,9 +477,9 @@ IOUtil::recover                         = "autoprobe"
 IOUtil::recover_and_remove              = "no"
 IOUtil::recover_dir                     = "../checkpoints"
 
-#---------KadathImporter----------
-KadathImporter::type = "BNS"
-KadathImporter::filename = "/work2/09319/acw6923/frontera/EOS/BNS_ECC_RED.APR4LDPex_norad.30.47.0.0.2.7.q1.0.0.13.info"
+# Parameters of thorn Meudon_Bin_NS (implementing Meudon_Bin_NS)
+Meudon_Bin_NS::eos_table = "nuc_eos"
+Meudon_Bin_NS::filename  = "/work2/09319/acw6923/frontera/EOS/resu_APR4LDPex_norad.d"
 
 # Parameters of thorn MHD_Diagnostics
 MHD_Diagnostics::diagnostics_compute_every = 256
@@ -571,6 +558,23 @@ outflow::extra_variables			= "
 HydroBase::rho
 HydroBase::temperature 
 HydroBase::Y_e
+THC_M1::rE[0] # For neutrino luminosity vvvvvv
+THC_M1::rFx[0]
+THC_M1::rFy[0]
+THC_M1::rFz[0]
+THC_M1::rE[1]
+THC_M1::rFx[1]
+THC_M1::rFy[1]
+THC_M1::rFz[1]
+THC_M1::rE[2]
+THC_M1::rFx[2]
+THC_M1::rFy[2]
+THC_M1::rFz[2]
+ADMBase::betax
+ADMBase::betay
+ADMBase::betaz
+ADMBase::alp
+IllinoisGRMHD::psi_bssn
 "
 
 
@@ -706,6 +710,21 @@ TerminationTrigger::on_remaining_walltime   = 60
 TerminationTrigger::termination_file        = "TERMINATE"
 TerminationTrigger::termination_from_file   = "yes"
 
+# Parameters of thorn THC_M1
+THC_M1::backreact                                           = "yes"
+THC_M1::closure                                             = "minerbo"
+THC_M1::fiducial_velocity                                   = "fluid"
+THC_M1::include_GR_sources                                  = "yes"
+
+THC_M1::verbose                                             = "yes"
+
+WeakRates::use_rho_max_ext                                  = "yes"
+WeakRates::use_rho_min_ext                                  = "yes"
+WeakRates::use_temp_max_ext                                 = "yes"
+WeakRates::use_temp_min_ext                                 = "yes"
+WeakRates::use_ye_max_ext                                   = "yes"
+WeakRates::use_ye_min_ext                                   = "yes"
+
 # Parameters of thorn Time (implementing time)
 Time::dtfac = 0.021875 #0.35/16.0
 
@@ -789,6 +808,33 @@ VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[13] = 300
 
 # Parameters of thorn WeylScal4 (implementing WeylScal4)
 WeylScal4::fd_order = "4th"
+
+#--------ZelmaniTracers----------------------
+ZelmaniTracers::tracers_with_leakage    = "no"
+ZelmaniTracers::ntracers    = 80000
+Zelmanitracers::interpolator_options = "order=2"
+ZelmaniTracers::reset_tracers_on_recover                    = "no"
+
+ZelmaniTracers::seed_method = "randomize_vol"
+ZelmaniTracers::init_dens_min = IllinoisGRMHD::rho_b_atm_max * 1e4
+
+zelmanitracers::tracerproblem = "BinaryNS"
+zelmanitracers::center_ns1[0] = 15.2
+zelmanitracers::center_ns1[1] = 0.0
+zelmanitracers::center_ns1[2] = 0.0
+
+zelmanitracers::center_ns2[0] = -15.2
+zelmanitracers::center_ns2[1] = 0.0
+zelmanitracers::center_ns2[2] = 0.0
+
+zelmanitracers::rad_max[0] = 10.0
+zelmanitracers::rad_min[0] = 0.0
+
+zelmanitracers::rad_max[1] = 10.0
+zelmanitracers::rad_min[1] = 0.0
+
+ZelmaniTracers::outTracers_every    = 128
+ZelmaniTracers::output_extra_fields   = "yes"
 
 # TimerReport ################################################
 
