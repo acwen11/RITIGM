@@ -593,6 +593,9 @@ outflow::extra_variables			= "
 HydroBase::rho
 HydroBase::temperature 
 HydroBase::Y_e
+IllinoisGRMHD::Bx
+IllinoisGRMHD::By
+IllinoisGRMHD::Bz
 THC_M1::radial_flux_1[0] # vvv For neutrino and EM luminosity vvv
 THC_M1::radial_flux_1[1]
 THC_M1::radial_flux_1[2]
