@@ -11,7 +11,7 @@ USES INCLUDE HEADER: WVU_EOS_Tabulated_headers.hh
 public:
 
 #vvvvvvvv EVOLVED VARIABLES vvvvvvvv#
-cctk_real grmhd_conservatives type = GF Timelevels=3 TAGS='prolongation="ENO"'
+cctk_real grmhd_conservatives type = GF Timelevels=3 TAGS='prolongation="Lagrange_third_order_prolong"'
 {
   rho_star,tau,mhd_st_x,mhd_st_y,mhd_st_z,Ye_star,S_star  # Note that st = Stilde, as mhd_st_i = \tilde{S}_i.
 } "Evolved mhd variables"

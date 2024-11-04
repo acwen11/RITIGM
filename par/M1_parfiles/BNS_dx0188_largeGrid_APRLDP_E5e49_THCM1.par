@@ -744,6 +744,9 @@ THC_M1::backreact                                           = "yes"
 THC_M1::closure                                             = "minerbo"
 THC_M1::fiducial_velocity                                   = "fluid"
 THC_M1::include_GR_sources                                  = "yes"
+THC_M1::source_Ye_min                                       = 0.005
+THC_M1::source_Ye_max                                       = 0.655
+THC_M1::source_limiter                                      = 0.5
 
 THC_M1::verbose                                             = "yes"
 
