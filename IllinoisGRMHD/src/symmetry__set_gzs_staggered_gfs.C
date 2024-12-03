@@ -9,8 +9,8 @@ void IllinoisGRMHD_set_symmetry_gzs_staggered(const cGH *cctkGH, const int *cctk
 
   DECLARE_CCTK_PARAMETERS;
 
-  if(CCTK_EQUALS(Symmetry, "equatorial"))
-    CCTK_VError(VERR_DEF_PARAMS,"Warning: Symmetry==equatorial not supported! USE AT YOUR OWN RISK. You will need to comment this error message out.");
+  // if(CCTK_EQUALS(Symmetry, "equatorial"))
+  //   CCTK_VError(VERR_DEF_PARAMS,"Warning: Symmetry==equatorial not supported! USE AT YOUR OWN RISK. You will need to comment this error message out.");
 
   // No symmetries -> return.
   if(CCTK_EQUALS(Symmetry, "none")) return;

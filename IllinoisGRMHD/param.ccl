@@ -156,6 +156,7 @@ KEYWORD EM_BC "EM field boundary condition"
 KEYWORD Symmetry "Currently only no symmetry supported, though work has begun in adding equatorial-symmetry support. FIXME: Extend ET symmetry interface to support symmetries on staggered gridfunctions"
 {
   "none"       :: "no symmetry, full 3d domain"
+  "equatorial" :: "symmetry across xy plane"
 } "none"
 
 REAL Sym_Bz "In-progress equatorial symmetry support: Symmetry parameter across z axis for magnetic fields = +/- 1"
