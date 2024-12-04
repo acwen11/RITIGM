@@ -113,6 +113,14 @@ schedule IllinoisGRMHD_driver_evaluate_MHD_rhs in MoL_CalcRHS as IllinoisGRMHD_R
 # Problem: all the sync's in outer boundary updates might just overwrite prolongated values.
 ############################################################
 
+if (CCTK_Equals(Symmetry, "equatorial"))
+{
+	schedule select_BCs_IllinoisGRMHD in HydroBase_Select_Boundaries
+	{
+		LANG: C
+	} "Setting BCs as none for conservatives, just to fill symmetry gridfunctions"
+}
+
 schedule IllinoisGRMHD_InitSymBound in HydroBase_Boundaries as Boundary_SYNCs before compute_B_postrestrict
 {
   SYNC: grmhd_conservatives,em_Ax,em_Ay,em_Az,em_psi6phi

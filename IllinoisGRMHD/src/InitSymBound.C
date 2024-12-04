@@ -64,6 +64,7 @@ extern "C" void IllinoisGRMHD_InitSymBound(CCTK_ARGUMENTS)
       CCTK_VError(VERR_DEF_PARAMS,"IllinoisGRMHD_initsymbound: Should not be here; picked an impossible symmetry.");
     }
   }
+
 }
 
 
