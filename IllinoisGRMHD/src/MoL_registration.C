@@ -43,8 +43,12 @@ extern "C" void IllinoisGRMHD_RegisterVars(CCTK_ARGUMENTS)
   ierr += MoLRegisterEvolvedGroup(group, rhs);
 
   /* ALL OTHER EVOLVED VARIABLES (rho_star,tau,mhd_st_x,mhd_st_y,mhd_st_z) */
-  group = CCTK_GroupIndex("IllinoisGRMHD::grmhd_conservatives");
-  rhs = CCTK_GroupIndex("IllinoisGRMHD::grmhd_conservatives_rhs");
+  group = CCTK_GroupIndex("IllinoisGRMHD::grmhd_conservatives_scalar");
+  rhs = CCTK_GroupIndex("IllinoisGRMHD::grmhd_conservatives_scalar_rhs");
+  ierr += MoLRegisterEvolvedGroup(group, rhs);
+
+  group = CCTK_GroupIndex("IllinoisGRMHD::grmhd_conservatives_vector");
+  rhs = CCTK_GroupIndex("IllinoisGRMHD::grmhd_conservatives_vector_rhs");
   ierr += MoLRegisterEvolvedGroup(group, rhs);
 
   if (ierr) CCTK_ERROR("Problems registering with MoL");
