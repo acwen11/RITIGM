@@ -11,6 +11,7 @@ SRCS =  InitSymBound.C MoL_registration.C \
     compute_B_and_Bstagger_from_A.C \
     driver_conserv_to_prims.C \
     symmetry__set_gzs_staggered_gfs.C \
+		select_BCs_IllinoisGRMHD.C \
     \
     outer_boundaries.C \
     \

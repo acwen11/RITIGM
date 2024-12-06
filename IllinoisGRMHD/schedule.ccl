@@ -3,8 +3,8 @@
 STORAGE: ADMBase::metric[metric_timelevels], ADMBase::curv[metric_timelevels], ADMBase::lapse[lapse_timelevels], ADMBase::shift[shift_timelevels]
 STORAGE: IllinoisGRMHD::BSSN_quantities
 
-STORAGE: grmhd_conservatives[3],em_Ax[3],em_Ay[3],em_Az[3],em_psi6phi[3]
-STORAGE: grmhd_primitives_allbutBi, grmhd_primitives_Bi, grmhd_primitives_Bi_stagger, grmhd_primitives_reconstructed_temps,grmhd_conservatives_rhs,em_Ax_rhs,em_Ay_rhs,em_Az_rhs,em_psi6phi_rhs,grmhd_cmin_cmax_temps,grmhd_flux_temps,TUPmunu,diagnostic_gfs,con2prim_failed_flag
+STORAGE: grmhd_conservatives_scalar[3],grmhd_conservatives_vector[3],em_Ax[3],em_Ay[3],em_Az[3],em_psi6phi[3]
+STORAGE: grmhd_primitives_scalar, grmhd_primitives_vector, grmhd_primitives_Bi, grmhd_primitives_Bi_stagger, grmhd_primitives_reconstructed_temps,grmhd_conservatives_scalar_rhs, grmhd_conservatives_vector_rhs,em_Ax_rhs,em_Ay_rhs,em_Az_rhs,em_psi6phi_rhs,grmhd_cmin_cmax_temps,grmhd_flux_temps,TUPmunu,diagnostic_gfs,con2prim_failed_flag
 STORAGE: Tmunu_source_terms
 
 ####################
@@ -61,7 +61,7 @@ schedule GROUP IllinoisGRMHD_PostPostInitial at CCTK_POSTPOSTINITIAL before MoL_
 
 schedule IllinoisGRMHD_InitSymBound in IllinoisGRMHD_PostPostInitial as postid before compute_b
 {
-  SYNC: grmhd_conservatives,em_Ax,em_Ay,em_Az,em_psi6phi
+  SYNC: grmhd_conservatives_scalar,grmhd_conservatives_vector,em_Ax,em_Ay,em_Az,em_psi6phi
   LANG: C
 } "Schedule symmetries -- Actually just a placeholder function to ensure prolongations / processor syncs are done BEFORE outer boundaries are updated."
 
@@ -113,9 +113,17 @@ schedule IllinoisGRMHD_driver_evaluate_MHD_rhs in MoL_CalcRHS as IllinoisGRMHD_R
 # Problem: all the sync's in outer boundary updates might just overwrite prolongated values.
 ############################################################
 
-schedule IllinoisGRMHD_InitSymBound in HydroBase_Boundaries as Boundary_SYNCs before compute_B_postrestrict
+if (CCTK_Equals(Symmetry, "equatorial"))
 {
-  SYNC: grmhd_conservatives,em_Ax,em_Ay,em_Az,em_psi6phi
+	schedule select_BCs_IllinoisGRMHD in HydroBase_Select_Boundaries
+	{
+		LANG: C
+	} "Setting BCs as none for conservatives, just to fill symmetry gridfunctions"
+}
+
+schedule IllinoisGRMHD_InitSymBound in HydroBase_Boundaries as Boundary_SYNCs after HydroBase_Select_Boundaries before HydroBase_ApplyBCs
+{
+  SYNC: grmhd_conservatives_scalar,grmhd_conservatives_vector,em_Ax,em_Ay,em_Az,em_psi6phi
   LANG: C
 } "Schedule symmetries -- Actually just a placeholder function to ensure prolongations / processor syncs are done BEFORE outer boundaries are updated."
 
@@ -142,7 +150,7 @@ schedule IllinoisGRMHD_conserv_to_prims in AddToTmunu after compute_B_and_Bstagg
 schedule IllinoisGRMHD_outer_boundaries_on_P_rho_b_vx_vy_vz in AddToTmunu after IllinoisGRMHD_conserv_to_prims
 {
 # We must sync {P,rho_b,vx,vy,vz} here.
-  SYNC: grmhd_primitives_allbutBi
+  SYNC: grmhd_primitives_scalar,grmhd_primitives_vector
   LANG: C
 } "Apply outflow-only, flat BCs on {P,rho_b,vx,vy,vz}. Outflow only == velocities pointed inward from outer boundary are set to zero."
 ##########################################################

@@ -30,17 +30,20 @@ extern "C" void IllinoisGRMHD_InitSymBound(CCTK_ARGUMENTS)
     if(CCTK_EQUALS(Symmetry,"none")) {
       /* FIRST SET NO SYMMETRY OPTION */
       sym[0] = 1; sym[1] = 1; sym[2] = 1;
-      SetCartSymGN(cctkGH,sym,"IllinoisGRMHD::grmhd_conservatives");
+      SetCartSymGN(cctkGH,sym,"IllinoisGRMHD::grmhd_conservatives_scalar");
+      SetCartSymGN(cctkGH,sym,"IllinoisGRMHD::grmhd_conservatives_vector");
       SetCartSymGN(cctkGH,sym,"IllinoisGRMHD::em_Ax");
       SetCartSymGN(cctkGH,sym,"IllinoisGRMHD::em_Ay");
       SetCartSymGN(cctkGH,sym,"IllinoisGRMHD::em_Az");
       SetCartSymGN(cctkGH,sym,"IllinoisGRMHD::em_psi6phi");
-      SetCartSymGN(cctkGH,sym,"IllinoisGRMHD::grmhd_primitives_allbutBi");
+      SetCartSymGN(cctkGH,sym,"IllinoisGRMHD::grmhd_primitives_scalar");
+      SetCartSymGN(cctkGH,sym,"IllinoisGRMHD::grmhd_primitives_vector");
     } else if(CCTK_EQUALS(Symmetry,"equatorial")) {
       /* THEN SET EQUATORIAL SYMMETRY OPTION */
       // Set default to no symmetry, which is correct for scalars and most vectors:
       sym[0] = 1; sym[1] = 1; sym[2] = 1;
-      SetCartSymGN(cctkGH,sym,"IllinoisGRMHD::grmhd_conservatives");
+      SetCartSymGN(cctkGH,sym,"IllinoisGRMHD::grmhd_conservatives_scalar");
+      SetCartSymGN(cctkGH,sym,"IllinoisGRMHD::grmhd_conservatives_vector");
       // Don't worry about the wrong sym values since A_{\mu} is staggered
       // and we're going to impose the symmetry separately
       SetCartSymGN(cctkGH,sym,"IllinoisGRMHD::em_Ax");
@@ -48,7 +51,8 @@ extern "C" void IllinoisGRMHD_InitSymBound(CCTK_ARGUMENTS)
       SetCartSymGN(cctkGH,sym,"IllinoisGRMHD::em_Az");
       SetCartSymGN(cctkGH,sym,"IllinoisGRMHD::em_psi6phi");
 
-      SetCartSymGN(cctkGH,sym,"IllinoisGRMHD::grmhd_primitives_allbutBi");
+      SetCartSymGN(cctkGH,sym,"IllinoisGRMHD::grmhd_primitives_scalar");
+      SetCartSymGN(cctkGH,sym,"IllinoisGRMHD::grmhd_primitives_vector");
 
       // Then set unstaggered B field variables
       sym[2] = -Sym_Bz;
@@ -64,6 +68,7 @@ extern "C" void IllinoisGRMHD_InitSymBound(CCTK_ARGUMENTS)
       CCTK_VError(VERR_DEF_PARAMS,"IllinoisGRMHD_initsymbound: Should not be here; picked an impossible symmetry.");
     }
   }
+
 }
 
 
