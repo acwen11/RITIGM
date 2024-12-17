@@ -78,10 +78,13 @@ void initialize_Tabulated_EOS_parameters_from_input( const CCTK_REAL cctk_time,i
   else if( CCTK_EQUALS(igm_PPM_reconstructed_variable,"entropy") ) {
     eos.PPM_reconstructed_var = ENTROPY;
   }
+  else if( CCTK_EQUALS(igm_PPM_reconstructed_variable,"temperature") ) {
+    eos.PPM_reconstructed_var = TEMPERATURE;
+  }
   else {
     CCTK_VError(VERR_DEF_PARAMS,
                 "PPM reconstruction of variable \"%s\" not supported with Tabulated EOS. "
-                "Can only reconstruct: pressure, epsilon, entropy. ABORTING!",
+                "Can only reconstruct: pressure, epsilon, entropy, temperature. ABORTING!",
                 igm_PPM_reconstructed_variable);
   }
 
@@ -207,23 +210,28 @@ void compute_remaining_prims_on_right_and_left_face( const igm_eos_parameters eo
         //---------- Left face ----------
         CCTK_REAL xrhoR  = out_prims_r[RHOB    ].gf[index];
         CCTK_REAL xyeR   = out_prims_r[YEPRIM  ].gf[index];
-        CCTK_REAL xtempR = in_prims[TEMPERATURE].gf[index];
+        CCTK_REAL xtempR = 0.0;
         CCTK_REAL xprsR  = 0.0;
         CCTK_REAL xepsR  = 0.0;
         CCTK_REAL xentR  = 0.0;
         if( eos.PPM_reconstructed_var == PRESSURE ) {
           xprsR = out_prims_r[PRESSURE].gf[index];
-          xepsR = 0.0;
           enforce_table_bounds_rho_Ye_P(eos,&xrhoR,&xyeR,&xprsR);
           WVU_EOS_eps_S_and_T_from_rho_Ye_P( xrhoR,xyeR,xprsR,T_atm, &xepsR,&xentR,&xtempR );
           out_prims_r[EPSILON  ].gf[index] = xepsR;
         }
         else if( eos.PPM_reconstructed_var == EPSILON ) {
-          xprsR = 0.0;
           xepsR = out_prims_r[EPSILON].gf[index];
           enforce_table_bounds_rho_Ye_eps(eos,&xrhoR,&xyeR,&xepsR);
           WVU_EOS_P_S_and_T_from_rho_Ye_eps( xrhoR,xyeR,xepsR,T_atm, &xprsR,&xentR,&xtempR );
           out_prims_r[PRESSURE ].gf[index] = xprsR;
+        }
+        else if( eos.PPM_reconstructed_var == TEMPERATURE ) {
+        	xtempR = out_prims_r[TEMPERATURE].gf[index];
+          enforce_table_bounds_rho_Ye_T(eos,&xrhoR,&xyeR,&xtempR);
+          WVU_EOS_P_eps_and_S_from_rho_Ye_T( xrhoR,xyeR,xtempR, &xprsR,&xepsR,&xentR );
+          out_prims_r[PRESSURE ].gf[index] = xprsR;
+          out_prims_r[EPSILON  ].gf[index] = xepsR;
         }
         // Update everything
         out_prims_r[RHOB       ].gf[index] = xrhoR;
@@ -237,23 +245,28 @@ void compute_remaining_prims_on_right_and_left_face( const igm_eos_parameters eo
         //---------- Right face ---------
         CCTK_REAL xrhoL  = out_prims_l[RHOB    ].gf[index];
         CCTK_REAL xyeL   = out_prims_l[YEPRIM  ].gf[index];
-        CCTK_REAL xtempL = in_prims[TEMPERATURE].gf[index];
+        CCTK_REAL xtempL = 0.0; //in_prims[TEMPERATURE].gf[index];
         CCTK_REAL xprsL  = 0.0;
         CCTK_REAL xepsL  = 0.0;
         CCTK_REAL xentL  = 0.0;
         if( eos.PPM_reconstructed_var == PRESSURE ) {
           xprsL = out_prims_l[PRESSURE].gf[index];
-          xepsL = 0.0;
           enforce_table_bounds_rho_Ye_P(eos,&xrhoL,&xyeL,&xprsL);
           WVU_EOS_eps_S_and_T_from_rho_Ye_P( xrhoL,xyeL,xprsL,T_atm, &xepsL,&xentL,&xtempL );
           out_prims_l[EPSILON  ].gf[index] = xepsL;
         }
         else if( eos.PPM_reconstructed_var == EPSILON ) {
-          xprsL = 0.0;
           xepsL = out_prims_l[EPSILON].gf[index];
           enforce_table_bounds_rho_Ye_eps(eos,&xrhoL,&xyeL,&xepsL);
           WVU_EOS_P_S_and_T_from_rho_Ye_eps( xrhoL,xyeL,xepsL,T_atm, &xprsL,&xentL,&xtempL );
           out_prims_l[PRESSURE ].gf[index] = xprsL;
+        }
+        else if( eos.PPM_reconstructed_var == TEMPERATURE ) {
+        	xtempL = out_prims_l[TEMPERATURE].gf[index];
+          enforce_table_bounds_rho_Ye_T(eos,&xrhoL,&xyeL,&xtempL);
+          WVU_EOS_P_eps_and_S_from_rho_Ye_T( xrhoL,xyeL,xtempL, &xprsL,&xepsL,&xentL );
+          out_prims_l[PRESSURE ].gf[index] = xprsL;
+          out_prims_l[EPSILON  ].gf[index] = xepsL;
         }
         // Update everything
         out_prims_l[RHOB       ].gf[index] = xrhoL;

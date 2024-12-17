@@ -240,6 +240,7 @@ CCTK_STRING igm_PPM_reconstructed_variable "Type of EOS IllinoisGRMHD will use"
   "pressure" :: "Default: reconstruct the pressure"
   "epsilon"  :: "Reconstruct the specific internal energy"
   "entropy"  :: "Reconstruct the entropy"
+  "temperature"  :: "Reconstruct the temperature"
 } "pressure"
 
 restricted:
