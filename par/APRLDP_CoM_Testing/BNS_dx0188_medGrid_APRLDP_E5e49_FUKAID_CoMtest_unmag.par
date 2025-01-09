@@ -144,6 +144,8 @@ BNSTrackerGen::analysis_reflevel  = 6
 BNSTrackerGen::analyze_every    = 32
 
 BNSTrackerGen::merge_separation   = 9.0
+BNSTrackerGen::follow_hmns = "yes"
+BNSTrackerGen::move_z = "yes"
 BNSTrackerGen::collapse_separation    = -1
 BNSTrackerGen::add_levels_post_merge    = 2
 BNSTrackerGen::index_region1 = 1
@@ -166,7 +168,7 @@ Carpet::ghost_size               = 3
 Carpet::init_3_timelevels        = "no"
 Carpet::init_fill_timelevels     = "yes"
 Carpet::max_refinement_levels    = 10
-Carpet::output_timers_every      = 64
+Carpet::output_timers_every      = 512
 Carpet::poison_new_timelevels    = "yes"
 Carpet::prolongation_order_space = 5
 Carpet::prolongation_order_time  = 2
@@ -181,7 +183,7 @@ CarpetInterp::tree_search       = "yes"
 
 # Parameters of thorn CarpetIOASCII (implementing IOASCII)
 CarpetIOASCII::one_file_per_group     = "no"
-CarpetIOASCII::out0D_every            = 64
+CarpetIOASCII::out0D_every            = 512
 CarpetIOASCII::out0D_vars             = "
   Carpet::physical_time_per_hour
   carpet::timing
@@ -400,11 +402,11 @@ CoordBase::boundary_size_y_upper = 3
 CoordBase::boundary_size_z_upper = 3
 CoordBase::domainsize            = "minmax"
 CoordBase::spacing               = "gridspacing"
-CoordBase::dx                    = 19.712
+CoordBase::dx                    = 24.064
 CoordBase::dy                    = CoordBase::dx
 CoordBase::dz                    = CoordBase::dx
-CoordBase::xmin                  = -1971.2
-CoordBase::xmax                  = 1971.2 
+CoordBase::xmin                  = -1997.312
+CoordBase::xmax                  = 1997.312
 CoordBase::ymin                  = CoordBase::xmin
 CoordBase::zmin                  = CoordBase::xmin
 CoordBase::ymax                  = CoordBase::xmax

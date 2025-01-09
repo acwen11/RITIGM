@@ -210,7 +210,7 @@ void compute_remaining_prims_on_right_and_left_face( const igm_eos_parameters eo
         //---------- Left face ----------
         CCTK_REAL xrhoR  = out_prims_r[RHOB    ].gf[index];
         CCTK_REAL xyeR   = out_prims_r[YEPRIM  ].gf[index];
-        CCTK_REAL xtempR = 0.0;
+        CCTK_REAL xtempR = in_prims[TEMPERATURE].gf[index];
         CCTK_REAL xprsR  = 0.0;
         CCTK_REAL xepsR  = 0.0;
         CCTK_REAL xentR  = 0.0;
@@ -245,7 +245,7 @@ void compute_remaining_prims_on_right_and_left_face( const igm_eos_parameters eo
         //---------- Right face ---------
         CCTK_REAL xrhoL  = out_prims_l[RHOB    ].gf[index];
         CCTK_REAL xyeL   = out_prims_l[YEPRIM  ].gf[index];
-        CCTK_REAL xtempL = 0.0; //in_prims[TEMPERATURE].gf[index];
+        CCTK_REAL xtempL = in_prims[TEMPERATURE].gf[index];
         CCTK_REAL xprsL  = 0.0;
         CCTK_REAL xepsL  = 0.0;
         CCTK_REAL xentL  = 0.0;
