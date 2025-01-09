@@ -153,6 +153,7 @@ extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const 
 															 &xrho,&xeps,&xtemp,&xye,&xpress,&xent,
 															 &dummy,&dummy,&dummy,&dummy,&dummy,
 															 &keyerr,&anyerr);
+								temperature[index] = xtemp;
 							}
 							else if (CCTK_Equals(id_entropy_type, "from table")) {
 								// Only call EOS_Omni_short() if we need the entropy.
