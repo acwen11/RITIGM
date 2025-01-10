@@ -286,7 +286,6 @@ CarpetIOHDF5::out_vars                      = "
   ADMBase::curv
   ADMBase::lapse
   ADMBase::shift
-  Baikal::aux_variables
   IllinoisGRMHD::grmhd_primitives_scalar
   IllinoisGRMHD::grmhd_primitives_Bi
 "
