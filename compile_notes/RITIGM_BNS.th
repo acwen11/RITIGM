@@ -209,6 +209,7 @@ CactusNumerical/SummationByParts
 !REPO_PATH= $2
 !CHECKOUT = CactusUtils/Accelerator CactusUtils/OpenCLRunTime
 #DISABLED CactusUtils/Accelerator
+CactusUtils/Formaline
 CactusUtils/NaNChecker
 #DISABLED CactusUtils/OpenCLRunTime
 CactusUtils/SystemStatistics
@@ -408,18 +409,20 @@ ExternalLibraries/Boost
 # FUKA initial data thorns
 # the crazy path works around a bug in GetComponents that does not handle
 # symbolic links and ".." correctly
-# !TARGET = $ARR/Fuka/KadathThorn/src/fuka/../../../../repos/KadathThorn/src/fuka
-# !TYPE   = git
-# !URL    = https://bitbucket.org/fukaws/fuka
-# !REPO_BRANCH = $ET_RELEASE
-# !CHECKOUT = Cmake build_debug build_release codes eos include install_par.sh install_seq.sh src src_par src_seq
-# 
-# !TARGET   = $ARR
-# !TYPE     = git
-# !URL      = https://bitbucket.org/fukaws/$2
-# !REPO_BRANCH = $ET_RELEASE
-# !REPO_PATH=../$2
-# !CHECKOUT = Fuka/KadathImporter Fuka/KadathThorn
+!TARGET = $ARR/Fuka/KadathThorn/src/fuka/../../../../repos/KadathThorn/src/fuka
+!TYPE   = git
+!URL    = https://bitbucket.org/fukaws/fuka
+!REPO_BRANCH = $ET_RELEASE
+!CHECKOUT = Cmake build_debug build_release codes eos include install_par.sh install_seq.sh src src_par src_seq
+
+!TARGET   = $ARR
+!TYPE     = git
+!URL      = https://bitbucket.org/fukaws/$2
+!REPO_BRANCH = $ET_RELEASE
+!REPO_PATH=../$2
+!CHECKOUT = Fuka/KadathImporter Fuka/KadathThorn
+Fuka/KadathImporter
+Fuka/KadathThorn
 
 # From Kranc (required e.g. by McLachlan)
 !TARGET   = $ARR
@@ -549,6 +552,7 @@ WVUThorns_Diagnostics/VolumeIntegrals_vacuum
 !URL      = git@github.com:RITnumrel/RITIGM_BNS.git
 !REPO_PATH= $2
 !CHECKOUT =
+RITIGM_BNS/BNSTrackerGen
 RITIGM_BNS/Convert_to_HydroBase
 RITIGM_BNS/EOS_Omni
 RITIGM_BNS/ID_converter_ILGRMHD
@@ -560,10 +564,21 @@ RITIGM_BNS/particle_tracerET
 RITIGM_BNS/smallbPoynET
 RITIGM_BNS/VolumeIntegrals_GRMHD
 RITIGM_BNS/WVU_EOS
+RITIGM_BNS/ZelmaniTracers
 
-THCExtra/BNSTrackerGen
+THCCore/THC_M1
+# THCCore/THC_LeakageBase
+# THCCore/THC_LeakageM0
+THCCore/THC_UtilsLite
+
+THCBase/CPPUtils
+THCBase/FDCore
+THCBase/HRSCCore
+
 THCExtra/PizzaBase
 THCExtra/PizzaNumUtils
+THCExtra/Units
+THCExtra/WeakRates
 
 # Private thorns
 !TARGET   = $ARR

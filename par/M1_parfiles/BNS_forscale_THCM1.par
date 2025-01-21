@@ -235,6 +235,9 @@ CarpetIOHDF5::out2D_vars                    = "
   ADMBase::curv
   ADMBase::lapse
   ADMBase::shift
+  HydroBase::rho
+  HydroBase::temperature
+  HydroBase::Y_e
   IllinoisGRMHD::rho_b
   IllinoisGRMHD::igm_Ye
   IllinoisGRMHD::igm_temperature
@@ -252,7 +255,6 @@ CarpetIOHDF5::out2D_vars                    = "
   IllinoisGRMHD::grmhd_conservatives
 	HydroBase::vel
 	HydroBase::w_lorentz
-  Baikal::aux_variables
   Baikal::HGF
   Baikal::MU0GF
   Baikal::MU1GF
@@ -436,11 +438,11 @@ CoordBase::boundary_size_y_upper = 3
 CoordBase::boundary_size_z_upper = 3
 CoordBase::domainsize            = "minmax"
 CoordBase::spacing               = "gridspacing"
-CoordBase::dx                    = 384.16
+CoordBase::dx                    = 315.392
 CoordBase::dy                    = CoordBase::dx
 CoordBase::dz                    = CoordBase::dx
-CoordBase::xmin                  = -34958.56
-CoordBase::xmax                  = 34958.56 
+CoordBase::xmin                  = -35008.512 
+CoordBase::xmax                  = 35008.512 
 CoordBase::ymin                  = CoordBase::xmin
 CoordBase::zmin                  = CoordBase::xmin
 CoordBase::ymax                  = CoordBase::xmax
@@ -735,7 +737,7 @@ sphericalsurface::symmetric_z[12]         = no
 # Parameters of thorn TerminationTrigger (implementing TerminationTrigger)
 TerminationTrigger::create_termination_file = "yes"
 TerminationTrigger::max_walltime            = 48
-TerminationTrigger::on_remaining_walltime   = 60
+TerminationTrigger::on_remaining_walltime   = 15
 TerminationTrigger::termination_file        = "TERMINATE"
 TerminationTrigger::termination_from_file   = "yes"
 
