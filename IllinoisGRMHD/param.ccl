@@ -45,7 +45,7 @@ BOOLEAN update_HydroBase "Convert to HydroBase at every C2P?" STEERABLE=ALWAYS
 } "yes"
 
 ###########################
-# Radial-falloff atmosphere
+# Radial falloff atmosphere
 CCTK_BOOLEAN atmo_falloff "If true, rho_atmo(r) = rho_b_atm_max*r^r_power outside a radius 'r_atmo_min' (see below)" STEERABLE=ALWAYS
 {
 } false

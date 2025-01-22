@@ -171,6 +171,7 @@ CactusBase/Time
 CactusNumerical/LocalInterp
 CactusNumerical/LocalReduce
 CactusNumerical/MoL
+CactusNumerical/ReflectionSymmetry
 CactusNumerical/Slab
 CactusNumerical/SpaceMask
 CactusNumerical/SphericalSurface
@@ -421,8 +422,8 @@ ExternalLibraries/Boost
 !REPO_BRANCH = $ET_RELEASE
 !REPO_PATH=../$2
 !CHECKOUT = Fuka/KadathImporter Fuka/KadathThorn
-Fuka/KadathImporter
-Fuka/KadathThorn
+#Fuka/KadathImporter
+#Fuka/KadathThorn
 
 # From Kranc (required e.g. by McLachlan)
 !TARGET   = $ARR
@@ -573,7 +574,7 @@ THCCore/THC_UtilsLite
 
 THCBase/CPPUtils
 THCBase/FDCore
-THCBase/HRSCCore
+# THCBase/HRSCCore
 
 THCExtra/PizzaBase
 THCExtra/PizzaNumUtils

@@ -254,9 +254,10 @@ CarpetIOHDF5::out2D_vars                    = "
   IllinoisGRMHD::Bz
   IllinoisGRMHD::psi_bssn
   IllinoisGRMHD::failure_checker
-  IllinoisGRMHD::grmhd_conservatives
-	HydroBase::vel
-	HydroBase::w_lorentz
+  IllinoisGRMHD::grmhd_conservatives_scalar
+  IllinoisGRMHD::grmhd_conservatives_vector
+  HydroBase::vel
+  HydroBase::w_lorentz
   Baikal::HGF
   Baikal::MU0GF
   Baikal::MU1GF
@@ -287,8 +288,9 @@ CarpetIOHDF5::out_vars                      = "
   ADMBase::curv
   ADMBase::lapse
   ADMBase::shift
-  Baikal::aux_variables
-  IllinoisGRMHD::grmhd_primitives_allbutBi
+  Baikal::aux_variables_scalar
+  IllinoisGRMHD::grmhd_primitives_scalar
+  IllinoisGRMHD::grmhd_primitives_vector
   IllinoisGRMHD::grmhd_primitives_Bi
 "
 
@@ -541,7 +543,8 @@ Multipole::variables    = "WeylScal4::Psi4r{sw=-2 cmplx='WeylScal4::Psi4i' name=
 NaNChecker::action_if_found = "terminate"
 NaNChecker::check_every     = 64000
 NaNChecker::check_vars      = "
-  IllinoisGRMHD::grmhd_conservatives
+  IllinoisGRMHD::grmhd_conservatives_scalar
+  IllinoisGRMHD::grmhd_conservatives_vector
   ADMBase::curv
   ADMBase::dtshift
   ADMBase::lapse

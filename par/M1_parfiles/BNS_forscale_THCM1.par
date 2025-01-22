@@ -54,6 +54,7 @@ NaNChecker
 NewRad 
 Outflow
 QuasiLocalMeasures 
+ReflectionSymmetry
 Seed_Magnetic_Fields_BNS 
 Slab 
 SpaceMask 
@@ -160,7 +161,7 @@ BNSTrackerGen::index_region3 = 0
 
 # Parameters of thorn Cactus (implementing Cactus)
 Cactus::cctk_full_warnings = "yes"
-Cactus::cctk_itlast        = 10000000
+Cactus::cctk_itlast        = 128
 Cactus::cctk_run_title     = "IGM_APR4_BNS_Magnetized"
 Cactus::terminate          = "iteration"
 
@@ -188,7 +189,7 @@ CarpetInterp::tree_search       = "yes"
 
 # Parameters of thorn CarpetIOASCII (implementing IOASCII)
 CarpetIOASCII::one_file_per_group     = "no"
-CarpetIOASCII::out0D_every            = 64
+CarpetIOASCII::out0D_every            = -1
 CarpetIOASCII::out0D_vars             = "
   Carpet::physical_time_per_hour
   carpet::timing
@@ -252,9 +253,10 @@ CarpetIOHDF5::out2D_vars                    = "
   IllinoisGRMHD::By
   IllinoisGRMHD::Bz
   IllinoisGRMHD::failure_checker
-  IllinoisGRMHD::grmhd_conservatives
-	HydroBase::vel
-	HydroBase::w_lorentz
+  IllinoisGRMHD::grmhd_conservatives_scalar
+  IllinoisGRMHD::grmhd_conservatives_vector
+  HydroBase::vel
+  HydroBase::w_lorentz
   Baikal::HGF
   Baikal::MU0GF
   Baikal::MU1GF
@@ -309,8 +311,9 @@ CarpetIOHDF5::out_vars                      = "
   ADMBase::curv
   ADMBase::lapse
   ADMBase::shift
-  Baikal::aux_variables
-  IllinoisGRMHD::grmhd_primitives_allbutBi
+  Baikal::aux_variables_scalar
+  IllinoisGRMHD::grmhd_primitives_scalar
+  IllinoisGRMHD::grmhd_primitives_vector
   IllinoisGRMHD::grmhd_primitives_Bi
 "
 
@@ -436,6 +439,8 @@ CoordBase::boundary_size_z_lower = 3
 CoordBase::boundary_size_x_upper = 3
 CoordBase::boundary_size_y_upper = 3
 CoordBase::boundary_size_z_upper = 3
+CoordBase::boundary_shiftout_z_lower = 1
+
 CoordBase::domainsize            = "minmax"
 CoordBase::spacing               = "gridspacing"
 CoordBase::dx                    = 315.392
@@ -444,9 +449,14 @@ CoordBase::dz                    = CoordBase::dx
 CoordBase::xmin                  = -35008.512 
 CoordBase::xmax                  = 35008.512 
 CoordBase::ymin                  = CoordBase::xmin
-CoordBase::zmin                  = CoordBase::xmin
 CoordBase::ymax                  = CoordBase::xmax
+CoordBase::zmin                  = 0
 CoordBase::zmax                  = CoordBase::xmax
+
+#---------ReflectionSymmetry---------
+ReflectionSymmetry::verbose = "yes"
+ReflectionSymmetry::reflection_z = "yes"
+ReflectionSymmetry::avoid_origin_z = "no"
 
 # Parameters of thorn EOS_Omni (implementing EOS_Omni)
 EOS_Omni::do_energy_shift   = "yes"
@@ -468,6 +478,8 @@ ID_TabEOS_HydroQuantities::id_entropy_type     = "from table"
 ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDPex_norad.txt"
 
 # Parameters of thorn IllinoisGRMHD (implementing IllinoisGRMHD)
+IllinoisGRMHD::Symmetry = "equatorial"
+
 IllinoisGRMHD::igm_eos_table_ceiling_safety_factor = 1
 IllinoisGRMHD::igm_eos_table_floor_safety_factor   = 1
 
@@ -554,7 +566,8 @@ Multipole::variables    = "WeylScal4::Psi4r{sw=-2 cmplx='WeylScal4::Psi4i' name=
 NaNChecker::action_if_found = "terminate"
 NaNChecker::check_every     = 64000
 NaNChecker::check_vars      = "
-  IllinoisGRMHD::grmhd_conservatives
+  IllinoisGRMHD::grmhd_conservatives_scalar
+  IllinoisGRMHD::grmhd_conservatives_vector
   ADMBase::curv
   ADMBase::dtshift
   ADMBase::lapse
@@ -720,19 +733,19 @@ sphericalsurface::set_spherical[10]       = yes
 sphericalsurface::set_spherical[11]       = yes
 sphericalsurface::set_spherical[12]       = yes
 
-sphericalsurface::symmetric_z[0]         = no
-sphericalsurface::symmetric_z[1]         = no
-sphericalsurface::symmetric_z[2]         = no
-sphericalsurface::symmetric_z[3]         = no
-sphericalsurface::symmetric_z[4]         = no
-sphericalsurface::symmetric_z[5]         = no
-sphericalsurface::symmetric_z[6]         = no
-sphericalsurface::symmetric_z[7]         = no
-sphericalsurface::symmetric_z[8]         = no
-sphericalsurface::symmetric_z[9]         = no
-sphericalsurface::symmetric_z[10]         = no
-sphericalsurface::symmetric_z[11]         = no
-sphericalsurface::symmetric_z[12]         = no
+sphericalsurface::symmetric_z[0]         = yes 
+sphericalsurface::symmetric_z[1]         = yes 
+sphericalsurface::symmetric_z[2]         = yes 
+sphericalsurface::symmetric_z[3]         = yes 
+sphericalsurface::symmetric_z[4]         = yes 
+sphericalsurface::symmetric_z[5]         = yes 
+sphericalsurface::symmetric_z[6]         = yes 
+sphericalsurface::symmetric_z[7]         = yes 
+sphericalsurface::symmetric_z[8]         = yes 
+sphericalsurface::symmetric_z[9]         = yes 
+sphericalsurface::symmetric_z[10]         = yes
+sphericalsurface::symmetric_z[11]         = yes
+sphericalsurface::symmetric_z[12]         = yes
 
 # Parameters of thorn TerminationTrigger (implementing TerminationTrigger)
 TerminationTrigger::create_termination_file = "yes"
@@ -749,6 +762,7 @@ THC_M1::include_GR_sources                                  = "yes"
 THC_M1::source_Ye_min                                       = 0.005
 THC_M1::source_Ye_max                                       = 0.655
 THC_M1::source_limiter                                      = 0.5
+THC_M1::floor_tol                                           = 0.0
 
 THC_M1::verbose                                             = "yes"
 
