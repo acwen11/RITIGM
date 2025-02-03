@@ -12,30 +12,34 @@ ActiveThorns = "
     CarpetIOHDF5
     CarpetIOScalar
     CarpetLib
+    CarpetRegrid2
     CarpetReduce
     CarpetSlab
     CartGrid3D
     CoordBase
     CoordGauge
     EOS_Barotropic
+    EOS_Omni
     EOS_Thermal
     EOS_Thermal_Extable
     EOS_Thermal_Table3d
     Fortran
     HydroBase
     HRSCCore
-    ID_Switch_EOS
+    # ID_Switch_EOS
+    ID_TabEOS_HydroQuantities
     InitBase
     IOUtil
     LocalInterp
     LoopControl
     MoL
     NaNChecker
+    NRPyPlusTOVID
     Outflow
     PizzaBase
-    PizzaIDBase
+    # PizzaIDBase
     PizzaNumUtils
-    PizzaTOV
+    # PizzaTOV
     # ReflectionSymmetry
     Refluxing
     Slab
@@ -130,6 +134,21 @@ Carpet::init_fill_timelevels		= "yes"
 
 CarpetLib::poison_new_memory		= "yes"
 
+# Grid #1: centered at "left" star
+# The values below are set to match Spritz
+CarpetRegrid2::freeze_unaligned_levels = "yes"
+CarpetRegrid2::snap_to_coarse = "yes"
+CarpetRegrid2::symmetry_rotating180    = "no"
+CarpetRegrid2::verbose                 = "no"
+CarpetRegrid2::num_centres             = 1
+
+CarpetRegrid2::num_levels_1 = 5
+CarpetRegrid2::radius_1[1]  = 72
+CarpetRegrid2::radius_1[2]  = 36
+CarpetRegrid2::radius_1[3]  = 18
+CarpetRegrid2::radius_1[4]  = 9
+CarpetRegrid2::regrid_every = -1
+
 NaNChecker::check_every		= 128
 NaNChecker::check_vars		= "
     HydroBase::rho
@@ -166,6 +185,9 @@ ADMBase::initial_lapse		= "NRPyPlusTOVID"
 ADMBase::initial_shift		= "NRPyPlusTOVID"
 ADMBase::initial_dtlapse		= "zero"
 ADMBase::initial_dtshift		= "zero"
+ADMBase::metric_timelevels        = 3
+ADMBase::lapse_timelevels         = 3
+ADMBase::shift_timelevels         = 3
 HydroBase::initial_hydro		= "NRPyPlusTOVID"
 HydroBase::initial_entropy		= "ID_TabEOS_HydroQuantities"
 HydroBase::initial_temperature		= "ID_TabEOS_HydroQuantities"
@@ -174,7 +196,7 @@ HydroBase::initial_Y_e		= "ID_TabEOS_HydroQuantities"
 # File describing a one-parametric EOS in Pizza format. Used only for initial data.
 # PizzaIDBase::eos_file		= "@HOME@/Data/EOS/LS220/0.01MeVbeta/LS220B0.pizza"
 #---------NRPyPlusTOVID---------
-NRPyPlusTOVID::TOV_filename     = "/work2/09319/acw6923/frontera/EOS/outputTOV_tabulated_Hot_APRLDP.txt"
+NRPyPlusTOVID::TOV_filename     = "/work2/09319/acw6923/frontera/EOS/outputTOV_APR4LDPex_norad.txt"
 NRPyPlusTOVID::rho_atmosphere   = 1e-14
 NRPyPlusTOVID::K_atmosphere     = 1
 NRPyPlusTOVID::Gamma_atmosphere = 1
@@ -183,7 +205,8 @@ NRPyPlusTOVID::Gamma_atmosphere = 1
 ID_TabEOS_HydroQuantities::id_temperature_type = "constant"
 ID_TabEOS_HydroQuantities::id_entropy_type     = "constant"
 ID_TabEOS_HydroQuantities::id_entropy          = 1.0
-ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDPex_Hot.txt"
+ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDPex_norad.txt"
+ID_TabEOS_HydroQuantities::rho_b_atm_max = 1e-14
 
 # Geometric unit system for initial data, specified by length unit.
 # use CACTUS units
@@ -196,9 +219,9 @@ PizzaBase::length_unit		= 1476.7161818921163
 # PizzaTOV::pert_n			= 1
 
 # Switch EOS
-ID_Switch_EOS::sync_eps_temp		= "yes"
-ID_Switch_EOS::temp_from_eps		= "no"
-ID_Switch_EOS::limit_efrac		= "yes"
+# ID_Switch_EOS::sync_eps_temp		= "yes"
+# ID_Switch_EOS::temp_from_eps		= "no"
+# ID_Switch_EOS::limit_efrac		= "yes"
 
 # =============================================================================
 # Templated hydrodynamics code
@@ -245,6 +268,11 @@ EOS_Thermal_Extable::extend_ye		= "yes"
 EOS_Thermal_Table3d::eos_db_loc		= "/work2/09319/acw6923/frontera/EOS"
 EOS_Thermal_Table3d::eos_folder		= "EOS_for_THC"
 EOS_Thermal_Table3d::eos_filename		= "APRLDP_hydro_03-Feb-2025.h5"
+
+#---------EOS_Omni---------
+EOS_Omni::nuceos_read_table = "yes"
+EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APRLDP_3335_rho420_temp187_ye66_gitMf0fc21f_20240626_ext_norad_adj_mineps0.h5"
+EOS_Omni::do_energy_shift   = "yes"
 
 # THC_LeakageBase::neu_abs_type		= "None"
 # THC_LeakageBase::num_sph_grids		= 1
@@ -332,7 +360,6 @@ CarpetIOASCII::out1d_vars		= "
     THC_Core::dens
     THC_Core::scon
     THC_Core::tau
-    THC_LeakageBase::thc_leakage_optd
 "
 
 CarpetIOHDF5::out2d_vars		= "
@@ -391,7 +418,7 @@ THC_M1::radial_flux_1[0] # vvv For neutrino luminosity vvv
 THC_M1::radial_flux_1[1]
 THC_M1::radial_flux_1[2]
 ADMBase::alp
-THCCore::volform
+THC_Core::volform
 "
 
 sphericalsurface::nsurfaces              = 3
