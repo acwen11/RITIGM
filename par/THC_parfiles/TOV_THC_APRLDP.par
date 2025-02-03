@@ -1,0 +1,429 @@
+ActiveThorns = "
+    ADMBase
+    ADMCoupling
+    ADMMacros
+    AEILocalInterp
+    Boundary
+    Carpet
+    CarpetInterp
+    CarpetInterp2
+    CarpetIOASCII
+    CarpetIOBasic
+    CarpetIOHDF5
+    CarpetIOScalar
+    CarpetLib
+    CarpetReduce
+    CarpetSlab
+    CartGrid3D
+    CoordBase
+    CoordGauge
+    EOS_Barotropic
+    EOS_Thermal
+    EOS_Thermal_Extable
+    EOS_Thermal_Table3d
+    Fortran
+    HydroBase
+    HRSCCore
+    ID_Switch_EOS
+    InitBase
+    IOUtil
+    LocalInterp
+    LoopControl
+    MoL
+    NaNChecker
+    Outflow
+    PizzaBase
+    PizzaIDBase
+    PizzaNumUtils
+    PizzaTOV
+    # ReflectionSymmetry
+    Refluxing
+    Slab
+    SpaceMask
+    SphericalSurface
+    SphericalHarmonicDecomp
+    StaticConformal
+    SymBase
+    SystemTopology
+    THC_Core
+    # THC_LeakageBase
+    THC_M1
+    THC_Refluxing
+    THC_Tracer
+    Time
+    TimerReport
+    TmunuBase
+    WeakRates
+    WatchDog
+"
+
+Cactus::terminate			= "iteration"
+Cactus::cctk_itlast			= 1024
+
+TimerReport::out_every		= 128
+TimerReport::output_all_timers_readable		= "yes"
+
+# =============================================================================
+# Grid
+# =============================================================================
+Grid::avoid_origin			= "no"
+Grid::domain			= "full"
+Grid::type			= "coordbase"
+
+# ReflectionSymmetry::reflection_x		= "yes"
+# ReflectionSymmetry::reflection_y		= "yes"
+# ReflectionSymmetry::reflection_z		= "yes"
+# ReflectionSymmetry::avoid_origin_x		= "yes"
+# ReflectionSymmetry::avoid_origin_y		= "yes"
+# ReflectionSymmetry::avoid_origin_z		= "yes"
+
+CoordBase::dx   = 3.0
+CoordBase::dy   = CoordBase::dx
+CoordBase::dz   = CoordBase::dx
+CoordBase::xmin = -144 + CoordBase::dx/32.0
+CoordBase::xmax = +144 + CoordBase::dx/32.0
+CoordBase::ymin = CoordBase::xmin
+CoordBase::ymax = CoordBase::xmax
+CoordBase::zmin = CoordBase::xmin
+CoordBase::zmax = CoordBase::xmax
+
+CoordBase::domainsize            = "minmax"
+CoordBase::spacing               = "gridspacing"
+
+CoordBase::boundary_size_x_lower		= 3
+CoordBase::boundary_size_x_upper		= 3
+CoordBase::boundary_shiftout_x_lower		= 0
+CoordBase::boundary_shiftout_x_upper		= 0
+CoordBase::boundary_staggered_x_lower		= "yes"
+CoordBase::boundary_staggered_x_upper		= "yes"
+
+CoordBase::boundary_size_y_lower		= 3
+CoordBase::boundary_size_y_upper		= 3
+CoordBase::boundary_shiftout_y_lower		= 0
+CoordBase::boundary_shiftout_y_upper		= 0
+CoordBase::boundary_staggered_y_lower		= "yes"
+CoordBase::boundary_staggered_y_upper		= "yes"
+
+CoordBase::boundary_size_z_lower		= 3
+CoordBase::boundary_size_z_upper		= 3
+CoordBase::boundary_shiftout_z_lower		= 0
+CoordBase::boundary_shiftout_z_upper		= 0
+CoordBase::boundary_staggered_z_lower		= "yes"
+CoordBase::boundary_staggered_z_upper		= "yes"
+
+Driver::ghost_size			= 3
+Driver::ghost_size_x		= 3
+Driver::ghost_size_y		= 3
+Driver::ghost_size_z		= 3
+
+Carpet::refinement_centering		= "cell"
+Carpet::domain_from_coordbase		= "yes"
+
+InitBase::initial_data_setup_method		= "init_some_levels"
+
+Carpet::max_refinement_levels		= 5
+Carpet::prolongation_order_space		= 3
+Carpet::prolongation_order_time		= 2
+Carpet::use_buffer_zones		= "yes"
+Carpet::enable_all_storage		= "no"
+Carpet::init_fill_timelevels		= "yes"
+
+CarpetLib::poison_new_memory		= "yes"
+
+NaNChecker::check_every		= 128
+NaNChecker::check_vars		= "
+    HydroBase::rho
+    HydroBase::vel
+    HydroBase::w_lorentz
+    THC_Core::densxn
+    THC_Core::densxp
+    THC_Core::scon
+    THC_Core::tau
+    THC_Core::volform
+"
+NaNChecker::action_if_found		= "abort"
+
+# =============================================================================
+# Time integration
+# =============================================================================
+Carpet::num_integrator_substeps		= 3
+
+MoL::ode_method			= "RK3"
+MoL::MoL_Intermediate_Steps		= 3
+MoL::MoL_Num_Scratch_Levels		= 0
+MoL::verbose			= "register"
+
+HydroBase::timelevels		= 3
+
+Time::timestep_method		= "courant_static"
+Time::dtfac			= 0.075
+
+# =============================================================================
+# Initial data
+# =============================================================================
+ADMBase::initial_data		= "NRPyPlusTOVID"
+ADMBase::initial_lapse		= "NRPyPlusTOVID"
+ADMBase::initial_shift		= "NRPyPlusTOVID"
+ADMBase::initial_dtlapse		= "zero"
+ADMBase::initial_dtshift		= "zero"
+HydroBase::initial_hydro		= "NRPyPlusTOVID"
+HydroBase::initial_entropy		= "ID_TabEOS_HydroQuantities"
+HydroBase::initial_temperature		= "ID_TabEOS_HydroQuantities"
+HydroBase::initial_Y_e		= "ID_TabEOS_HydroQuantities"
+
+# File describing a one-parametric EOS in Pizza format. Used only for initial data.
+# PizzaIDBase::eos_file		= "@HOME@/Data/EOS/LS220/0.01MeVbeta/LS220B0.pizza"
+#---------NRPyPlusTOVID---------
+NRPyPlusTOVID::TOV_filename     = "/work2/09319/acw6923/frontera/EOS/outputTOV_tabulated_Hot_APRLDP.txt"
+NRPyPlusTOVID::rho_atmosphere   = 1e-14
+NRPyPlusTOVID::K_atmosphere     = 1
+NRPyPlusTOVID::Gamma_atmosphere = 1
+
+#---------ID_TabEOS_HydroQuantities---------
+ID_TabEOS_HydroQuantities::id_temperature_type = "constant"
+ID_TabEOS_HydroQuantities::id_entropy_type     = "constant"
+ID_TabEOS_HydroQuantities::id_entropy          = 1.0
+ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDPex_Hot.txt"
+
+# Geometric unit system for initial data, specified by length unit.
+# use CACTUS units
+PizzaBase::length_unit		= 1476.7161818921163
+
+# TOV central rest mass density in kg/m^3
+# PizzaTOV::star_crmd			= 2.0e18
+# PizzaTOV::pert_amp			= 0.01
+# PizzaTOV::pert_l			= 0
+# PizzaTOV::pert_n			= 1
+
+# Switch EOS
+ID_Switch_EOS::sync_eps_temp		= "yes"
+ID_Switch_EOS::temp_from_eps		= "no"
+ID_Switch_EOS::limit_efrac		= "yes"
+
+# =============================================================================
+# Templated hydrodynamics code
+# =============================================================================
+HydroBase::evolution_method		= "THCode"
+HydroBase::temperature_evolution_method		= "THCode"
+HydroBase::entropy_evolution_method		= "THCode"
+HydroBase::Y_e_evolution_method		= "THCode"
+
+THC_Core::eos_type			= "nuclear"
+THC_Core::physics			= "GRHD"
+
+TmunuBase::prolongation_type		= "none"
+TmunuBase::stress_energy_storage		= "yes"
+TmunuBase::stress_energy_at_RHS		= "yes"
+TmunuBase::support_old_CalcTmunu_mechanism	= "no"
+
+THC_Core::bc_type			= "none"
+
+HRSCCore::scheme			= "FV"
+HRSCCore::pplim			= "yes"
+HRSCCore::refluxing			= "yes"
+HRSCCore::reconstruction		= "MP5"
+HRSCCore::riemann_solver		= "HLLE"
+HRSCCore::flux_split		= "LLF"
+HRSCCore::system_split		= "components"
+HRSCCore::speed_eps			= 0.05
+
+THC_Core::atmo_rho			= 1e-14
+THC_Core::atmo_tolerance		= 0.0
+THC_Core::atmo_temperature		= 0.02
+
+THC_Core::c2a_BH_alp		= 0.15
+THC_Core::c2a_rho_strict		= 2e-5
+THC_Core::c2a_set_to_nan_on_failure		= "no"
+THC_Core::c2a_fix_conservatives		= "yes"
+THC_Core::c2a_kill_on_failure		= "no"
+
+EOS_Thermal::evol_eos_name		= "Extable"
+EOS_Thermal_Extable::rho_max		= 1e10
+EOS_Thermal_Extable::temp_max		= 1000
+EOS_Thermal_Extable::extend_ye		= "yes"
+
+EOS_Thermal_Table3d::eos_db_loc		= "/work2/09319/acw6923/frontera/EOS"
+EOS_Thermal_Table3d::eos_folder		= "EOS_for_THC"
+EOS_Thermal_Table3d::eos_filename		= "APRLDP_hydro_03-Feb-2025.h5"
+
+# THC_LeakageBase::neu_abs_type		= "None"
+# THC_LeakageBase::num_sph_grids		= 1
+# THC_LeakageBase::rmax		= 16.0
+# THC_LeakageBase::nrad		= 32
+# THC_LeakageBase::ntheta		= 16
+# THC_LeakageBase::nphi		= 32
+# THC_LeakageBase::store_free_rates		= "yes"
+# THC_LeakageBase::store_neu_luminosity		= "yes"
+
+THC_M1::backreact                                           = "yes"
+THC_M1::closure                                             = "minerbo"
+THC_M1::fiducial_velocity                                   = "fluid"
+THC_M1::include_GR_sources                                  = "yes"
+THC_M1::source_Ye_min                                       = 0.005
+THC_M1::source_Ye_max                                       = 0.655
+THC_M1::source_limiter                                      = 0.5
+
+THC_Refluxing::nvars		= 6
+
+WeakRates::table_filename                                   = "/work2/09319/acw6923/frontera/EOS/EOS_for_THC/APRLDP_weak_03-Feb-2025.h5"
+WeakRates::use_rho_max_ext		= "yes"
+WeakRates::use_rho_min_ext		= "yes"
+WeakRates::use_temp_max_ext		= "yes"
+WeakRates::use_temp_min_ext		= "yes"
+WeakRates::use_ye_max_ext		= "yes"
+WeakRates::use_ye_min_ext		= "yes"
+
+# =============================================================================
+# Spacetime evolution
+# =============================================================================
+ADMBase::evolution_method		= "static"
+ADMBase::lapse_evolution_method		= "static"
+ADMBase::shift_evolution_method		= "static"
+ADMBase::dtlapse_evolution_method		= "static"
+ADMBase::dtshift_evolution_method		= "static"
+
+THC_Core::fd_order			= 4
+
+# =============================================================================
+# Output
+# =============================================================================
+IOUtil::out_dir			= "./data/"
+IOUtil::strict_io_parameter_check		= "yes"
+IOUtil::parfile_write		= "copy"
+
+CarpetIOBasic::outinfo_vars		= "
+    Carpet::physical_time_per_hour
+    HydroBase::rho
+"
+
+CarpetIOASCII::out0D_vars		= "
+    Carpet::physical_time_per_hour
+"
+
+CarpetIOScalar::outscalar_vars		= "
+    HydroBase::rho
+    HydroBase::vel
+    HydroBase::w_lorentz
+    HydroBase::eps
+    HydroBase::press
+    THC_Core::dens
+    THC_Core::scon
+    THC_Core::tau
+    THC_M1::rE[0]
+    THC_M1::rFx[0]
+    THC_M1::rFy[0]
+    THC_M1::rFz[0]
+    THC_M1::rE[1]
+    THC_M1::rFx[1]
+    THC_M1::rFy[1]
+    THC_M1::rFz[1]
+    THC_M1::rE[2]
+    THC_M1::rFx[2]
+    THC_M1::rFy[2]
+    THC_M1::rFz[2]
+"
+
+CarpetIOASCII::out1d_vars		= "
+    HydroBase::rho
+    HydroBase::vel
+    HydroBase::w_lorentz
+    HydroBase::eps
+    HydroBase::press
+    THC_Core::dens
+    THC_Core::scon
+    THC_Core::tau
+    THC_LeakageBase::thc_leakage_optd
+"
+
+CarpetIOHDF5::out2d_vars		= "
+    HydroBase::rho
+    HydroBase::vel
+    HydroBase::w_lorentz
+    HydroBase::temperature
+    HydroBase::Y_e
+    THC_M1::chi[0]
+    THC_M1::rN[0]
+    THC_M1::rE[0]
+    THC_M1::rFx[0]
+    THC_M1::rFy[0]
+    THC_M1::rFz[0]
+"
+
+CarpetIOHDF5::out_vars		= "
+    HydroBase::rho
+    HydroBase::vel
+    HydroBase::w_lorentz
+    HydroBase::temperature
+    HydroBase::Y_e
+"
+
+CarpetIOASCII::one_file_per_group		= "no"
+IO::out_single_precision		= "yes"
+
+CarpetIOBasic::outinfo_every		= 1
+CarpetIOScalar::outscalar_criterion		= "divisor"
+CarpetIOScalar::outscalar_every		= 32
+CarpetIOASCII::out0d_criterion		= "divisor"
+CarpetIOASCII::out0d_every		= 64
+CarpetIOASCII::out1d_every		= 64
+CarpetIOHDF5::out2d_every		= 64
+CarpetIOHDF5::out_every		= 256
+
+# Analysis
+outflow::compute_every        = 64
+outflow::num_detectors        = 3
+outflow::surface_index[0]     = 0 #10
+outflow::surface_index[1]     = 1 #30
+outflow::surface_index[2]     = 2 #60
+outflow::interpolator_name    = "Lagrange polynomial interpolation"
+outflow::interpolator_pars    = "order=4"
+outflow::output_2d_data       = "yes"
+outflow::out_format           = ".7e"
+outflow::verbose              = 0
+
+outflow::threshold_on_var     = "eninf"
+outflow::num_thresholds       = 1 # default threshold is 0
+outflow::extra_variables      = "
+HydroBase::rho
+HydroBase::temperature
+HydroBase::Y_e
+THC_M1::radial_flux_1[0] # vvv For neutrino luminosity vvv
+THC_M1::radial_flux_1[1]
+THC_M1::radial_flux_1[2]
+ADMBase::alp
+THCCore::volform
+"
+
+sphericalsurface::nsurfaces              = 3
+
+sphericalsurface::maxnphi                = 240
+sphericalsurface::maxntheta              = 140
+sphericalsurface::nghostsphi[0]          = 2
+sphericalsurface::nghostsphi[1]          = 2
+sphericalsurface::nghostsphi[2]          = 2
+
+sphericalsurface::nghoststheta[0]        = 2
+sphericalsurface::nghoststheta[1]        = 2
+sphericalsurface::nghoststheta[2]        = 2
+
+sphericalsurface::nphi[0]                = 96
+sphericalsurface::nphi[1]                = 96
+sphericalsurface::nphi[2]                = 96
+sphericalsurface::ntheta[0]              = 55
+sphericalsurface::ntheta[1]              = 55
+sphericalsurface::ntheta[2]              = 55
+
+sphericalsurface::radius[0]              = 10
+sphericalsurface::radius[1]              = 30
+sphericalsurface::radius[2]              = 60
+
+sphericalsurface::set_spherical[0]       = yes
+sphericalsurface::set_spherical[1]       = yes
+sphericalsurface::set_spherical[2]       = yes
+
+sphericalsurface::symmetric_z[0]         = no
+sphericalsurface::symmetric_z[1]         = no
+sphericalsurface::symmetric_z[2]         = no
+
+# vim: set ft=sh tabstop=20 noexpandtab :
+# /* -*- Mode: C; indent-tabs-mode: t; tab-width: 20 -*- */
