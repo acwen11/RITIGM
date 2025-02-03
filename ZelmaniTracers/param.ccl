@@ -12,6 +12,10 @@ BOOLEAN tracers_with_leakage "interpolate leakage quantities on the tracer parti
 {
 } "yes"
 
+BOOLEAN seed_with_zsymm "Only seed tracers with z>0" STEERABLE=ALWAYS
+{
+} "no"
+
 BOOLEAN reset_tracers_on_recover "start with clean tracers upon recover" STEERABLE=ALWAYS
 {
 } "no"

@@ -40,7 +40,11 @@ void get_random_position(double *x,double *y,double *z, const int fam) {
   // const double thmin = seed_particles_theta_min[fam] * M_PI / 180; // convert to radians
   // const double thmax = seed_particles_theta_max[fam] * M_PI / 180;
 	const double thmin = 0.0;
-	const double thmax = M_PI;
+	double thmax;
+	if (seed_with_zsymm)
+		thmax = M_PI / 2.0;
+	else
+		thmax = M_PI;
 	// We want to uniformly sample in space:
 	double r3 = mkrand(pow(rmin,3), pow(rmax,3));
 	double costh = mkrand(cos(thmin), cos(thmax));
