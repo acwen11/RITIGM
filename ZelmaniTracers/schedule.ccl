@@ -11,6 +11,10 @@ if(tracers_with_leakage)
 {
   STORAGE: tracerleak
 }
+if(tracers_with_m1)
+{
+  STORAGE: tracerm1
+}
 STORAGE: tracerextra
 STORAGE: first_step
 STORAGE: tracers_out_of_domain

@@ -10,6 +10,10 @@ CCTK_INT ntracers "how many tracers do we want to use" STEERABLE=RECOVER
 
 BOOLEAN tracers_with_leakage "interpolate leakage quantities on the tracer particles" STEERABLE=ALWAYS
 {
+} "no"
+
+BOOLEAN tracers_with_m1 "interpolate M1 quantities on the tracer particles" STEERABLE=ALWAYS
+{
 } "yes"
 
 BOOLEAN seed_with_zsymm "Only seed tracers with z>0" STEERABLE=ALWAYS

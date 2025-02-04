@@ -238,6 +238,16 @@ extern "C" void ZelmaniTracers_InterpExtra(CCTK_ARGUMENTS)
   };
   int const nfields_leak = length(fields_leak);
 
+  // M1 quantities (only if tracers_with_m1 is yes)
+  Field const fields_m1[] = {
+    {"THC_M1::netabs",  tabs},
+    {"THC_M1::netheat",  theat},
+    {"THC_M1::nueave[0]",  teavg0},
+    {"THC_M1::nueave[1]",  teavg1},
+    {"THC_M1::nueave[2]",  teavg2}
+  };
+  int const nfields_m1 = length(fields_m1);
+
   // Select fields to interpolate
   vector<CCTK_INT> input_array_indices;
   vector<CCTK_INT> output_array_types;
@@ -262,6 +272,15 @@ extern "C" void ZelmaniTracers_InterpExtra(CCTK_ARGUMENTS)
       input_array_indices.push_back(CCTK_VarIndex(fields_leak[i].name));
       output_array_types.push_back(CCTK_VARIABLE_REAL);
       output_arrays.push_back(reinterpret_cast<void *>(fields_leak[i].data));
+    }
+  }
+  if(tracers_with_m1 && CCTK_IsThornActive("THC_M1"))
+  {
+    for(int i = 0; i < nfields_m1; ++i)
+    {
+      input_array_indices.push_back(CCTK_VarIndex(fields_m1[i].name));
+      output_array_types.push_back(CCTK_VARIABLE_REAL);
+      output_arrays.push_back(reinterpret_cast<void *>(fields_m1[i].data));
     }
   }
   int const ninputs = input_array_indices.size();

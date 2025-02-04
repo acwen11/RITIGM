@@ -55,6 +55,12 @@ CCTK_REAL tracerleak TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="no"'
   teave0, teave1,teave2
 } "Quantities from ZelmaniLeakage"
 
+CCTK_REAL tracerm1 TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="no"'
+{
+  tabs, theat,
+  teavg0, teavg1, teavg2
+} "Quantities from THC_M1"
+
 CCTK_REAL tracerextra TYPE=array DIM=1 SIZE=ntracers TAGS='Checkpoint="no"'
 {
   tgxx, tgxy, tgxz, tgyy, tgyz, tgzz
