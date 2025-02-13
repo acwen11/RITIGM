@@ -20,7 +20,7 @@ ActiveThorns = "
     CoordGauge
     EOS_Barotropic
     EOS_Thermal
-    EOS_Thermal_Extable
+    # EOS_Thermal_Extable
     EOS_Thermal_Table3d
     Fortran
     HydroBase
@@ -209,9 +209,10 @@ EOS_Omni::do_energy_shift   = "yes"
 ID_TabEOS_HydroQuantities::id_temperature_type = "constant"
 ID_TabEOS_HydroQuantities::id_entropy_type     = "constant"
 ID_TabEOS_HydroQuantities::id_entropy          = 1.5
-#ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDPex_norad.txt"
+# ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDPex_norad.txt"
 ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDP.txt"
 ID_TabEOS_HydroQuantities::rho_b_atm_max = 1e-13
+# ID_TabEOS_HydroQuantities::igm_T_atm = 1e-2
 
 ####################### THE THC WAY ###############################
 #ActiveThorns = "PizzaIDBase PizzaTOV ID_Switch_EOS"
@@ -264,6 +265,7 @@ HRSCCore::speed_eps			= 0.05
 THC_Core::atmo_rho			= 1e-13
 THC_Core::atmo_tolerance		= 0.0
 THC_Core::atmo_temperature		= 0.01
+THC_Core::atmo_Y_e			= 0.5
 
 THC_Core::c2a_BH_alp		= 0.15
 THC_Core::c2a_rho_strict		= 2e-5
@@ -271,10 +273,10 @@ THC_Core::c2a_set_to_nan_on_failure		= "no"
 THC_Core::c2a_fix_conservatives		= "yes"
 THC_Core::c2a_kill_on_failure		= "no"
 
-EOS_Thermal::evol_eos_name		= "Extable"
-EOS_Thermal_Extable::rho_max		= 1e10
-EOS_Thermal_Extable::temp_max		= 1000
-EOS_Thermal_Extable::extend_ye		= "yes"
+EOS_Thermal::evol_eos_name		= "Tabulated3d"
+# EOS_Thermal_Extable::rho_max		= 1e10
+# EOS_Thermal_Extable::temp_max		= 1000
+# EOS_Thermal_Extable::extend_ye		= "no"
 
 EOS_Thermal_Table3d::eos_db_loc		= "/work2/09319/acw6923/frontera/EOS"
 EOS_Thermal_Table3d::eos_folder		= "APRLDP_forTHC"
@@ -336,12 +338,14 @@ CarpetIOASCII::out0D_vars		= "
 "
 
 CarpetIOScalar::outscalar_vars		= "
+    ADMBase::alp
     HydroBase::rho
     HydroBase::vel
     HydroBase::w_lorentz
     HydroBase::eps
     HydroBase::press
     HydroBase::temperature
+    HydroBase::Y_e
     THC_Core::dens
     THC_Core::scon
     THC_Core::tau
@@ -357,6 +361,7 @@ CarpetIOScalar::outscalar_vars		= "
     THC_M1::rFx[2]
     THC_M1::rFy[2]
     THC_M1::rFz[2]
+    THC_M1::opacs
 "
 
 CarpetIOASCII::out1d_vars		= "
@@ -382,6 +387,17 @@ CarpetIOHDF5::out2d_vars		= "
     THC_M1::rFx[0]
     THC_M1::rFy[0]
     THC_M1::rFz[0]
+    THC_M1::rE[1]
+    THC_M1::rFx[1]
+    THC_M1::rFy[1]
+    THC_M1::rFz[1]
+    THC_M1::rE[2]
+    THC_M1::rFx[2]
+    THC_M1::rFy[2]
+    THC_M1::rFz[2]
+    THC_M1::opacs
+    THC_M1::netabs
+    THC_M1::netheat
 "
 
 CarpetIOHDF5::out_vars		= "

@@ -55,7 +55,7 @@ NewRad
 Outflow
 QuasiLocalMeasures 
 ReflectionSymmetry
-Seed_Magnetic_Fields_BNS 
+Seed_Magnetic_Fields
 Slab 
 SpaceMask 
 SphericalSurface 
@@ -636,11 +636,11 @@ quasilocalmeasures::surface_index[8]     = 11
 quasilocalmeasures::surface_index[9]     = 12
 
 # Parameters of thorn Seed_Magnetic_Fields_BNS (implementing Seed_Magnetic_Fields_Privt)
-Seed_Magnetic_Fields_BNS::A_b                                     = 94079.23592602537 # E_mag = 5e49
-Seed_Magnetic_Fields_BNS::enable_IllinoisGRMHD_staggered_A_fields = "yes"
-Seed_Magnetic_Fields_BNS::have_two_NSs_along_x_axis               = "yes"
-Seed_Magnetic_Fields_BNS::n_s                                     = 2
-Seed_Magnetic_Fields_BNS::P_cut                                   = 0.04 * 0.00016629
+Seed_Magnetic_Fields::A_b                                     = 94079.23592602537 # E_mag = 5e49
+Seed_Magnetic_Fields::enable_IllinoisGRMHD_staggered_A_fields = "yes"
+Seed_Magnetic_Fields::have_two_NSs_along_x_axis               = "yes"
+Seed_Magnetic_Fields::n_s                                     = 2
+Seed_Magnetic_Fields::P_cut                                   = 0.04 * 0.00016629
 
 # Parameters of thorn SpaceMask (implementing SpaceMask)
 SpaceMask::use_mask = "yes"
