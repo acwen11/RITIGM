@@ -168,7 +168,7 @@ Carpet::enable_all_storage       = "no"
 Carpet::ghost_size               = 3
 Carpet::init_3_timelevels        = "no"
 Carpet::init_fill_timelevels     = "yes"
-Carpet::max_refinement_levels    = 10
+Carpet::max_refinement_levels    = 9
 Carpet::output_timers_every      = 512
 Carpet::poison_new_timelevels    = "yes"
 Carpet::prolongation_order_space = 5
@@ -347,46 +347,46 @@ CarpetReduce::verbose = "no"
 #carpet::time_refinement_factors = "[1, 1, 2,  4,  8,  16,  32,  64,  128,  256]"
 
 carpetregrid2::num_centres               = 3
-carpetregrid2::num_levels_1              = 6 # Levels 0 to 5 already activated. 6 and 7 activate at merger. 8 activates at collapse. 9 can be activated if required
-carpetregrid2::num_levels_2              = 8
-carpetregrid2::num_levels_3              = 8
+carpetregrid2::num_levels_1              = 5 # Levels 0 to 4 already activated. 6 and 7 activate at merger. 8 activates at collapse. 9 can be activated if required
+carpetregrid2::num_levels_2              = 7
+carpetregrid2::num_levels_3              = 7
 
 carpetregrid2::position_x_1              = 0
 carpetregrid2::position_x_2              = -15.2 # Adjust according to ID. Corresponds to ~45 km sep.
 carpetregrid2::position_x_3              = 15.2
 
-carpetregrid2::radius_1[1]               = 1024 #dx=9.856
-carpetregrid2::radius_1[2]               = 512 #dx=4.928
-carpetregrid2::radius_1[3]               = 256 #dx=2.464
-carpetregrid2::radius_1[4]               = 128  #dx=1.232
-carpetregrid2::radius_1[5]               = 70  #dx=0.616
-carpetregrid2::radius_1[6]              = 40  #dx=0.308 #activated at merger
-carpetregrid2::radius_1[7]              = 20  #dx=0.154 #activated at merger
+#carpetregrid2::radius_1[1]               = 1024 #dx=9.856
+carpetregrid2::radius_1[1]               = 512 
+carpetregrid2::radius_1[2]               = 256 
+carpetregrid2::radius_1[3]               = 128 
+carpetregrid2::radius_1[4]               = 70  
+carpetregrid2::radius_1[5]              = 40 
+carpetregrid2::radius_1[6]              = 20
 
-carpetregrid2::radius_1[8]               = 3.2  #dx=0.077 #activated just before collapse
-carpetregrid2::radius_1[9]               = 2.4  #disabled
+carpetregrid2::radius_1[7]               = 3.2
+carpetregrid2::radius_1[8]               = 2.4 
 
 #during inspiral
 
-carpetregrid2::radius_2[1]               = 384 #dx=7.68
-carpetregrid2::radius_2[2]               = 192 #dx=3.84
-carpetregrid2::radius_2[3]               = 96  #dx=1.92
-carpetregrid2::radius_2[4]               = 48  #dx=0.96
-carpetregrid2::radius_2[5]               = 24  #dx=0.48
-carpetregrid2::radius_2[6]               = 18  #dx=0.24
-carpetregrid2::radius_2[7]               = 12  #dx=0.12
+#carpetregrid2::radius_2[1]               = 384 #dx=7.68
+carpetregrid2::radius_2[1]               = 192 
+carpetregrid2::radius_2[2]               = 96  
+carpetregrid2::radius_2[3]               = 48  
+carpetregrid2::radius_2[4]               = 24  
+carpetregrid2::radius_2[5]               = 18  
+carpetregrid2::radius_2[6]               = 12  
 
-carpetregrid2::radius_3[1]               = 384 #dx=7.68
-carpetregrid2::radius_3[2]               = 192 #dx=3.84
-carpetregrid2::radius_3[3]               = 96  #dx=1.92
-carpetregrid2::radius_3[4]               = 48  #dx=0.96
-carpetregrid2::radius_3[5]               = 24  #dx=0.48
-carpetregrid2::radius_3[6]               = 18  #dx=0.24
-carpetregrid2::radius_3[7]               = 12  #dx=0.12
+#carpetregrid2::radius_3[1]               = 384 
+carpetregrid2::radius_3[1]               = 192 
+carpetregrid2::radius_3[2]               = 96  
+carpetregrid2::radius_3[3]               = 48  
+carpetregrid2::radius_3[4]               = 24  
+carpetregrid2::radius_3[5]               = 18  
+carpetregrid2::radius_3[6]               = 12  
 
 ###
 
-carpetregrid2::regrid_every              = 64
+carpetregrid2::regrid_every              = 32
 carpetregrid2::snap_to_coarse            = yes
 carpetregrid2::symmetry_rotating180      = no
 carpetregrid2::verbose                   = no
@@ -406,11 +406,11 @@ CoordBase::boundary_shiftout_z_lower = 1
 
 CoordBase::domainsize            = "minmax"
 CoordBase::spacing               = "gridspacing"
-CoordBase::dx                    = 24.064
+CoordBase::dx                    = 12.032 #24.064
 CoordBase::dy                    = CoordBase::dx
 CoordBase::dz                    = CoordBase::dx
-CoordBase::xmin                  = -1997.312
-CoordBase::xmax                  = 1997.312
+CoordBase::xmin                  = -1022.72
+CoordBase::xmax                  = 1022.72
 CoordBase::ymin                  = CoordBase::xmin
 CoordBase::ymax                  = CoordBase::xmax
 CoordBase::zmin                  = 0.0
