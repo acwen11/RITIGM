@@ -55,7 +55,7 @@ NewRad
 Outflow
 QuasiLocalMeasures 
 ReflectionSymmetry
-Seed_Magnetic_Fields_BNS 
+Seed_Magnetic_Fields
 Slab 
 SpaceMask 
 SphericalSurface 
@@ -77,7 +77,7 @@ VolumeIntegrals_vacuum
 WeakRates
 WeylScal4 
 WVU_EOS 
-ZelmaniTracers
+#ZelmaniTracers
 zlib
 "
 
@@ -161,7 +161,7 @@ BNSTrackerGen::index_region3 = 0
 
 # Parameters of thorn Cactus (implementing Cactus)
 Cactus::cctk_full_warnings = "yes"
-Cactus::cctk_itlast        = 128
+Cactus::cctk_itlast        = 512
 Cactus::cctk_run_title     = "IGM_APR4_BNS_Magnetized"
 Cactus::terminate          = "iteration"
 
@@ -189,7 +189,7 @@ CarpetInterp::tree_search       = "yes"
 
 # Parameters of thorn CarpetIOASCII (implementing IOASCII)
 CarpetIOASCII::one_file_per_group     = "no"
-CarpetIOASCII::out0D_every            = -1
+CarpetIOASCII::out0D_every            = 64
 CarpetIOASCII::out0D_vars             = "
   Carpet::physical_time_per_hour
   carpet::timing
@@ -236,9 +236,6 @@ CarpetIOHDF5::out2D_vars                    = "
   ADMBase::curv
   ADMBase::lapse
   ADMBase::shift
-  HydroBase::rho
-  HydroBase::temperature
-  HydroBase::Y_e
   IllinoisGRMHD::rho_b
   IllinoisGRMHD::igm_Ye
   IllinoisGRMHD::igm_temperature
@@ -450,11 +447,11 @@ CoordBase::xmin                  = -35008.512
 CoordBase::xmax                  = 35008.512 
 CoordBase::ymin                  = CoordBase::xmin
 CoordBase::ymax                  = CoordBase::xmax
-CoordBase::zmin                  = 0
+CoordBase::zmin                  = 0.0
 CoordBase::zmax                  = CoordBase::xmax
 
 #---------ReflectionSymmetry---------
-ReflectionSymmetry::verbose = "yes"
+ReflectionSymmetry::verbose = "no"
 ReflectionSymmetry::reflection_z = "yes"
 ReflectionSymmetry::avoid_origin_z = "no"
 
@@ -639,11 +636,11 @@ quasilocalmeasures::surface_index[8]     = 11
 quasilocalmeasures::surface_index[9]     = 12
 
 # Parameters of thorn Seed_Magnetic_Fields_BNS (implementing Seed_Magnetic_Fields_Privt)
-Seed_Magnetic_Fields_BNS::A_b                                     = 94079.23592602537 # E_mag = 5e49
-Seed_Magnetic_Fields_BNS::enable_IllinoisGRMHD_staggered_A_fields = "yes"
-Seed_Magnetic_Fields_BNS::have_two_NSs_along_x_axis               = "yes"
-Seed_Magnetic_Fields_BNS::n_s                                     = 2
-Seed_Magnetic_Fields_BNS::P_cut                                   = 0.04 * 0.00016629
+Seed_Magnetic_Fields::A_b                                     = 94079.23592602537 # E_mag = 5e49
+Seed_Magnetic_Fields::enable_IllinoisGRMHD_staggered_A_fields = "yes"
+Seed_Magnetic_Fields::have_two_NSs_along_x_axis               = "yes"
+Seed_Magnetic_Fields::n_s                                     = 2
+Seed_Magnetic_Fields::P_cut                                   = 0.04 * 0.00016629
 
 # Parameters of thorn SpaceMask (implementing SpaceMask)
 SpaceMask::use_mask = "yes"
@@ -733,19 +730,19 @@ sphericalsurface::set_spherical[10]       = yes
 sphericalsurface::set_spherical[11]       = yes
 sphericalsurface::set_spherical[12]       = yes
 
-sphericalsurface::symmetric_z[0]         = yes 
-sphericalsurface::symmetric_z[1]         = yes 
-sphericalsurface::symmetric_z[2]         = yes 
-sphericalsurface::symmetric_z[3]         = yes 
-sphericalsurface::symmetric_z[4]         = yes 
-sphericalsurface::symmetric_z[5]         = yes 
-sphericalsurface::symmetric_z[6]         = yes 
-sphericalsurface::symmetric_z[7]         = yes 
-sphericalsurface::symmetric_z[8]         = yes 
-sphericalsurface::symmetric_z[9]         = yes 
-sphericalsurface::symmetric_z[10]         = yes
-sphericalsurface::symmetric_z[11]         = yes
-sphericalsurface::symmetric_z[12]         = yes
+sphericalsurface::symmetric_z[0]         = no
+sphericalsurface::symmetric_z[1]         = no
+sphericalsurface::symmetric_z[2]         = no
+sphericalsurface::symmetric_z[3]         = no
+sphericalsurface::symmetric_z[4]         = no
+sphericalsurface::symmetric_z[5]         = no
+sphericalsurface::symmetric_z[6]         = no
+sphericalsurface::symmetric_z[7]         = no
+sphericalsurface::symmetric_z[8]         = no
+sphericalsurface::symmetric_z[9]         = no
+sphericalsurface::symmetric_z[10]         = no
+sphericalsurface::symmetric_z[11]         = no
+sphericalsurface::symmetric_z[12]         = no
 
 # Parameters of thorn TerminationTrigger (implementing TerminationTrigger)
 TerminationTrigger::create_termination_file = "yes"
@@ -763,6 +760,7 @@ THC_M1::source_Ye_min                                       = 0.005
 THC_M1::source_Ye_max                                       = 0.655
 THC_M1::source_limiter                                      = 0.5
 THC_M1::floor_tol                                           = 0.0
+THC_M1::m1_dis																							= 0.1
 
 THC_M1::verbose                                             = "yes"
 
@@ -858,31 +856,31 @@ VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[13] = 300
 WeylScal4::fd_order = "4th"
 
 #--------ZelmaniTracers----------------------
-ZelmaniTracers::tracers_with_leakage    = "no"
-ZelmaniTracers::ntracers    = 80000
-Zelmanitracers::interpolator_options = "order=2"
-ZelmaniTracers::reset_tracers_on_recover                    = "no"
-
-ZelmaniTracers::seed_method = "randomize_vol"
-ZelmaniTracers::init_dens_min = IllinoisGRMHD::rho_b_atm_max * 1e4
-
-zelmanitracers::tracerproblem = "BinaryNS"
-zelmanitracers::center_ns1[0] = 15.2
-zelmanitracers::center_ns1[1] = 0.0
-zelmanitracers::center_ns1[2] = 0.0
-
-zelmanitracers::center_ns2[0] = -15.2
-zelmanitracers::center_ns2[1] = 0.0
-zelmanitracers::center_ns2[2] = 0.0
-
-zelmanitracers::rad_max[0] = 10.0
-zelmanitracers::rad_min[0] = 0.0
-
-zelmanitracers::rad_max[1] = 10.0
-zelmanitracers::rad_min[1] = 0.0
-
-ZelmaniTracers::outTracers_every    = 128
-ZelmaniTracers::output_extra_fields   = "yes"
+# ZelmaniTracers::tracers_with_leakage    = "no"
+# ZelmaniTracers::ntracers    = 80000
+# Zelmanitracers::interpolator_options = "order=2"
+# ZelmaniTracers::reset_tracers_on_recover                    = "no"
+# 
+# ZelmaniTracers::seed_method = "randomize_vol"
+# ZelmaniTracers::init_dens_min = IllinoisGRMHD::rho_b_atm_max * 1e4
+# 
+# zelmanitracers::tracerproblem = "BinaryNS"
+# zelmanitracers::center_ns1[0] = 15.2
+# zelmanitracers::center_ns1[1] = 0.0
+# zelmanitracers::center_ns1[2] = 0.0
+# 
+# zelmanitracers::center_ns2[0] = -15.2
+# zelmanitracers::center_ns2[1] = 0.0
+# zelmanitracers::center_ns2[2] = 0.0
+# 
+# zelmanitracers::rad_max[0] = 10.0
+# zelmanitracers::rad_min[0] = 0.0
+# 
+# zelmanitracers::rad_max[1] = 10.0
+# zelmanitracers::rad_min[1] = 0.0
+# 
+# ZelmaniTracers::outTracers_every    = 128
+# ZelmaniTracers::output_extra_fields   = "yes"
 
 # TimerReport ################################################
 
