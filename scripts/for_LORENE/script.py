@@ -6,7 +6,7 @@ import os
 from tabulated_eos_fcts import read_and_slice_EOS_table_at_given_temperature
 import numpy as np
 # Set table path and the slicing temperature
-tablepath = os.path.join(".","SLy4_3335_rho391_temp163_ye66_adjusted.h5")
+tablepath = os.path.join(".","Hempel_DD2EOS_rho234_temp180_ye60_version_1.1_20120817_adj_mineps0.h5")
 slicetemp = 0.01 # in MeV
 # This command will provide the 1D interpolators we need, i.e.
 # P(rho), eps(rho), and Y_{e}(rho) in beta-equilibrium at

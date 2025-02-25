@@ -6,7 +6,7 @@ from bisect import bisect_left                  # Bisection algorithm
 import h5py as h5                               # HDF5 file system support
 from collections import namedtuple              # C-like struct functionality
 # 1d and 2d interpolating functions
-from scipy.interpolate import interp1d, interp2d
+from scipy.interpolate import interp1d, RectBivariateSpline
 import bisect                                   # Bisection algorithms
 import astropy.constants as constants
 from numpy import empty, array, zeros, log, exp, loadtxt
@@ -124,9 +124,9 @@ def read_and_slice_EOS_table_at_given_temperature(eos_file_path, T_in_MeV):
 
     # Set 2d interpolators for P and eps
     # as functions of rho and Ye
-    lp_interp = interp2d(tab_lr, tab_Ye, tab_lp[:, T_idx, :])
-    le_interp = interp2d(tab_lr, tab_Ye, tab_le[:, T_idx, :])
-    ent_interp = interp2d(tab_lr, tab_Ye, tab_ent[:, T_idx, :])
+    lp_interp = RectBivariateSpline(tab_lr, tab_Ye, tab_lp[:, T_idx, :].T)
+    le_interp = RectBivariateSpline(tab_lr, tab_Ye, tab_le[:, T_idx, :].T)
+    ent_interp = RectBivariateSpline(tab_lr, tab_Ye, tab_ent[:, T_idx, :].T)
 
     # Now, loop over the density and set the array
     Ye_be = empty(len(tab_lr))
@@ -137,7 +137,7 @@ def read_and_slice_EOS_table_at_given_temperature(eos_file_path, T_in_MeV):
     for rho_idx in range(len(tab_lr)):
         # Set the interpolator
         #         Ye_ito_munu_of_T_and_rho = interp1d(munu[:,T_idx,rho_idx],tab_Ye)
-        Ye_ito_munu_of_T_and_rho = interp1d(mu_l[:, T_idx, rho_idx], tab_Ye)
+        Ye_ito_munu_of_T_and_rho = interp1d(mu_l[:, T_idx, rho_idx], tab_Ye, kind="cubic")
         # Then find the value of Ye which sets munu to zero
         try:
             YeL = Ye_ito_munu_of_T_and_rho(0.0)
@@ -183,11 +183,11 @@ def read_and_slice_EOS_table_at_given_temperature(eos_file_path, T_in_MeV):
     tab_lr = log(exp(tab_lr)/units_of_density)
 
     # Functions to interpolate P and eps
-    lr_of_lp = interp1d(lp_be, tab_lr)
-    lp_of_lr = interp1d(tab_lr, lp_be)
-    le_of_lr = interp1d(tab_lr, le_be)
-    ye_of_lr = interp1d(tab_lr, Ye_be)
-    lent_of_lr = interp1d(tab_lr, log(ent_be))
+    lr_of_lp = interp1d(lp_be, tab_lr, kind="cubic")
+    lp_of_lr = interp1d(tab_lr, lp_be, kind="cubic")
+    le_of_lr = interp1d(tab_lr, le_be, kind="cubic")
+    ye_of_lr = interp1d(tab_lr, Ye_be, kind="cubic")
+    lent_of_lr = interp1d(tab_lr, log(ent_be), kind="cubic")
 
     def rho_of_P_func(P):
         return exp(lr_of_lp(log(P)))
