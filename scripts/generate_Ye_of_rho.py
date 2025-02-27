@@ -4,7 +4,8 @@
 from bisect import bisect_left
 from numpy import array, empty
 from h5py import File as h5open
-from scipy.interpolate import interp1d, interp2d
+#from scipy.interpolate import interp1d, interp2d
+from scipy.interpolate import interp1d, RectBivariateSpline
 
 class EOS_beq:
     def __init__(self,
@@ -45,8 +46,8 @@ def read_and_slice_EOS_table_at_given_temperature(eos_file_path, T_in_MeV):
 
     # Set 2d interpolators for P and eps
     # as functions of rho and Ye
-    P_interp   = interp2d(tab_rho,tab_Ye,tab_P[  :,T_idx,:])
-    eps_interp = interp2d(tab_rho,tab_Ye,tab_eps[:,T_idx,:])
+    P_interp   = RectBivariateSpline(tab_rho,tab_Ye,tab_P[  :,T_idx,:].T, kx = 1, ky = 1)
+    eps_interp = RectBivariateSpline(tab_rho,tab_Ye,tab_eps[:,T_idx,:].T, kx = 1, ky = 1)
 
     # Now, loop over the density and set the array
     Ye_be  = empty(len(tab_rho))
@@ -57,7 +58,7 @@ def read_and_slice_EOS_table_at_given_temperature(eos_file_path, T_in_MeV):
 
     for rho_idx in range(len(tab_rho)):
         # Set the interpolator
-        Ye_ito_munu_of_T_and_rho = interp1d(munu[:,T_idx,rho_idx],tab_Ye)
+        Ye_ito_munu_of_T_and_rho = interp1d(munu[:,T_idx,rho_idx],tab_Ye, kind="cubic")
         # Then find the value of Ye which sets munu to zero
         try:
             Ye_be[rho_idx]  = Ye_ito_munu_of_T_and_rho(0.0)
@@ -101,10 +102,10 @@ def read_and_slice_EOS_table_at_given_temperature(eos_file_path, T_in_MeV):
     eps_be  /= units_of_spec_int_energy
 
     # Functions to interpolate P and eps
-    P_of_rho   = interp1d(P_be   ,tab_rho)
-    rho_of_P   = interp1d(tab_rho,P_be)
-    eps_of_rho = interp1d(tab_rho,eps_be)
-    Ye_of_rho  = interp1d(tab_rho,Ye_be)
+    P_of_rho   = interp1d(P_be   ,tab_rho, kind="cubic")
+    rho_of_P   = interp1d(tab_rho,P_be, kind="cubic")
+    eps_of_rho = interp1d(tab_rho,eps_be, kind="cubic")
+    Ye_of_rho  = interp1d(tab_rho,Ye_be, kind="cubic")
 
     # Set the EOS tuple
     return EOS_beq(tab_rho, tab_temp[T_idx], P_of_rho, rho_of_P, eps_of_rho, Ye_of_rho,
