@@ -55,15 +55,10 @@ CCTK_STRING id_temperature_type "Type of initial temperature"
 {
   "constant"  :: "Constant initial temperature"
   "from file" :: "Read initial temperature from file (as a function of density)"
+  "from entropy" :: "Constant initial entropy"
 } "constant"
 
 restricted:
-CCTK_STRING id_entropy_type "Type of initial entropy"
-{
-  "constant"   :: "Constant initial entropy"
-  "from table" :: "Set initial entropy from (rho,Ye,T) using the EOS table"
-} "from table"
-
 CCTK_REAL id_entropy "Initial entropy (constant everywhere)"
 {
   0:* :: "Should be positive"

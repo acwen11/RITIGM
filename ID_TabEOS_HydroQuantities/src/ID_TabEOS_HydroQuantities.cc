@@ -52,13 +52,16 @@ extern "C" void ID_TabEOS_HydroQuantities__initial_Y_e( const CCTK_INT  npoints,
   }
 }
 
-// Set initial temperature to be constant everywhere (TODO: add other options)
+// Set initial temperature to be constant everywhere
 extern "C" void ID_TabEOS_HydroQuantities__initial_temperature( const cGH *cctkGH, 
 																																const CCTK_INT imax,
 																																const CCTK_INT jmax,
 																																const CCTK_INT kmax,
 																																const CCTK_INT  npoints,
 																																CCTK_REAL *restrict r,
+                                                                CCTK_REAL *restrict rho,
+                                                                CCTK_REAL *restrict Y_e,
+                                                                CCTK_REAL *restrict entropy,
                                                                 CCTK_REAL *restrict temperature ) {
 
   DECLARE_CCTK_PARAMETERS;
@@ -72,15 +75,58 @@ extern "C" void ID_TabEOS_HydroQuantities__initial_temperature( const cGH *cctkG
 				const CCTK_REAL r_pow_T			= atmo_falloff_T ? r_power_T : 0.;
 				const CCTK_REAL r_atmo      = std::max(r_atmo_min, r[index]);
 				const CCTK_REAL id_T_atm    = std::max(igm_T_atm*std::pow(r_atmo / r_atmo_min, r_pow_T), nuc_eos::eos_tempmin);
-				// Constant in inner atmosphere.
-				if( r[index] < r_atmo_min) {
-					temperature[index] = igm_T_atm;
+
+				if (CCTK_Equals(id_temperature_type, "constant")) {
+					// Constant in inner atmosphere.
+					if( r[index] < r_atmo_min) {
+						temperature[index] = igm_T_atm;
+					}
+					// Radial Falloff in outer atmosphere.
+					else {
+						temperature[index] = id_T_atm;
+					}
+					// Fill entropy with dummy values
+					entropy[index] = 0.0;
 				}
-				// Radial Falloff in outer atmosphere.
-				else {
-					temperature[index] = id_T_atm;
-				}
-    }
+				else if (CCTK_Equals(id_temperature_type, "from entropy")) {
+					assert(CCTK_EQUALS( initial_entropy,"ID_TabEOS_HydroQuantities" ));
+
+					// Constant Entropy
+					entropy[index] = id_entropy;
+
+					CCTK_REAL xrho     = rho[index];
+					if (xrho > rho_b_atm_max) {
+						CCTK_REAL xye     = Y_e[index];
+						CCTK_REAL xtemp   = 0.0;
+						CCTK_REAL xent    = id_entropy;
+
+						// Prepare for EoS function call
+						const CCTK_INT  eoskey       = EOS_Omni_GetHandle("nuc_eos");
+						const CCTK_REAL rf_precision = 1e-10; // This is a dummy variable
+						CCTK_REAL dummy        = 0.0;
+						CCTK_INT  keyerr       = 0;
+						CCTK_INT  anyerr       = 0;
+						// use havetemp = 2 to get T from S
+						EOS_Omni_short(eoskey,2,rf_precision,1,
+													 &xrho,&dummy,&xtemp,&xye,&dummy,&xent,
+													 &dummy,&dummy,&dummy,&dummy,&dummy,
+													 &keyerr,&anyerr);
+
+						temperature[index] = xtemp;
+					}
+					else { // Set to atmo
+						// Constant in inner atmosphere.
+						if( r[index] < r_atmo_min) {
+							temperature[index] = igm_T_atm;
+						}
+						// Radial Falloff in outer atmosphere.
+						else {
+							temperature[index] = id_T_atm;
+						}
+					}
+				} // if id_T = from S
+
+	} // grid loop
 }
   
 // Now recompute all HydroQuantities, to ensure consistent initial data
@@ -143,25 +189,14 @@ extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const 
 						CCTK_REAL xtemp   = temperature[index];
 						CCTK_REAL xpress  = 0.0;
 						CCTK_REAL xeps    = 0.0;
-						CCTK_REAL xent    = 0.0;
+						CCTK_REAL xent    = entropy[index];
 						dummy             = 0.0;
-						if( initialize_entropy ) {
-							if (CCTK_Equals(id_entropy_type, "constant")) {
-								xent = id_entropy;
-								// use havetemp = 2 to get T from S
-								EOS_Omni_short(eoskey,2,rf_precision,1,
-															 &xrho,&xeps,&xtemp,&xye,&xpress,&xent,
-															 &dummy,&dummy,&dummy,&dummy,&dummy,
-															 &keyerr,&anyerr);
-								temperature[index] = xtemp;
-							}
-							else if (CCTK_Equals(id_entropy_type, "from table")) {
+						if( initialize_entropy && CCTK_Equals(id_temperature_type, "constant")) {
 								// Only call EOS_Omni_short() if we need the entropy.
 								EOS_Omni_short(eoskey,havetemp,rf_precision,1,
 															 &xrho,&xeps,&xtemp,&xye,&xpress,&xent,
 															 &dummy,&dummy,&dummy,&dummy,&dummy,
 															 &keyerr,&anyerr);
-							}
 						}
 						else {
 							// Otherwise use EOS_Omni_press(), which performs fewer
@@ -182,7 +217,7 @@ extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const 
 						CCTK_REAL id_temp_atm  = temperature[index];
 						CCTK_REAL id_press_atm = 0.0;
 						CCTK_REAL id_eps_atm   = 0.0;
-						CCTK_REAL id_ent_atm   = 0.0;
+						CCTK_REAL id_ent_atm   = 0.0; // Previous func does not account for S_atm
 						dummy 								 = 0.0;
 						if( initialize_entropy ) {
 							// Only call EOS_Omni_short() if we need the entropy.
@@ -199,15 +234,13 @@ extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const 
 														 &keyerr,&anyerr);
 						}
 
-						// CCTK_VINFO("Performing atm reset: rho = %e at r = %g.", id_rho_atm, r[index]);
-
 						rho[          index] = id_rho_atm;
 						Y_e[          index] = id_Y_e_atm;
 						temperature[  index] = id_temp_atm;
 						press[        index] = id_press_atm;
 						eps[          index] = id_eps_atm;
 						vel[          index] = 0.0;
-						vel[npoints  +index] = 0.0; //TODO: Check if this is right
+						vel[npoints  +index] = 0.0;
 						vel[2*npoints+index] = 0.0;
 						if( initialize_entropy )
 							entropy[    index] = id_ent_atm;
@@ -327,7 +360,7 @@ extern "C" void ID_TabEOS_HydroQuantities(CCTK_ARGUMENTS) {
     CCTK_VInfo(CCTK_THORNSTRING,"temperature initialization is ENABLED!");
     // Initialize the temperature
     ID_TabEOS_HydroQuantities__initial_temperature( cctkGH, cctk_lsh[0], cctk_lsh[1], cctk_lsh[2], 
-																										npoints, r, temperature );
+																										npoints, r, rho, Y_e, entropy, temperature );
   }
   else {
     CCTK_VInfo(CCTK_THORNSTRING,"temperature initialization is DISABLED!");
