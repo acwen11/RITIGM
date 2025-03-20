@@ -178,9 +178,9 @@ Seed_Magnetic_Fields::n_s = 2
 Seed_Magnetic_Fields::P_cut = 0.04 * 0.0003472
 
 #---------ID_TabEOS_HydroQuantities---------
-ID_TabEOS_HydroQuantities::id_temperature_type = "constant"
-ID_TabEOS_HydroQuantities::id_entropy_type     = "from table"
-ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/stampede3/EOS/Ye_beq_DD2.txt"
+ID_TabEOS_HydroQuantities::id_temperature_type = "from entropy"
+ID_TabEOS_HydroQuantities::id_entropy = 0.5
+ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/stampede3/EOS/Ye_beq_DD2_s0.5.txt"
 
 #---------IllinoisGRMHD---------
 # Setting up the EOS parameters like this
