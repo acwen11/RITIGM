@@ -18,11 +18,11 @@ void VI_GRMHD_DoSum(CCTK_ARGUMENTS)
   /* FIXME: Add this symmetry stuff... Should be straightforward. */
   CCTK_REAL sym_factor1,sym_factor2,sym_factor3;
 
-  if (CCTK_EQUALS(domain,"bitant")){
+  if (CCTK_EQUALS(VIdomain,"bitant")){
     sym_factor1 = 2.0e0;
     sym_factor2 = 2.0e0;
     sym_factor3 = 0.0e0;
-  } else if (CCTK_EQUALS(domain,"octant")){
+  } else if (CCTK_EQUALS(VIdomain,"octant")){
     sym_factor1 = 8.0e0;
     sym_factor2 = 0.0e0;
     sym_factor3 = 0.0e0;

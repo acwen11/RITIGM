@@ -3,15 +3,22 @@
 
 shares: grid
 
-USES KEYWORD domain
-
-
 private:
 
 CCTK_INT enable_file_output "Enable output file" STEERABLE = RECOVER
 {
   0:1 :: "0 = no output; 1 = yes, output to file"
 } 1
+
+KEYWORD VIdomain "Domain type"
+{
+  "octant"     :: "Use an octant about the origin"
+  "quadrant"   :: "Use a quadrant in x-y plane"
+  "quadrant_reflect_rotate" :: "Use a quadrant with rotation symmetry about an axis"
+  "bitant"     :: "Use a bitant about the x-y plane"
+  "bitant_rotate"   :: "Use a bitant with rotation symmetry about an axis"
+  "full"       :: "Use the full domain"
+} "full"
 
 STRING outVolIntegral_dir "Output directory for volume integration output files, overrides IO::out_dir" STEERABLE = RECOVER
 {

@@ -518,7 +518,7 @@ multipole::radius[2]                     = 100
 multipole::radius[3]                     = 200
 multipole::radius[4]                     = 500
 multipole::radius[5]                     = 850
-multipole::radius[6]                     = 1700
+multipole::radius[6]                     = 1000
 Multipole::variables    = "WeylScal4::Psi4r{sw=-2 cmplx='WeylScal4::Psi4i' name='psi4'}"
 
 # Parameters of thorn NaNChecker (implementing NaNChecker)
@@ -549,7 +549,7 @@ outflow::surface_index[2]     = 4 #100
 outflow::surface_index[3]     = 5 #200
 outflow::surface_index[4]     = 6 #500
 outflow::surface_index[5]     = 7 #850
-outflow::surface_index[6]     = 8 #1700
+outflow::surface_index[6]     = 8 #1000
 #outflow::extra_variables      = "grid::x grid::y"
 outflow::interpolator_name    = "Lagrange polynomial interpolation"
 outflow::interpolator_pars    = "order=4"
@@ -647,7 +647,7 @@ sphericalsurface::radius[4]              = 100
 sphericalsurface::radius[5]              = 200
 sphericalsurface::radius[6]              = 500
 sphericalsurface::radius[7]              = 850
-sphericalsurface::radius[8]              = 2000
+sphericalsurface::radius[8]              = 1000
 
 sphericalsurface::set_spherical[2]       = yes
 sphericalsurface::set_spherical[3]       = yes
@@ -684,15 +684,14 @@ TmunuBase::stress_energy_storage = "yes"
 TmunuBase::timelevels            = 1
 
 # Parameters of thorn VolumeIntegrals_GRMHD (implementing VolumeIntegrals_GRMHD)
-VolumeIntegrals_GRMHD::NumIntegrals = 15
-VolumeIntegrals_GRMHD::VolIntegral_out_every = 256
+VolumeIntegrals_GRMHD::verbose = 1
+VolumeIntegrals_GRMHD::VIdomain = "bitant"
 
+VolumeIntegrals_GRMHD::VolIntegral_out_every = 256
 VolumeIntegrals_GRMHD::enable_file_output = 1
 VolumeIntegrals_GRMHD::outVolIntegral_dir = "$parfile/volume_integration"
-VolumeIntegrals_GRMHD::verbose = 1
 
-#   The AMR centre will only track the first referenced integration quantities that track said centre.
-#   Thus, centeroflapse output will not feed back into the AMR centre positions.
+VolumeIntegrals_GRMHD::NumIntegrals = 15
 
 VolumeIntegrals_GRMHD::Integration_quantity_keyword[1] = "thermal_energy"
 VolumeIntegrals_GRMHD::Integration_quantity_keyword[2] = "kinetic_energy"

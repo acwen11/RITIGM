@@ -54,7 +54,7 @@ NewRad
 Outflow
 QuasiLocalMeasures 
 ReflectionSymmetry
-Seed_Magnetic_Fields_BNS 
+Seed_Magnetic_Fields
 Slab 
 SpaceMask 
 SphericalSurface 
@@ -424,7 +424,7 @@ ReflectionSymmetry::avoid_origin_z = "no"
 # Parameters of thorn EOS_Omni (implementing EOS_Omni)
 EOS_Omni::do_energy_shift   = "yes"
 EOS_Omni::nuceos_read_table = "yes"
-EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/stampede3/EOS/Hempel_DD2EOS_rho234_temp180_ye60_version_1.1_20120817_ext_adj_mineps0.h5"
+EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/stampede3/EOS/Hempel_DD2EOS_rho234_temp180_ye60_version_1.1_20120817_adj_mineps0.h5"
 
 # Parameters of thorn HydroBase (implementing HydroBase)
 HydroBase::initial_Aphi        = "zero"
@@ -438,7 +438,7 @@ HydroBase::timelevels          = 3
 # Parameters of thorn ID_TabEOS_HydroQuantities (implementing ID_tabEOS_HydroQuantities)
 ID_TabEOS_HydroQuantities::id_temperature_type = "constant"
 ID_TabEOS_HydroQuantities::id_entropy_type     = "from table"
-ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/stampede3/EOS/Ye_beq_DD2_ext.txt"
+ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/stampede3/EOS/Ye_beq_DD2.txt"
 
 # Parameters of thorn IllinoisGRMHD (implementing IllinoisGRMHD)
 IllinoisGRMHD::Symmetry = "equatorial"
@@ -446,7 +446,7 @@ IllinoisGRMHD::Symmetry = "equatorial"
 IllinoisGRMHD::igm_eos_table_ceiling_safety_factor = 1
 IllinoisGRMHD::igm_eos_table_floor_safety_factor   = 1
 
-IllinoisGRMHD::igm_PPM_reconstructed_variable = "pressure"
+IllinoisGRMHD::igm_PPM_reconstructed_variable = "temperature"
 IllinoisGRMHD::igm_con2prim_routine           = "Palenzuela1D"
 IllinoisGRMHD::igm_con2prim_backup_routine[0] = "Newman1D"
 IllinoisGRMHD::igm_eos_type                   = "Tabulated"
@@ -462,10 +462,8 @@ IllinoisGRMHD::palenzuela_depsdT_threshold    = 1e-100 # Set to 1e100/1e-100 to 
 IllinoisGRMHD::tau_atm_hybrid                 = 1e-20
 
 # Graded Atmo params
-IllinoisGRMHD::atmo_falloff                   = "yes"
-IllinoisGRMHD::atmo_falloff_T                 = "yes"
-IllinoisGRMHD::r_power 			                  = -6
-IllinoisGRMHD::r_power_T 			                = -0.4111701437845368
+IllinoisGRMHD::atmo_falloff                   = "no"
+IllinoisGRMHD::atmo_falloff_T                 = "no"
 IllinoisGRMHD::rho_b_atm_max                  = 1e-13
 IllinoisGRMHD::igm_Ye_atm                     = 0.5
 IllinoisGRMHD::igm_T_atm                      = 1e-2
@@ -491,7 +489,7 @@ IOUtil::recover_dir                     = "../checkpoints"
 
 #---------KadathImporter----------
 KadathImporter::type = "BNS"
-KadathImporter::filename = "/work2/09319/acw6923/frontera/EOS/BNS_ECC_RED.DD2.30.47.0.0.2.7.q1.0.0.13.info"
+KadathImporter::filename = "/work2/09319/acw6923/stampede3/EOS/BNS_ECC_RED.DD2.30.47.0.0.2.7.q1.0.0.13.info"
 
 # Parameters of thorn MHD_Diagnostics
 MHD_Diagnostics::diagnostics_compute_every = 256
@@ -518,7 +516,7 @@ multipole::radius[2]                     = 100
 multipole::radius[3]                     = 200
 multipole::radius[4]                     = 500
 multipole::radius[5]                     = 850
-multipole::radius[6]                     = 1700
+multipole::radius[6]                     = 1000
 Multipole::variables    = "WeylScal4::Psi4r{sw=-2 cmplx='WeylScal4::Psi4i' name='psi4'}"
 
 # Parameters of thorn NaNChecker (implementing NaNChecker)
@@ -549,7 +547,7 @@ outflow::surface_index[2]     = 4 #100
 outflow::surface_index[3]     = 5 #200
 outflow::surface_index[4]     = 6 #500
 outflow::surface_index[5]     = 7 #850
-outflow::surface_index[6]     = 8 #1700
+outflow::surface_index[6]     = 8 #1000
 #outflow::extra_variables      = "grid::x grid::y"
 outflow::interpolator_name    = "Lagrange polynomial interpolation"
 outflow::interpolator_pars    = "order=4"
@@ -586,12 +584,12 @@ quasilocalmeasures::surface_index[3]     = 6
 quasilocalmeasures::surface_index[4]     = 7
 quasilocalmeasures::surface_index[5]     = 8
 
-# Parameters of thorn Seed_Magnetic_Fields_BNS (implementing Seed_Magnetic_Fields_Privt)
-Seed_Magnetic_Fields_BNS::A_b                                     = 94079.23592602537 # E_mag = 5e49
-Seed_Magnetic_Fields_BNS::enable_IllinoisGRMHD_staggered_A_fields = "yes"
-Seed_Magnetic_Fields_BNS::have_two_NSs_along_x_axis               = "yes"
-Seed_Magnetic_Fields_BNS::n_s                                     = 2
-Seed_Magnetic_Fields_BNS::P_cut                                   = 0.04 * 0.00016629
+# Parameters of thorn Seed_Magnetic_Fields
+Seed_Magnetic_Fields::A_b                                     = 33843.57422438454 # E_mag = 5e49
+Seed_Magnetic_Fields::enable_IllinoisGRMHD_staggered_A_fields = "yes"
+Seed_Magnetic_Fields::have_two_NSs_along_x_axis               = "yes"
+Seed_Magnetic_Fields::n_s                                     = 2
+Seed_Magnetic_Fields::P_cut                                   = 0.04 * 0.000114078705145154
 
 # Parameters of thorn SpaceMask (implementing SpaceMask)
 SpaceMask::use_mask = "yes"
@@ -647,7 +645,7 @@ sphericalsurface::radius[4]              = 100
 sphericalsurface::radius[5]              = 200
 sphericalsurface::radius[6]              = 500
 sphericalsurface::radius[7]              = 850
-sphericalsurface::radius[8]              = 2000
+sphericalsurface::radius[8]              = 1000
 
 sphericalsurface::set_spherical[2]       = yes
 sphericalsurface::set_spherical[3]       = yes
@@ -684,15 +682,14 @@ TmunuBase::stress_energy_storage = "yes"
 TmunuBase::timelevels            = 1
 
 # Parameters of thorn VolumeIntegrals_GRMHD (implementing VolumeIntegrals_GRMHD)
-VolumeIntegrals_GRMHD::NumIntegrals = 15
-VolumeIntegrals_GRMHD::VolIntegral_out_every = 256
+VolumeIntegrals_GRMHD::verbose = 1
+VolumeIntegrals_GRMHD::VIdomain = "bitant"
 
+VolumeIntegrals_GRMHD::VolIntegral_out_every = 256
 VolumeIntegrals_GRMHD::enable_file_output = 1
 VolumeIntegrals_GRMHD::outVolIntegral_dir = "$parfile/volume_integration"
-VolumeIntegrals_GRMHD::verbose = 1
 
-#   The AMR centre will only track the first referenced integration quantities that track said centre.
-#   Thus, centeroflapse output will not feed back into the AMR centre positions.
+VolumeIntegrals_GRMHD::NumIntegrals = 15
 
 VolumeIntegrals_GRMHD::Integration_quantity_keyword[1] = "thermal_energy"
 VolumeIntegrals_GRMHD::Integration_quantity_keyword[2] = "kinetic_energy"
