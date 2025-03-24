@@ -124,10 +124,16 @@ CarpetRegrid2::num_centres             = 1
 # Grid #1: centered at "left" star
 # The values below are set to match Spritz
 CarpetRegrid2::num_levels_1 = 5
-CarpetRegrid2::radius_1[1]  = 72
-CarpetRegrid2::radius_1[2]  = 36
-CarpetRegrid2::radius_1[3]  = 18
-CarpetRegrid2::radius_1[4]  = 9
+CarpetRegrid2::radius_1[1]  = 80
+CarpetRegrid2::radius_1[2]  = 40
+CarpetRegrid2::radius_1[3]  = 20
+CarpetRegrid2::radius_1[4]  = 10
+
+CarpetRegrid2::radius_z_1[1]  = 60
+CarpetRegrid2::radius_z_1[2]  = 30
+CarpetRegrid2::radius_z_1[3]  = 15
+CarpetRegrid2::radius_z_1[4]  = 7.5
+
 CarpetRegrid2::regrid_every = 2**Carpet::max_refinement_levels
 
 #---------CartGrid3D---------
@@ -147,8 +153,8 @@ CoordBase::spacing               = "gridspacing"
 CoordBase::dx   = 1.92
 CoordBase::dy   = CoordBase::dx
 CoordBase::dz   = CoordBase::dx
-CoordBase::xmin = -144
-CoordBase::xmax = +144
+CoordBase::xmin = -159.36
+CoordBase::xmax = +159.36
 CoordBase::ymin = CoordBase::xmin
 CoordBase::ymax = CoordBase::xmax
 CoordBase::zmin = CoordBase::xmin

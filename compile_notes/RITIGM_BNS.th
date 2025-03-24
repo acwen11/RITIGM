@@ -422,8 +422,8 @@ ExternalLibraries/Boost
 !REPO_BRANCH = $ET_RELEASE
 !REPO_PATH=../$2
 !CHECKOUT = Fuka/KadathImporter Fuka/KadathThorn
-#Fuka/KadathImporter
-#Fuka/KadathThorn
+Fuka/KadathImporter
+Fuka/KadathThorn
 
 # From Kranc (required e.g. by McLachlan)
 !TARGET   = $ARR
@@ -528,6 +528,7 @@ Numerical/AEILocalInterp
 !REPO_PATH= $2
 !CHECKOUT =
 WVUThorns/Baikal
+WVUThorns/Seed_Magnetic_Fields
 
 
 # Various "diagnostic" thorns from WVU:
@@ -544,7 +545,6 @@ WVUThorns/Baikal
 !REPO_BRANCH = $ET_RELEASE
 !REPO_PATH= $2
 !CHECKOUT =
-WVUThorns_Diagnostics/Seed_Magnetic_Fields_BNS
 WVUThorns_Diagnostics/VolumeIntegrals_vacuum
 
 # Tabulated EOS and Leakage Thorns
