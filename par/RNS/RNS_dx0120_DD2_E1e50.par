@@ -1,5 +1,5 @@
 # .-------------------------------------------------.
-# | Baikal+IllinoisGRMHD Tabulated apr4 EOS TOV run |
+# | IllinoisGRMHD Tabulated DD2 EOS RNS run |
 # .-------------------------------------------------.
 #
 #-------------Thorn activation-------------
@@ -9,7 +9,6 @@ ActiveThorns = "
   ADMCoupling
   ADMMacros
   AEILocalInterp
-  Baikal
   Boundary
   Carpet
   CarpetInterp
@@ -24,6 +23,7 @@ ActiveThorns = "
   CartGrid3D
   CoordBase
   CoordGauge
+	Dissipation
   EOS_Base
   EOS_Omni
   GenericFD
@@ -40,6 +40,8 @@ ActiveThorns = "
   LocalReduce
   LoopControl
 	MHD_Diagnostics
+	ML_BSSN
+	ML_BSSN_Helper
   MoL
   MPI
   NaNChecker
@@ -57,33 +59,78 @@ ActiveThorns = "
   TmunuBase
   Vectors
 	VolumeIntegrals_GRMHD_TOV
+	VolumeIntegrals_vacuum
 "
 
 #---------Cactus---------
-Cactus::cctk_run_title     = "Baikal_IGM_APR4_TOV"
+Cactus::cctk_run_title     = "IGM_DD2_TOV"
 Cactus::cctk_full_warnings = "yes"
 Cactus::terminate          = "time"
 Cactus::cctk_final_time    = 20000 #more or less 0.5 ms # divide by ~203 to get ms
 
 #---------ADMBase---------
-ADMBase::evolution_method         = "static"
-ADMBase::lapse_evolution_method   = "static"
-ADMBase::shift_evolution_method   = "static"
-ADMBase::dtlapse_evolution_method = "static"
-ADMBase::dtshift_evolution_method = "static"
 ADMBase::initial_data             = "Hydro_rnsid"
 ADMBase::initial_lapse            = "Hydro_rnsid"
 ADMBase::initial_shift            = "Hydro_rnsid"
 ADMBase::initial_dtlapse          = "zero"
 ADMBase::initial_dtshift          = "zero"
+
 ADMBase::metric_type              = "physical"
-ADMBase::metric_timelevels        = 3
+ADMBase::evolution_method         = "ML_BSSN"
+ADMBase::lapse_evolution_method   = "ML_BSSN"
+ADMBase::shift_evolution_method   = "ML_BSSN"
+ADMBase::dtlapse_evolution_method = "ML_BSSN"
+ADMBase::dtshift_evolution_method = "ML_BSSN"
 ADMBase::lapse_timelevels         = 3
 ADMBase::shift_timelevels         = 3
+ADMBase::metric_timelevels        = 3
 
 #---------ADMMacros---------
 ADMMacros::spatial_order = 4
 
+# Parameters of thorn ML_BSSN (implementing ML_BSSN)
+ML_BSSN::timelevels                     = 3
+ML_BSSN::initial_boundary_condition  = "extrapolate-gammas"
+ML_BSSN::rhs_boundary_condition       = "NewRad"
+
+ML_BSSN::harmonicN           = 1      # 1+log
+ML_BSSN::harmonicF           = 2.0    # 1+log
+ML_BSSN::ShiftGammaCoeff     = 0.75
+ML_BSSN::AlphaDriver         = 0.0
+ML_BSSN::BetaDriver          = 0.4 # =1/Madm
+ML_BSSN::advectShift = 1.0
+ML_BSSN::advectLapse = 1.0
+
+ML_BSSN::MinimumLapse = 1.0e-8
+ML_BSSN::ML_log_confac_bound = "none"
+ML_BSSN::ML_metric_bound     = "none"
+ML_BSSN::ML_Gamma_bound      = "none"
+ML_BSSN::ML_trace_curv_bound = "none"
+ML_BSSN::ML_curv_bound       = "none"
+ML_BSSN::ML_lapse_bound      = "none"
+ML_BSSN::ML_dtlapse_bound    = "none"
+ML_BSSN::ML_shift_bound      = "none"
+ML_BSSN::ML_dtshift_bound    = "none"
+
+ML_BSSN::UseSpatialBetaDriver = 1
+ML_BSSN::SpatialBetaDriverRadius = 50
+ML_BSSN::epsDiss=0.0
+
+# ------------------dissipation-------------------------------------------------
+
+Dissipation::epsdis                      = 0.1
+Dissipation::order                       = 5
+Dissipation::vars = "
+  ML_BSSN::ml_curv
+  ML_BSSN::ml_dtlapse
+  ML_BSSN::ml_dtshift
+  ML_BSSN::ml_gamma
+  ML_BSSN::ml_lapse
+  ML_BSSN::ml_log_confac
+  ML_BSSN::ml_metric
+  ML_BSSN::ml_shift
+  ML_BSSN::ml_trace_curv
+"
 #---------Boundary---------
 Boundary::radpower = 2
 
@@ -162,7 +209,7 @@ CoordBase::zmax = CoordBase::xmax
 
 #---------EOS_Omni---------
 EOS_Omni::nuceos_read_table = "yes"
-EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/stampede3/EOS/Hempel_DD2EOS_rho234_temp180_ye60_version_1.1_20120817_adj_mineps0.h5"
+EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/Hempel_DD2EOS_rho234_temp180_ye60_version_1.1_20120817_adj_mineps0.h5"
 EOS_Omni::do_energy_shift   = "yes"
 
 #---------INITIAL HYDRO---------
@@ -174,9 +221,9 @@ HydroBase::timelevels          = 3
 
 Hydro_rnsid::save_2Dmodel    = "no"
 Hydro_rnsid::recover_2Dmodel    = "yes"
-Hydro_rnsid::model2D_file  = "/work2/09319/acw6923/stampede3/EOS/DD2hot9Q.hdf5"
+Hydro_rnsid::model2D_file  = "/work2/09319/acw6923/frontera/EOS/DD2hot9Q.hdf5"
 Hydro_rnsid::eos_type = "tab"
-Hydro_rnsid::eos_file = "/work2/09319/acw6923/stampede3/EOS/DD2_warm.rns"
+Hydro_rnsid::eos_file = "/work2/09319/acw6923/frontera/EOS/DD2_warm.rns"
 Hydro_rnsid::RNS_rho_min = 1e-13
 
 Seed_Magnetic_Fields::A_b = 53038.98367783295
@@ -186,7 +233,7 @@ Seed_Magnetic_Fields::P_cut = 0.04 * 0.0003472
 #---------ID_TabEOS_HydroQuantities---------
 ID_TabEOS_HydroQuantities::id_temperature_type = "from entropy"
 ID_TabEOS_HydroQuantities::id_entropy = 0.5
-ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/stampede3/EOS/Ye_beq_DD2_s0.5.txt"
+ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_DD2_s0.5.txt"
 
 #---------IllinoisGRMHD---------
 # Setting up the EOS parameters like this
@@ -356,15 +403,6 @@ CarpetIOASCII::out1D_vars  = "
   IllinoisGRMHD::igm_eps
   IllinoisGRMHD::igm_entropy
   IllinoisGRMHD::P
-#  IllinoisGRMHD::vx
-#  IllinoisGRMHD::vy
-#  IllinoisGRMHD::vz
-#  IllinoisGRMHD::Ax
-#  IllinoisGRMHD::Ay
-#  IllinoisGRMHD::Az
-#  IllinoisGRMHD::Bx
-#  IllinoisGRMHD::By
-#  IllinoisGRMHD::Bz
   ADMBase::lapse
 "
 CarpetIOASCII::out3D_ghosts           = "no"
@@ -375,6 +413,7 @@ CarpetIOBasic::outInfo_every      = 512
 CarpetIOBasic::outInfo_reductions = "maximum"
 CarpetIOBasic::outInfo_vars       = "
   Carpet::physical_time_per_hour
+	ML_BSSN::ML_Ham
   IllinoisGRMHD::rho_b
   IllinoisGRMHD::failure_checker
 "
@@ -391,6 +430,8 @@ CarpetIOHDF5::out2D_vars                    = "
   ADMBase::curv
   ADMBase::lapse
   ADMBase::shift
+	ML_BSSN::ML_Ham
+	ML_BSSN::ML_mom
   IllinoisGRMHD::rho_b
   IllinoisGRMHD::igm_Ye
   IllinoisGRMHD::igm_temperature
@@ -439,6 +480,18 @@ CarpetIOHDF5::out2D_vars                    = "
 	MHD_Diagnostics::a4sq
 "
 
+CarpetIOHDF5::out_dir                       = "$parfile/hdf5_output_3d"
+CarpetIOHDF5::out_every                     = 8192
+CarpetIOHDF5::out_vars                      = "
+  ADMBase::metric
+  ADMBase::curv
+  ADMBase::lapse
+  ADMBase::shift
+  ML_BSSN::ML_Ham
+  IllinoisGRMHD::grmhd_primitives_scalar
+  IllinoisGRMHD::grmhd_primitives_vector
+  IllinoisGRMHD::grmhd_primitives_Bi
+"
 
 #---------CarpetIOScalar---------
 CarpetIOScalar::one_file_per_group   = "no"
@@ -459,6 +512,8 @@ CarpetIOScalar::outScalar_vars       = "
   IllinoisGRMHD::By
   IllinoisGRMHD::Bz
   ADMBase::alp
+	ML_BSSN::ML_Ham
+	ML_BSSN::ML_mom
   MHD_Diagnostics::normB{ reductions = 'maximum' }
   MHD_Diagnostics::normcurlB{ reductions = 'maximum' }
   MHD_Diagnostics::smallb2{ reductions = 'maximum' }
@@ -499,3 +554,42 @@ VolumeIntegrals_GRMHD_TOV::dens_c = 1.6193138848638947e-05
 
 # Let the result of integral #13 (CoM) track the grid centre 0
 VolumeIntegrals_GRMHD_TOV::amr_centre__tracks__volintegral_inside_sphere[13] =  0
+
+# Parameters of thorn VolumeIntegrals_vacuum (implementing VolumeIntegrals_vacuum)
+VolumeIntegrals_vacuum::enable_file_output                     = 1
+VolumeIntegrals_vacuum::enable_time_reparameterization         = "no"
+VolumeIntegrals_vacuum::HamiltonianVarString                   = "ML_BSSN::H"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[1]        = "H_M_CnstraintsL2"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[2]        = "H_M_CnstraintsL2"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[3]        = "H_M_CnstraintsL2"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[4]        = "H_M_CnstraintsL2"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[5]        = "H_M_CnstraintsL2"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[6]        = "H_M_CnstraintsL2"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[7]        = "H_M_CnstraintsL2"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[8]        = "H_M_CnstraintsL2"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[9]        = "H_M_CnstraintsL2"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[10]       = "ADM_Mass"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[11]       = "ADM_Mass"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[12]       = "ADM_Mass"
+VolumeIntegrals_vacuum::Integration_quantity_keyword[13]       = "ADM_Mass"
+VolumeIntegrals_vacuum::Momentum0VarString                     = "ML_BSSN::M1"
+VolumeIntegrals_vacuum::Momentum1VarString                     = "ML_BSSN::M2"
+VolumeIntegrals_vacuum::Momentum2VarString                     = "ML_BSSN::M3"
+VolumeIntegrals_vacuum::NumIntegrals                           = 13
+VolumeIntegrals_vacuum::outVolIntegral_dir                     = "$parfile/volume_integration"
+VolumeIntegrals_vacuum::verbose                                = 1
+VolumeIntegrals_vacuum::VIv_time_reparam_t0                    = 10
+VolumeIntegrals_vacuum::VIv_time_reparam_w                     = 5
+VolumeIntegrals_vacuum::VolIntegral_out_every                  = 256
+VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[2]  = 4
+VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[3]  = 8
+VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[4]  = 16
+VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[5]  = 32
+VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[6]  = 64
+VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[7]  = 128
+VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[8]  = 256
+VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[9]  = 512
+VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[11] = 100
+VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[12] = 200
+VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[13] = 300
+
