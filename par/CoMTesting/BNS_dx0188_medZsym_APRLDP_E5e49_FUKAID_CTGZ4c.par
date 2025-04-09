@@ -5,6 +5,7 @@
 ActiveThorns = "
 ADMBase 
 ADMCoupling 
+ADMDerivatives
 ADMMacros 
 AEILocalInterp 
 AHFinderDirect 
@@ -25,8 +26,14 @@ CarpetSlab
 CartGrid3D 
 CoordBase 
 CoordGauge 
+CartesianCoordinates
+CTGBase
+CTGEvolution
+CTGGauge
+CTGConstraints
+CTGRadiativeBC
+GlobalDerivative
 CycleClock 
-Dissipation
 EOS_Base
 EOS_Omni 
 Fortran 
@@ -46,8 +53,6 @@ LocalInterp
 LocalReduce 
 LoopControl 
 MHD_Diagnostics
-ML_BSSN
-ML_BSSN_Helper
 MoL 
 MPI 
 Multipole 
@@ -86,11 +91,11 @@ ADMBase::initial_lapse            = "Kadath"
 ADMBase::initial_shift            = "Kadath"
 
 ADMBase::metric_type              = "physical"
-ADMBase::evolution_method         = "ML_BSSN"
-ADMBase::lapse_evolution_method   = "ML_BSSN"
-ADMBase::shift_evolution_method   = "ML_BSSN"
-ADMBase::dtlapse_evolution_method = "ML_BSSN"
-ADMBase::dtshift_evolution_method = "ML_BSSN"
+ADMBase::evolution_method         = "CTGamma"
+ADMBase::lapse_evolution_method   = "1+log"
+ADMBase::shift_evolution_method   = "gamma-driver"
+ADMBase::dtlapse_evolution_method = "1+log"
+ADMBase::dtshift_evolution_method = "gamma-driver"
 ADMBase::lapse_timelevels         = 3
 ADMBase::shift_timelevels         = 3
 ADMBase::metric_timelevels        = 3
@@ -131,50 +136,56 @@ AHFinderDirect::verbose_level                            = "physics details"
 AHFinderDirect::which_surface_to_store_info[1]           = 0
 AHFinderDirect::which_surface_to_store_info[2]           = 1
 
-# Parameters of thorn ML_BSSN (implementing ML_BSSN)
-ML_BSSN::timelevels                     = 3
-#ML_BSSN::initial_data                = "ADMBase"
-ML_BSSN::initial_boundary_condition  = "extrapolate-gammas"
-ML_BSSN::rhs_boundary_condition       = "NewRad"
+# CTGamma
+CTGBase::timelevels                     = 3
+CTGBase::conformal_factor_type          = "w"
+CTGBase::use_matter                     = "yes"
 
-ML_BSSN::harmonicN           = 1      # 1+log
-ML_BSSN::harmonicF           = 2.0    # 1+log
-ML_BSSN::ShiftGammaCoeff     = 0.75
-ML_BSSN::AlphaDriver         = 0.0
-ML_BSSN::BetaDriver          = 0.75 # =2/Madm
-ML_BSSN::advectShift = 1.0
-ML_BSSN::advectLapse = 1.0
+CTGEvolution::bc                        = radiative
+CTGGauge::eta                           = 1.0
+CTGGauge::damping_factor_method         = prescribed
+CTGGauge::damping_factor_type           = "Schnetter-Simple"
+CTGGauge::eta_damping_radius            = 250.0
+CTGEvolution::force_lndetg_zero         = yes
+CTGBase::evolution_system_type          = Z4c
+CTGEvolution::kappa1                    = 0.02
+CTGEvolution::kappa2                    = 0.0
+CTGEvolution::MaxNumEvolvedVars         = 18
+CTGEvolution::MaxNumConstrainedVars     = 13
 
-ML_BSSN::MinimumLapse = 1.0e-8
-ML_BSSN::ML_log_confac_bound = "none"
-ML_BSSN::ML_metric_bound     = "none"
-ML_BSSN::ML_Gamma_bound      = "none"
-ML_BSSN::ML_trace_curv_bound = "none"
-ML_BSSN::ML_curv_bound       = "none"
-ML_BSSN::ML_lapse_bound      = "none"
-ML_BSSN::ML_dtlapse_bound    = "none"
-ML_BSSN::ML_shift_bound      = "none"
-ML_BSSN::ML_dtshift_bound    = "none"
+CTGConstraints::constraints_persist     = yes
 
-ML_BSSN::UseSpatialBetaDriver = 1
-ML_BSSN::SpatialBetaDriverRadius = 50
-ML_BSSN::epsDiss=0.0
+SummationByParts::order         = 4
+SummationByParts::sbp_upwind_deriv              = no
+SummationByParts::onesided_outer_boundaries     = yes
+SummationByParts::onesided_interpatch_boundaries        = no
+SummationByParts::sbp_1st_deriv         = yes
+SummationByParts::sbp_2nd_deriv         = no
 
-# ------------------dissipation-------------------------------------------------
+SummationByParts::use_dissipation       = no
+GlobalDerivative::use_dissipation       = yes
+SummationByParts::scale_with_h          = yes
+SummationByParts::dissipation_type      = "Kreiss-Oliger"
+SummationByParts::epsdis                = 0.15
+GlobalDerivative::epsdis_for_level[0]   = 0.15
 
-Dissipation::epsdis                      = 0.1
-Dissipation::order                       = 5
-Dissipation::vars = "
-  ML_BSSN::ml_curv
-  ML_BSSN::ml_dtlapse
-  ML_BSSN::ml_dtshift
-  ML_BSSN::ml_gamma
-  ML_BSSN::ml_lapse
-  ML_BSSN::ml_log_confac
-  ML_BSSN::ml_metric
-  ML_BSSN::ml_shift
-  ML_BSSN::ml_trace_curv
-"
+SummationByParts::vars          = "
+ADMBase::lapse
+ADMBase::shift
+CTGBase::conformal_factor
+CTGBase::conformal_metric
+CTGBase::curvature_scalar_a
+CTGBase::curvature_scalar_b
+CTGBase::curvature_tensor
+CTGBase::Gamma"
+
+ADMDerivatives::store_time_derivatives          = yes
+ADMDerivatives::store_radial_derivatives        = yes
+ADMDerivatives::timelevels              = 3
+
+CartesianCoordinates::store_jacobian = "yes"
+CartesianCoordinates::store_jacobian_derivative = "yes"
+CartesianCoordinates::store_inverse_jacobian = "yes"
 
 # Parameters of thorn Boundary (implementing boundary)
 Boundary::radpower = 2
@@ -257,7 +268,7 @@ CarpetIOBasic::outInfo_every      = 64
 CarpetIOBasic::outInfo_reductions = "maximum"
 CarpetIOBasic::outInfo_vars       = "
   Carpet::physical_time_per_hour
-	ML_BSSN::ML_Ham
+	CTGConstraints::H
   IllinoisGRMHD::rho_b
   IllinoisGRMHD::failure_checker
 "
@@ -274,8 +285,10 @@ CarpetIOHDF5::out2D_vars                    = "
   ADMBase::curv
   ADMBase::lapse
   ADMBase::shift
-  ML_BSSN::ML_Ham
-  ML_BSSN::ML_mom
+  CTGConstraints::H
+  CTGConstraints::M1
+  CTGConstraints::M2
+  CTGConstraints::M3
   IllinoisGRMHD::rho_b
   IllinoisGRMHD::igm_Ye
   IllinoisGRMHD::igm_temperature
@@ -328,7 +341,7 @@ CarpetIOHDF5::out_vars                      = "
   ADMBase::curv
   ADMBase::lapse
   ADMBase::shift
-  ML_BSSN::ML_Ham
+	CTGConstraints::H
   IllinoisGRMHD::grmhd_primitives_scalar
   IllinoisGRMHD::grmhd_primitives_vector
   IllinoisGRMHD::grmhd_primitives_Bi
@@ -358,8 +371,10 @@ CarpetIOScalar::outScalar_vars       = "
   IllinoisGRMHD::By
   IllinoisGRMHD::Bz
   ADMBase::alp
-  ML_BSSN::ML_Ham
-  ML_BSSN::ML_mom
+	CTGConstraints::H
+	CTGConstraints::M1
+	CTGConstraints::M2
+	CTGConstraints::M3
 	MHD_Diagnostics::normB{ reductions = 'maximum' }
 	MHD_Diagnostics::normcurlB{ reductions = 'maximum' }
 	MHD_Diagnostics::smallb2{ reductions = 'maximum' }
@@ -463,7 +478,7 @@ ReflectionSymmetry::avoid_origin_z = "no"
 # Parameters of thorn EOS_Omni (implementing EOS_Omni)
 EOS_Omni::do_energy_shift   = "yes"
 EOS_Omni::nuceos_read_table = "yes"
-EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APRLDP_3335_rho420_temp167_ye66_gitMf0fc21f_20250403_extended_adj_mineps0.h5"
+EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APRLDP_3335_rho393_temp133_ye66_gitM180edd5_20190225_adj_mineps0.h5"
 
 # Parameters of thorn HydroBase (implementing HydroBase)
 HydroBase::initial_Aphi        = "zero"
@@ -476,7 +491,7 @@ HydroBase::timelevels          = 3
 
 # Parameters of thorn ID_TabEOS_HydroQuantities (implementing ID_tabEOS_HydroQuantities)
 ID_TabEOS_HydroQuantities::id_temperature_type = "constant"
-ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDPex.txt"
+ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDP.txt"
 
 # Parameters of thorn IllinoisGRMHD (implementing IllinoisGRMHD)
 IllinoisGRMHD::Symmetry = "equatorial"
@@ -529,7 +544,7 @@ IOUtil::recover_dir                     = "../checkpoints"
 
 #---------KadathImporter----------
 KadathImporter::type = "BNS"
-KadathImporter::filename = "/work2/09319/acw6923/frontera/EOS/BNS_ECC_RED.APRLDPex.30.47.0.0.2.7.q1.0.0.11.info"
+KadathImporter::filename = "/work2/09319/acw6923/frontera/EOS/BNS_ECC_RED.APR4LDPex_norad.30.47.0.0.2.7.q1.0.0.13.info"
 
 # Parameters of thorn MHD_Diagnostics
 MHD_Diagnostics::diagnostics_compute_every = 256
@@ -570,7 +585,7 @@ NaNChecker::check_vars      = "
   ADMBase::lapse
   ADMBase::metric
   ADMBase::shift
-	ML_BSSN::gt11
+	CTGBase::gamma11
 "
 NaNChecker::verbose         = "all"
 
@@ -757,7 +772,7 @@ VolumeIntegrals_GRMHD::dens_c = 1.6193138848638947e-05
 # Parameters of thorn VolumeIntegrals_vacuum (implementing VolumeIntegrals_vacuum)
 VolumeIntegrals_vacuum::enable_file_output                     = 1
 VolumeIntegrals_vacuum::enable_time_reparameterization         = "no"
-VolumeIntegrals_vacuum::HamiltonianVarString                   = "ML_BSSN::H"
+VolumeIntegrals_vacuum::HamiltonianVarString                   = "CTGConstraints::H"
 VolumeIntegrals_vacuum::Integration_quantity_keyword[1]        = "H_M_CnstraintsL2"
 VolumeIntegrals_vacuum::Integration_quantity_keyword[2]        = "H_M_CnstraintsL2"
 VolumeIntegrals_vacuum::Integration_quantity_keyword[3]        = "H_M_CnstraintsL2"
@@ -771,9 +786,9 @@ VolumeIntegrals_vacuum::Integration_quantity_keyword[10]       = "ADM_Mass"
 VolumeIntegrals_vacuum::Integration_quantity_keyword[11]       = "ADM_Mass"
 VolumeIntegrals_vacuum::Integration_quantity_keyword[12]       = "ADM_Mass"
 VolumeIntegrals_vacuum::Integration_quantity_keyword[13]       = "ADM_Mass"
-VolumeIntegrals_vacuum::Momentum0VarString                     = "ML_BSSN::M1"
-VolumeIntegrals_vacuum::Momentum1VarString                     = "ML_BSSN::M2"
-VolumeIntegrals_vacuum::Momentum2VarString                     = "ML_BSSN::M3"
+VolumeIntegrals_vacuum::Momentum0VarString                     = "CTGConstraints::M1"
+VolumeIntegrals_vacuum::Momentum1VarString                     = "CTGConstraints::M2"
+VolumeIntegrals_vacuum::Momentum2VarString                     = "CTGConstraints::M3"
 VolumeIntegrals_vacuum::NumIntegrals                           = 13
 VolumeIntegrals_vacuum::outVolIntegral_dir                     = "$parfile/volume_integration"
 VolumeIntegrals_vacuum::verbose                                = 1
