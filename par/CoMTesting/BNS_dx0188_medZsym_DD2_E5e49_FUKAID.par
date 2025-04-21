@@ -585,6 +585,7 @@ quasilocalmeasures::surface_index[4]     = 7
 quasilocalmeasures::surface_index[5]     = 8
 
 # Parameters of thorn Seed_Magnetic_Fields
+Seed_Magnetic_Fields::Afield_type                             = "BNS_poloidal_A_interior"
 Seed_Magnetic_Fields::A_b                                     = 33843.57422438454 # E_mag = 5e49
 Seed_Magnetic_Fields::enable_IllinoisGRMHD_staggered_A_fields = "yes"
 Seed_Magnetic_Fields::have_two_NSs_along_x_axis               = "yes"

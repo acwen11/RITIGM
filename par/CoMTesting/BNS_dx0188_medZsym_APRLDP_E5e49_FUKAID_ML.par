@@ -141,7 +141,7 @@ ML_BSSN::harmonicN           = 1      # 1+log
 ML_BSSN::harmonicF           = 2.0    # 1+log
 ML_BSSN::ShiftGammaCoeff     = 0.75
 ML_BSSN::AlphaDriver         = 0.0
-ML_BSSN::BetaDriver          = 0.75 # =2/Madm
+ML_BSSN::BetaDriver          = 1.0/2.66161  # =1/Madm
 ML_BSSN::advectShift = 1.0
 ML_BSSN::advectLapse = 1.0
 
@@ -463,7 +463,7 @@ ReflectionSymmetry::avoid_origin_z = "no"
 # Parameters of thorn EOS_Omni (implementing EOS_Omni)
 EOS_Omni::do_energy_shift   = "yes"
 EOS_Omni::nuceos_read_table = "yes"
-EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APRLDP_3335_rho420_temp167_ye66_gitMf0fc21f_20250403_extended_adj_mineps0.h5"
+EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APRLDP_3335_rho393_temp133_ye66_gitM180edd5_20190225_adj_mineps0.h5"
 
 # Parameters of thorn HydroBase (implementing HydroBase)
 HydroBase::initial_Aphi        = "zero"
@@ -476,7 +476,7 @@ HydroBase::timelevels          = 3
 
 # Parameters of thorn ID_TabEOS_HydroQuantities (implementing ID_tabEOS_HydroQuantities)
 ID_TabEOS_HydroQuantities::id_temperature_type = "constant"
-ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDPex.txt"
+ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDP.txt"
 
 # Parameters of thorn IllinoisGRMHD (implementing IllinoisGRMHD)
 IllinoisGRMHD::Symmetry = "equatorial"
@@ -529,7 +529,7 @@ IOUtil::recover_dir                     = "../checkpoints"
 
 #---------KadathImporter----------
 KadathImporter::type = "BNS"
-KadathImporter::filename = "/work2/09319/acw6923/frontera/EOS/BNS_ECC_RED.APRLDPex.30.47.0.0.2.7.q1.0.0.11.info"
+KadathImporter::filename = "/work2/09319/acw6923/frontera/EOS/BNS_ECC_RED.APRLDPex.30.47.0.0.2.7.q1.0.0.13.info"
 
 # Parameters of thorn MHD_Diagnostics
 MHD_Diagnostics::diagnostics_compute_every = 256
@@ -625,6 +625,7 @@ quasilocalmeasures::surface_index[4]     = 7
 quasilocalmeasures::surface_index[5]     = 8
 
 # Parameters of thorn Seed_Magnetic_Fields
+Seed_Magnetic_Fields::Afield_type                             = "BNS_poloidal_A_interior"
 Seed_Magnetic_Fields::A_b                                     = 94079.23592602537 # E_mag = 5e49
 Seed_Magnetic_Fields::enable_IllinoisGRMHD_staggered_A_fields = "yes"
 Seed_Magnetic_Fields::have_two_NSs_along_x_axis               = "yes"
