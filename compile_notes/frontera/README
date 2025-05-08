@@ -24,4 +24,4 @@ FUKA tends to crash when trying to generate res=13 data from the beginning.
 2) Run res = 11 par file. One successful run used 8 nodes, 42 MPI procs per node (for memory reasons), ~2 hrs
 3) Use BNS_TOTAL...info/dat (and this file only!!!) as new starting point (eg. rename to initbin.info/dat) 
 4) Change initial_resolution to 11. Change res to 13. Change sequence controls as necessary.
-5) Run res = 13 par file. One successful run used 16 nodes, 28 MPI procs per node, ~2 hrs.
+5) Run res = 13 par file. One successful run used 16 nodes, 42 MPI procs per node, ~2 hrs.
