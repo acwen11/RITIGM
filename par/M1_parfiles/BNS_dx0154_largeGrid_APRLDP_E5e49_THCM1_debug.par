@@ -62,6 +62,7 @@ NaNChecker
 NewRad 
 Outflow
 QuasiLocalMeasures 
+ReflectionSymmetry
 Seed_Magnetic_Fields
 Slab 
 SpaceMask 
@@ -84,7 +85,7 @@ VolumeIntegrals_vacuum
 WeakRates
 WeylScal4 
 WVU_EOS 
-# ZelmaniTracers
+ZelmaniTracers
 zlib
 "
 
@@ -345,9 +346,7 @@ CarpetIOHDF5::out2D_vars                    = "
 	THC_M1::chi
 	THC_M1::rN
 	THC_M1::rE
-	THC_M1::rFx
-	THC_M1::rFy
-	THC_M1::rFz
+	THC_M1::rF
 	THC_M1::rPxx
 	THC_M1::rPxy
 	THC_M1::rPxz
@@ -374,7 +373,7 @@ CarpetIOHDF5::out_vars                      = "
   IllinoisGRMHD::grmhd_primitives_scalar
   IllinoisGRMHD::grmhd_primitives_vector
   IllinoisGRMHD::grmhd_primitives_Bi
-	THC_M1::rE[0]
+	THC_M1::rE
 "
 
 # Parameters of thorn CarpetIOScalar (implementing IOScalar)
@@ -411,9 +410,7 @@ CarpetIOScalar::outScalar_vars       = "
 	MHD_Diagnostics::sigma4Trace{ reductions = 'minimum maximum' }
 	MHD_Diagnostics::sigma4bb{ reductions = 'minimum maximum' }
 	THC_M1::rE
-	THC_M1::rFx
-	THC_M1::rFy
-	THC_M1::rFz
+	THC_M1::rF
 "
 # Carpet mask
 
@@ -502,6 +499,8 @@ CoordBase::boundary_size_z_lower = 3
 CoordBase::boundary_size_x_upper = 3
 CoordBase::boundary_size_y_upper = 3
 CoordBase::boundary_size_z_upper = 3
+CoordBase::boundary_shiftout_z_lower = 1
+
 CoordBase::domainsize            = "minmax"
 CoordBase::spacing               = "gridspacing"
 CoordBase::dx                    = 315.392
@@ -510,9 +509,14 @@ CoordBase::dz                    = CoordBase::dx
 CoordBase::xmin                  = -35008.512 
 CoordBase::xmax                  = 35008.512 
 CoordBase::ymin                  = CoordBase::xmin
-CoordBase::zmin                  = CoordBase::xmin
 CoordBase::ymax                  = CoordBase::xmax
+CoordBase::zmin                  = 0.0
 CoordBase::zmax                  = CoordBase::xmax
+
+#---------ReflectionSymmetry---------
+ReflectionSymmetry::verbose = "no"
+ReflectionSymmetry::reflection_z = "yes"
+ReflectionSymmetry::avoid_origin_z = "no"
 
 # Parameters of thorn EOS_Omni (implementing EOS_Omni)
 EOS_Omni::do_energy_shift   = "yes"
@@ -533,6 +537,8 @@ ID_TabEOS_HydroQuantities::id_temperature_type = "constant"
 ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDPex.txt"
 
 # Parameters of thorn IllinoisGRMHD (implementing IllinoisGRMHD)
+IllinoisGRMHD::Symmetry = "equatorial"
+
 IllinoisGRMHD::igm_eos_table_ceiling_safety_factor = 1
 IllinoisGRMHD::igm_eos_table_floor_safety_factor   = 1
 
@@ -838,6 +844,8 @@ TmunuBase::timelevels            = 1
 
 # Parameters of thorn VolumeIntegrals_GRMHD (implementing VolumeIntegrals_GRMHD)
 VolumeIntegrals_GRMHD::verbose = 1
+VolumeIntegrals_GRMHD::VIdomain = "bitant"
+
 VolumeIntegrals_GRMHD::VolIntegral_out_every = 256
 VolumeIntegrals_GRMHD::enable_file_output = 1
 VolumeIntegrals_GRMHD::outVolIntegral_dir = "$parfile/volume_integration"
@@ -908,6 +916,33 @@ VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[13] = 300
 # Parameters of thorn WeylScal4 (implementing WeylScal4)
 WeylScal4::fd_order = "4th"
 
+#--------ZelmaniTracers----------------------
+ZelmaniTracers::tracers_with_m1			    	= "yes"
+ZelmaniTracers::ntracers    							= 96000
+Zelmanitracers::interpolator_options 			= "order=2"
+ZelmaniTracers::reset_tracers_on_recover  = "no"
+ZelmaniTracers::seed_with_zsymm						= "yes"
+
+ZelmaniTracers::seed_method = "randomize_vol"
+ZelmaniTracers::init_dens_min = IllinoisGRMHD::rho_b_atm_max * 1e4
+
+zelmanitracers::tracerproblem = "BinaryNS"
+zelmanitracers::center_ns1[0] = 15.2
+zelmanitracers::center_ns1[1] = 0.0
+zelmanitracers::center_ns1[2] = 0.0
+
+zelmanitracers::center_ns2[0] = -15.2
+zelmanitracers::center_ns2[1] = 0.0
+zelmanitracers::center_ns2[2] = 0.0
+
+zelmanitracers::rad_max[0] = 10.0
+zelmanitracers::rad_min[0] = 0.0
+
+zelmanitracers::rad_max[1] = 10.0
+zelmanitracers::rad_min[1] = 0.0
+
+ZelmaniTracers::outTracers_every    = 128
+ZelmaniTracers::output_extra_fields   = "yes"
 
 # TimerReport ################################################
 

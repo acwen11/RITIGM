@@ -342,9 +342,7 @@ CarpetIOHDF5::out2D_vars                    = "
 	THC_M1::chi
 	THC_M1::rN
 	THC_M1::rE
-	THC_M1::rFx
-	THC_M1::rFy
-	THC_M1::rFz
+	THC_M1::rF
   THC_M1::opacs
 	THC_M1::fluidsources
 	THC_M1::neutrino_fractions
@@ -360,7 +358,7 @@ CarpetIOHDF5::out_vars                      = "
   IllinoisGRMHD::grmhd_primitives_scalar
   IllinoisGRMHD::grmhd_primitives_vector
   IllinoisGRMHD::grmhd_primitives_Bi
-	THC_M1::rE[0]
+	THC_M1::rE
 "
 
 # Parameters of thorn CarpetIOScalar (implementing IOScalar)
@@ -397,9 +395,7 @@ CarpetIOScalar::outScalar_vars       = "
 	MHD_Diagnostics::sigma4Trace{ reductions = 'minimum maximum' }
 	MHD_Diagnostics::sigma4bb{ reductions = 'minimum maximum' }
 	THC_M1::rE
-	THC_M1::rFx
-	THC_M1::rFy
-	THC_M1::rFz
+	THC_M1::rF
 "
 # Carpet mask
 
@@ -907,7 +903,7 @@ WeylScal4::fd_order = "4th"
 
 #--------ZelmaniTracers----------------------
 ZelmaniTracers::tracers_with_m1			    	= "yes"
-ZelmaniTracers::ntracers    							= 80000
+ZelmaniTracers::ntracers    							= 96000
 Zelmanitracers::interpolator_options 			= "order=2"
 ZelmaniTracers::reset_tracers_on_recover  = "no"
 ZelmaniTracers::seed_with_zsymm						= "yes"
