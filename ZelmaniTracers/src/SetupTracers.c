@@ -456,7 +456,8 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
     }
 		else if (CCTK_Equals(seed_method, "randomize_vol")){
 
-				srand(CCTK_MyProc(cctkGH));
+				srand(CCTK_MyProc(cctkGH) + 2);
+				int total_trials = 0;
         for(int d = 0; d < ndomains; ++d) {
 						double *particle_x_temp  = (double *)malloc(sizeof(double)*siz);
 						double *particle_y_temp  = (double *)malloc(sizeof(double)*siz);
@@ -465,35 +466,38 @@ void ZelmaniTracers_SetupTracers(CCTK_ARGUMENTS) {
 						double *particle_volform_temp = (double *)malloc(sizeof(double)*siz);
 
 						int which_particle = d * siz;
-						int total_trials = 0;
 						// Technically, this algorithm is nondeterministic. However it should complete within a few iterations.
-						for(int iter=0;iter<100000;iter++) {
+						const int NUM_TRIALS = 10; // TODO: Fix bad hack! Currently forcing loop to run too many times to ensure all procs call interpolator
+						for(int iter=0;iter<NUM_TRIALS;iter++) {
 								for(int i=0;i<siz;i++) {
 										// Find all particles whose positions still need to be set:
 										get_random_position(&particle_x_temp[i],&particle_y_temp[i],&particle_z_temp[i],d);
 								}
 								Interpolate_density_many_pts(cctkGH,siz,particle_x_temp,particle_y_temp,particle_z_temp, particle_density_temp, particle_volform_temp);	
-								for(int i=0;i<siz;i++) {
-										if(particle_density_temp[i] > init_dens_min){
-												// Accept particle!
-												tx[which_particle] = particle_x_temp[i];
-												ty[which_particle] = particle_y_temp[i];
-												tz[which_particle] = particle_z_temp[i];
-												tmass[which_particle] = particle_density_temp[i] * particle_volform_temp[i];
-												which_particle++;
+								if (which_particle < (d+1) * siz) {
+									for(int i=0;i<siz;i++) {
+										if(particle_density_temp[i] > init_dens_min && which_particle < (d+1) * siz) {
+											// Accept particle!
+											tx[which_particle] = particle_x_temp[i];
+											ty[which_particle] = particle_y_temp[i];
+											tz[which_particle] = particle_z_temp[i];
+											tmass[which_particle] = particle_density_temp[i] * particle_volform_temp[i];
+											which_particle++;
 										}
 										total_trials++;
-										if(which_particle == (d + 1) * siz) {
-												// If we've already seeded all the particles, break out of the loop!
-												iter=1000000;
-												i=siz+100;
-												CCTK_INFO("SHOULD BE ALL DONE!");
-										}
+									}
+									// if(which_particle == (d + 1) * siz) {
 								}
-								if(iter!=1000000)
-									CCTK_VINFO("Iteration #%d: Need to specify %d more particle location(s). Success rate = %.2e. Need ~ %d more iterations.",
-														 iter,siz-which_particle,(double)which_particle/(double)total_trials, (int)((double)total_trials/(double)which_particle) - iter - 1);
-								if(iter==99999)
+								else {
+										// If we've already seeded all the particles, do nothing
+										// iter=1000000;
+										// i=siz+100;
+										CCTK_INFO("SHOULD BE ALL DONE! Running dummy iterations now.");
+								}
+								// if(iter!=1000000)
+								CCTK_VINFO("Iteration #%d: Need to specify %d more particle location(s). Success rate = %.2e. Need ~ %d more iterations.",
+													 iter, (d+1)*siz-which_particle, (double)which_particle/(double)total_trials, (int)((double)total_trials/(double)which_particle) - iter - 1);
+								if(iter==NUM_TRIALS - 1 && which_particle < (d+1) * siz)
 									CCTK_WARN(CCTK_WARN_ABORT, "Hit iteration limit.");
 						}
 						free(particle_x_temp);

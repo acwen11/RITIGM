@@ -902,7 +902,7 @@ VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[13] = 300
 WeylScal4::fd_order = "4th"
 
 #--------ZelmaniTracers----------------------
-ZelmaniTracers::tracers_with_m1			    	= "yes"
+ZelmaniTracers::tracers_with_m1			    	= "no"
 ZelmaniTracers::ntracers    							= 96000
 Zelmanitracers::interpolator_options 			= "order=2"
 ZelmaniTracers::reset_tracers_on_recover  = "no"
@@ -912,18 +912,18 @@ ZelmaniTracers::seed_method = "randomize_vol"
 ZelmaniTracers::init_dens_min = IllinoisGRMHD::rho_b_atm_max * 1e4
 
 zelmanitracers::tracerproblem = "BinaryNS"
-zelmanitracers::center_ns1[0] = 15.2
+zelmanitracers::center_ns1[0] = 16.08
 zelmanitracers::center_ns1[1] = 0.0
 zelmanitracers::center_ns1[2] = 0.0
 
-zelmanitracers::center_ns2[0] = -15.2
+zelmanitracers::center_ns2[0] = -16.08
 zelmanitracers::center_ns2[1] = 0.0
 zelmanitracers::center_ns2[2] = 0.0
 
-zelmanitracers::rad_max[0] = 10.0
+zelmanitracers::rad_max[0] = 11.0
 zelmanitracers::rad_min[0] = 0.0
 
-zelmanitracers::rad_max[1] = 10.0
+zelmanitracers::rad_max[1] = 11.0
 zelmanitracers::rad_min[1] = 0.0
 
 ZelmaniTracers::outTracers_every    = 128
