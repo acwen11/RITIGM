@@ -5,8 +5,6 @@ import h5py as h5
 import numpy as np
 from scipy.ndimage import median_filter
 
-# V3: REMOVING RADIATION CONTRIBUTION FROM HELMHOLTZ
-
 # UNIT CONVERSIONS
 ## APR stores entropy in units of k_B / baryon, while helmholtz uses erg / K / g. Convert between the two using m_n / k_B.
 ENTFAC = 1.2131450484808232e-08
@@ -242,10 +240,10 @@ def main(args):
         h = helmholtz.helmeos(dens=helm_rhospace, temp=helm_Tspace, abar=Abar[iYe,:,:], zbar=Abar[iYe,:,:]*valYe) # Y_e = zbar / abar 
 
         # Extend tables
-        P = extend_std_table_at_Ye(iYe, num_new_pts_T, num_new_pts_rho, irho_plus, irho_minus, iT_plus, iT_minus, chi_rho, chi_temp, P, tab_P, h.ptot - h.prad, do_temp_extend)
-        S = extend_std_table_at_Ye(iYe, num_new_pts_T, num_new_pts_rho, irho_plus, irho_minus, iT_plus, iT_minus, chi_rho, chi_temp, S, tab_S, ENTFAC * (h.stot - h.srad), do_temp_extend)
-        cs2 = extend_std_table_at_Ye(iYe, num_new_pts_T, num_new_pts_rho, irho_plus, irho_minus, iT_plus, iT_minus, chi_rho, chi_temp, cs2, tab_cs2, h.cs_gas**2, do_temp_extend)
-        gamma = extend_std_table_at_Ye(iYe, num_new_pts_T, num_new_pts_rho, irho_plus, irho_minus, iT_plus, iT_minus, chi_rho, chi_temp, gamma, tab_gamma, h.gam1_gas, do_temp_extend)
+        P = extend_std_table_at_Ye(iYe, num_new_pts_T, num_new_pts_rho, irho_plus, irho_minus, iT_plus, iT_minus, chi_rho, chi_temp, P, tab_P, h.ptot, do_temp_extend)
+        S = extend_std_table_at_Ye(iYe, num_new_pts_T, num_new_pts_rho, irho_plus, irho_minus, iT_plus, iT_minus, chi_rho, chi_temp, S, tab_S, ENTFAC * h.stot, do_temp_extend)
+        cs2 = extend_std_table_at_Ye(iYe, num_new_pts_T, num_new_pts_rho, irho_plus, irho_minus, iT_plus, iT_minus, chi_rho, chi_temp, cs2, tab_cs2, h.cs**2, do_temp_extend)
+        gamma = extend_std_table_at_Ye(iYe, num_new_pts_T, num_new_pts_rho, irho_plus, irho_minus, iT_plus, iT_minus, chi_rho, chi_temp, gamma, tab_gamma, h.gam1, do_temp_extend)
 
         # eps needs special treatment due to eps_nuc (see Hayashi et al 2023)
         for iT in range(new_shape[1]):
@@ -253,9 +251,8 @@ def main(args):
             for irho in range(new_shape[2]):
                 irho_star = max(0, irho - num_new_pts_rho)
                 if np.isnan(eps[iYe, iT, irho]):
-                    h_eps = h.etot - h.erad
-                    eps_nuc = tab_eps[iYe, iT_star, irho_star] - h_eps[max(iT, num_new_pts_T), max(irho, num_new_pts_rho)]
-                    eps[iYe, iT, irho] = h_eps[iT, irho] + eps_nuc
+                    eps_nuc = tab_eps[iYe, iT_star, irho_star] - h.etot[max(iT, num_new_pts_T), max(irho, num_new_pts_rho)]
+                    eps[iYe, iT, irho] = h.etot[iT, irho] + eps_nuc
 
     ## End of Ye Loop
 
