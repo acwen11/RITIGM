@@ -422,8 +422,8 @@ carpetregrid2::num_levels_2              = 12
 carpetregrid2::num_levels_3              = 12
 
 carpetregrid2::position_x_1              = 0
-carpetregrid2::position_x_2              = -15.2 # Adjust according to ID. Corresponds to ~45 km sep.
-carpetregrid2::position_x_3              = 15.2
+carpetregrid2::position_x_2              = -16.08 # Adjust according to ID. Corresponds to ~47.5 km sep.
+carpetregrid2::position_x_3              = 16.08
 
 carpetregrid2::radius_1[1]               = 16384 #dx=122.8
 carpetregrid2::radius_1[2]               = 8192  #dx=61.44
@@ -572,7 +572,7 @@ IOUtil::recover_dir                     = "../checkpoints"
 
 #---------KadathImporter----------
 KadathImporter::type = "BNS"
-KadathImporter::filename = "/work2/09319/acw6923/frontera/EOS/BNS_ECC_RED.APRLDPex.30.47.0.0.2.7.q1.0.0.13.info"
+KadathImporter::filename = "/work2/09319/acw6923/frontera/EOS/BNS_ECC_RED.APRLDPex.32.166.-0.43.-0.43.2.7.q1.0.0.13.info"
 
 # Parameters of thorn MHD_Diagnostics
 MHD_Diagnostics::diagnostics_compute_every = 256
@@ -902,7 +902,7 @@ VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[13] = 300
 WeylScal4::fd_order = "4th"
 
 #--------ZelmaniTracers----------------------
-ZelmaniTracers::tracers_with_m1			    	= "yes"
+ZelmaniTracers::tracers_with_m1			    	= "no"
 ZelmaniTracers::ntracers    							= 96000
 Zelmanitracers::interpolator_options 			= "order=2"
 ZelmaniTracers::reset_tracers_on_recover  = "no"
@@ -912,18 +912,18 @@ ZelmaniTracers::seed_method = "randomize_vol"
 ZelmaniTracers::init_dens_min = IllinoisGRMHD::rho_b_atm_max * 1e4
 
 zelmanitracers::tracerproblem = "BinaryNS"
-zelmanitracers::center_ns1[0] = 15.2
+zelmanitracers::center_ns1[0] = 16.08
 zelmanitracers::center_ns1[1] = 0.0
 zelmanitracers::center_ns1[2] = 0.0
 
-zelmanitracers::center_ns2[0] = -15.2
+zelmanitracers::center_ns2[0] = -16.08
 zelmanitracers::center_ns2[1] = 0.0
 zelmanitracers::center_ns2[2] = 0.0
 
-zelmanitracers::rad_max[0] = 10.0
+zelmanitracers::rad_max[0] = 11.0
 zelmanitracers::rad_min[0] = 0.0
 
-zelmanitracers::rad_max[1] = 10.0
+zelmanitracers::rad_max[1] = 11.0
 zelmanitracers::rad_min[1] = 0.0
 
 ZelmaniTracers::outTracers_every    = 128

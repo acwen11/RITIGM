@@ -425,46 +425,46 @@ carpetregrid2::position_x_1              = 0
 carpetregrid2::position_x_2              = -15.2 # Adjust according to ID. Corresponds to ~45 km sep.
 carpetregrid2::position_x_3              = 15.2
 
-carpetregrid2::radius_1[1]               = 16384 #dx=122.8
-carpetregrid2::radius_1[2]               = 8192  #dx=61.44
-carpetregrid2::radius_1[3]               = 4096  #dx=30.72
-carpetregrid2::radius_1[4]               = 2048  #dx=15.36
-carpetregrid2::radius_1[5]               = 1024  #dx=7.68
-carpetregrid2::radius_1[6]               = 512   #dx=3.84
-carpetregrid2::radius_1[7]               = 256   #dx=1.92
-carpetregrid2::radius_1[8]               = 128   #dx=0.96
-carpetregrid2::radius_1[9]               = 70    #dx=0.48
-carpetregrid2::radius_1[10]              = 40    #dx=0.24 #activated at merger
-carpetregrid2::radius_1[11]              = 20    #dx=0.12 #activated at merger
+carpetregrid2::radius_1[1]               = 16384 #dx=157.696
+carpetregrid2::radius_1[2]               = 8192  #dx=78.848
+carpetregrid2::radius_1[3]               = 4096  #dx=39.424
+carpetregrid2::radius_1[4]               = 2048  #dx=19.712
+carpetregrid2::radius_1[5]               = 1024  #dx=9.856
+carpetregrid2::radius_1[6]               = 512   #dx=4.928
+carpetregrid2::radius_1[7]               = 256   #dx=2.464
+carpetregrid2::radius_1[8]               = 128   #dx=1.232
+carpetregrid2::radius_1[9]               = 70    #dx=0.616
+carpetregrid2::radius_1[10]              = 40    #dx=0.308 #activated at merger
+carpetregrid2::radius_1[11]              = 20    #dx=0.154 #activated at merger
 
-carpetregrid2::radius_1[12]               = 3.2  #dx=0.06 #activated just before collapse
+carpetregrid2::radius_1[12]               = 3.2  #dx=0.077 #activated just before collapse
 carpetregrid2::radius_1[13]               = 2.4  #disabled
 
 #during inspiral
 
-carpetregrid2::radius_2[1]               = 1944.0 #dx=122.88
-carpetregrid2::radius_2[2]               = 1296   #dx=61.44
-carpetregrid2::radius_2[3]               = 864    #dx=30.72
-carpetregrid2::radius_2[4]               = 576    #dx=15.36
-carpetregrid2::radius_2[5]               = 384    #dx=7.68
-carpetregrid2::radius_2[6]               = 192    #dx=3.84
-carpetregrid2::radius_2[7]               = 96     #dx=1.92
-carpetregrid2::radius_2[8]               = 48     #dx=0.96
-carpetregrid2::radius_2[9]               = 24     #dx=0.48
-carpetregrid2::radius_2[10]               = 18    #dx=0.24
-carpetregrid2::radius_2[11]               = 12    #dx=0.12
+carpetregrid2::radius_2[1]               = 1944.0 #dx=157.696
+carpetregrid2::radius_2[2]               = 1296   #dx=78.848
+carpetregrid2::radius_2[3]               = 864    #dx=39.424
+carpetregrid2::radius_2[4]               = 576    #dx=19.712
+carpetregrid2::radius_2[5]               = 384    #dx=9.856
+carpetregrid2::radius_2[6]               = 192    #dx=4.928
+carpetregrid2::radius_2[7]               = 96     #dx=2.464
+carpetregrid2::radius_2[8]               = 48     #dx=1.232
+carpetregrid2::radius_2[9]               = 24     #dx=0.616
+carpetregrid2::radius_2[10]               = 18    #dx=0.308
+carpetregrid2::radius_2[11]               = 12    #dx=0.154
 
-carpetregrid2::radius_3[1]               = 1944.0 #dx=122.88
-carpetregrid2::radius_3[2]               = 1296   #dx=61.44
-carpetregrid2::radius_3[3]               = 864    #dx=30.72
-carpetregrid2::radius_3[4]               = 576    #dx=15.36
-carpetregrid2::radius_3[5]               = 384    #dx=7.68
-carpetregrid2::radius_3[6]               = 192    #dx=3.84
-carpetregrid2::radius_3[7]               = 96     #dx=1.92
-carpetregrid2::radius_3[8]               = 48     #dx=0.96
-carpetregrid2::radius_3[9]               = 24     #dx=0.48
-carpetregrid2::radius_3[10]               = 18    #dx=0.24
-carpetregrid2::radius_3[11]               = 12    #dx=0.12
+carpetregrid2::radius_3[1]               = 1944.0 #dx=157.696
+carpetregrid2::radius_3[2]               = 1296   #dx=78.848
+carpetregrid2::radius_3[3]               = 864    #dx=39.424
+carpetregrid2::radius_3[4]               = 576    #dx=19.712
+carpetregrid2::radius_3[5]               = 384    #dx=9.856
+carpetregrid2::radius_3[6]               = 192    #dx=4.928
+carpetregrid2::radius_3[7]               = 96     #dx=2.464
+carpetregrid2::radius_3[8]               = 48     #dx=1.232
+carpetregrid2::radius_3[9]               = 24     #dx=0.616
+carpetregrid2::radius_3[10]               = 18    #dx=0.308
+carpetregrid2::radius_3[11]               = 12    #dx=0.154
 
 ###
 
@@ -488,11 +488,11 @@ CoordBase::boundary_shiftout_z_lower = 1
 
 CoordBase::domainsize            = "minmax"
 CoordBase::spacing               = "gridspacing"
-CoordBase::dx                    = 245.76
+CoordBase::dx                    = 315.392
 CoordBase::dy                    = CoordBase::dx
 CoordBase::dz                    = CoordBase::dx
-CoordBase::xmin                  = -34897.92 #245.76*142
-CoordBase::xmax                  = 34897.92 #245.76*142
+CoordBase::xmin                  = -35008.512 
+CoordBase::xmax                  = 35008.512 
 CoordBase::ymin                  = CoordBase::xmin
 CoordBase::ymax                  = CoordBase::xmax
 CoordBase::zmin                  = 0.0
@@ -536,7 +536,7 @@ IllinoisGRMHD::igm_evolve_entropy             = "yes"
 IllinoisGRMHD::igm_T_max											= 240
 IllinoisGRMHD::conserv_to_prims_debug         = 0
 IllinoisGRMHD::Psi6threshold                  = 60 # This value should only be reached far inside the horizon! Verify this!
-IllinoisGRMHD::damp_lorenz                    = 0.27901785714285715 #1.5/(dtfac*dx_coarsest)=1.5/(0.021875*245.76)
+IllinoisGRMHD::damp_lorenz                    = 0.217416512059369 #1.5/(dtfac*dx_coarsest)=1.5/(0.021875*315.392)
 
 #0.279017857142857 #1.5/(dtfac*dx_coarsest)=1.5/(0.021875*245.76)
 IllinoisGRMHD::palenzuela_depsdT_threshold    = 1e-100 # Set to 1e100/1e-100 to only use entropy/energy equation
@@ -572,7 +572,7 @@ IOUtil::recover_dir                     = "../checkpoints"
 
 #---------KadathImporter----------
 KadathImporter::type = "BNS"
-KadathImporter::filename = "/work2/09319/acw6923/frontera/EOS/BNS_ECC_RED.APRLDPex.30.47.0.0.2.7.q1.0.0.13.info"
+KadathImporter::filename = "/work2/09319/acw6923/stampede3/EOS/BNS_ECC_RED.APRLDPex.30.47.0.43.0.43.2.7.q1.0.0.13.info"
 
 # Parameters of thorn MHD_Diagnostics
 MHD_Diagnostics::diagnostics_compute_every = 256
