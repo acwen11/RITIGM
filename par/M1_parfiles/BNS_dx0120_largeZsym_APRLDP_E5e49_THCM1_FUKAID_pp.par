@@ -572,7 +572,7 @@ IOUtil::recover_dir                     = "../checkpoints"
 
 #---------KadathImporter----------
 KadathImporter::type = "BNS"
-KadathImporter::filename = "/work2/09319/acw6923/frontera/EOS/BNS_ECC_RED.APRLDPex.30.47.0.43.0.43.2.7.q1.0.0.13.info"
+KadathImporter::filename = "/work2/09319/acw6923/frontera/EOS/BNS_ECC_RED.APRLDPex.30.473.0.43.0.43.2.7.q1.0.0.13.info"
 
 # Parameters of thorn MHD_Diagnostics
 MHD_Diagnostics::diagnostics_compute_every = 256
@@ -684,7 +684,7 @@ quasilocalmeasures::surface_index[9]     = 12
 
 # Parameters of thorn Seed_Magnetic_Fields
 Seed_Magnetic_Fields::Afield_type                             = "BNS_poloidal_A_interior"
-Seed_Magnetic_Fields::A_b                                     = 94079.23592602537 # E_mag = 5e49
+Seed_Magnetic_Fields::A_b                                     = 94079.23592602537 # E_mag = 2.5e49
 Seed_Magnetic_Fields::enable_IllinoisGRMHD_staggered_A_fields = "yes"
 Seed_Magnetic_Fields::have_two_NSs_along_x_axis               = "yes"
 Seed_Magnetic_Fields::n_s                                     = 2
@@ -902,7 +902,7 @@ VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[13] = 300
 WeylScal4::fd_order = "4th"
 
 #--------ZelmaniTracers----------------------
-ZelmaniTracers::tracers_with_m1			    	= "yes"
+ZelmaniTracers::tracers_with_m1			    	= "no"
 ZelmaniTracers::ntracers    							= 96000
 Zelmanitracers::interpolator_options 			= "order=2"
 ZelmaniTracers::reset_tracers_on_recover  = "no"
@@ -920,10 +920,10 @@ zelmanitracers::center_ns2[0] = -15.2
 zelmanitracers::center_ns2[1] = 0.0
 zelmanitracers::center_ns2[2] = 0.0
 
-zelmanitracers::rad_max[0] = 10.0
+zelmanitracers::rad_max[0] = 11.0
 zelmanitracers::rad_min[0] = 0.0
 
-zelmanitracers::rad_max[1] = 10.0
+zelmanitracers::rad_max[1] = 11.0
 zelmanitracers::rad_min[1] = 0.0
 
 ZelmaniTracers::outTracers_every    = 128
