@@ -30,7 +30,7 @@ void WVU_EOS_P_from_rho_Ye_T_impl( const CCTK_REAL rho,
 
   // Error handling
   if( report.error ) {
-    CCTK_VINFO("Inside WVU_EOS_P_from_rho_Ye_T. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
+    CCTK_VERROR("Inside WVU_EOS_P_from_rho_Ye_T. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
     // May want to terminate depending on the error. We'll just warn for now.
   }
 
@@ -62,7 +62,7 @@ void WVU_EOS_P_and_eps_from_rho_Ye_T_impl( const CCTK_REAL rho,
 
   // Error handling
   if( report.error ) {
-    CCTK_VINFO("Inside WVU_EOS_P_and_eps_from_rho_Ye_T. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
+    CCTK_VERROR("Inside WVU_EOS_P_and_eps_from_rho_Ye_T. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
     // May want to terminate depending on the error. We'll just warn for now.
   }
 
@@ -97,7 +97,7 @@ void WVU_EOS_P_eps_and_S_from_rho_Ye_T_impl( const CCTK_REAL rho,
 
   // Error handling
   if( report.error ) {
-    CCTK_VINFO("Inside WVU_EOS_P_eps_and_S_from_rho_Ye_T. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
+    CCTK_VERROR("Inside WVU_EOS_P_eps_and_S_from_rho_Ye_T. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
     // May want to terminate depending on the error. We'll just warn for now.
   }
 
@@ -135,7 +135,7 @@ void WVU_EOS_P_eps_S_and_cs2_from_rho_Ye_T_impl( const CCTK_REAL rho,
 
   // Error handling
   if( report.error ) {
-    CCTK_VINFO("Inside WVU_EOS_P_eps_and_S_from_rho_Ye_T. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
+    CCTK_VERROR("Inside WVU_EOS_P_eps_and_S_from_rho_Ye_T. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
     // May want to terminate depending on the error. We'll just warn for now.
   }
 
@@ -174,7 +174,7 @@ void WVU_EOS_P_eps_and_depsdT_from_rho_Ye_T_impl( const CCTK_REAL rho,
 
   // Error handling
   if( report.error ) {
-    CCTK_VINFO("Inside WVU_EOS_P_eps_and_S_from_rho_Ye_T. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
+    CCTK_VERROR("Inside WVU_EOS_P_eps_and_S_from_rho_Ye_T. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
     // May want to terminate depending on the error. We'll just warn for now.
   }
 
@@ -231,7 +231,7 @@ void WVU_EOS_P_eps_dPdrho_dPdT_depsdrho_and_depsdT_from_rho_Ye_T_impl( const CCT
 
   // Error handling
   if( report.error ) {
-    CCTK_VINFO("Inside WVU_EOS_P_eps_and_S_from_rho_Ye_T. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
+    CCTK_VERROR("Inside WVU_EOS_P_eps_and_S_from_rho_Ye_T. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
     // May want to terminate depending on the error. We'll just warn for now.
   }
 
@@ -281,7 +281,7 @@ void WVU_EOS_mue_mup_mun_muhat_Xn_and_Xp_from_rho_Ye_T_impl( const CCTK_REAL rho
 
   // Error handling
   if( report.error ) {
-    CCTK_VINFO("Inside WVU_EOS_mue_mup_mun_muhat_Xn_and_Xp_from_rho_Ye_T. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
+    CCTK_VERROR("Inside WVU_EOS_mue_mup_mun_muhat_Xn_and_Xp_from_rho_Ye_T. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
     // May want to terminate depending on the error. We'll just warn for now.
   }
 
@@ -330,7 +330,7 @@ void WVU_EOS_THC_WeakRates_from_rho_Ye_T_impl( const CCTK_REAL rho,
 
   // Error handling
   if( report.error ) {
-    CCTK_VINFO("Inside WVU_EOS_THC_WeakRates_from_rho_Ye_T. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
+    CCTK_VERROR("Inside WVU_EOS_THC_WeakRates_from_rho_Ye_T. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
     // May want to terminate depending on the error. We'll just warn for now.
   }
 
