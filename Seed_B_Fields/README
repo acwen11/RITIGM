@@ -1,0 +1,13 @@
+Cactus Code Thorn Seed_Magnetic_Fields_BNS
+Author(s)    : Zachariah B. Etienne
+Note         : The thorn on which this is based,
+               WVUThorns/Seed_Magnetic_Fields,
+               seeds magnetic fields within a single star.
+               This thorn simply extends the capability to
+               two stars, centered at (x,y,z)=(x_c1,0,0)
+               and (x,y,z)=(x_c2,0,0) (LORENE sets up the
+               neutron stars along the x-axis by default).
+               
+Maintainer(s): Zachariah B. Etienne
+License      : BSD 2-Clause (FreeBSD license)
+--------------------------------------------------------------------------

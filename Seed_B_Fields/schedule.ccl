@@ -1,0 +1,82 @@
+# Schedule definitions for thorn Seed_Magnetic_Fields_Privt
+
+STORAGE: HydroBase::rho[1],HydroBase::press[1],HydroBase::eps[1],HydroBase::vel[1],HydroBase::Bvec[1],HydroBase::Avec[1],HydroBase::Aphi[1]
+
+#STORAGE: IllinoisGRMHD::em_Ax[3],IllinoisGRMHD::em_Ay[3],IllinoisGRMHD::em_Az[3],IllinoisGRMHD::em_psi6phi[3] 
+#STORAGE: IllinoisGRMHD::grmhd_primitives_allbutBi
+
+if (seed_every != 0)
+   {
+
+     STORAGE: SeedingVars
+
+     schedule Init_Seeding_Vars at CCTK_INITIAL
+          {
+             LANG: C
+             OPTIONS: GLOBAL
+             WRITES:  EvalMyScalar, DoneSeeding
+          } "Initialize seeding variables."
+
+     schedule Init_Seeding_Vars at CCTK_POST_RECOVER_VARIABLES
+          {
+             LANG: C
+             OPTIONS: GLOBAL
+             WRITES:  EvalMyScalar, DoneSeeding
+          } "Initialize seeding variables."
+
+     schedule group Seed_During_Evolution at CCTK_POSTSTEP
+          {
+          } "Routines for seeding magnetic field during evolution."
+
+     schedule Evaluate_SeedingVars in Seed_During_Evolution
+          {
+             LANG: C
+             OPTIONS: GLOBAL
+             READS: EvalMyScalar, DoneSeeding, BNSTrackerGen::bns_x_1, BNSTrackerGen::bns_x_2, BNSTrackerGen::bns_y_1, BNSTrackerGen::bns_y_2, BNSTrackerGen::bns_sep_tot
+             WRITES: EvalMyScalar  
+          } "Evaluate whether to seed now or not."
+
+     schedule group Seeding_Tasks in Seed_During_Evolution if Seed_B_Fields::EvalMyScalar after Evaluate_SeedingVars
+          {
+          } "If conditions are met, seed magnetic field."
+
+
+     schedule Seed_B_Fields_Func in Seeding_Tasks
+          {
+             LANG: C
+          }  "Set up binary neutron star seed magnetic fields DURING evolution."
+
+
+     schedule group HydroBase_PostStep in Seeding_Tasks after Seed_B_Fields_Func
+          {
+          } "This does all the work regarding BCs for Hydro and calculating B, no C2P."
+
+
+     schedule group SetTmunu in Seeding_Tasks after HydroBase_PostStep
+          {
+          } "This calculates Tmunu, computes C2P and sets some BCs ."
+
+     schedule group MoL_PseudoEvolutionBoundaries in Seeding_Tasks after SetTmunu
+          {
+          } ""
+  
+     schedule Done_Seeding_Var in Seeding_Tasks after MoL_PseudoEvolutionBoundaries
+          {
+             LANG: C
+             OPTIONS: GLOBAL
+             READS: DoneSeeding
+             WRITES: DoneSeeding
+          } "Set done_seeding to 1"
+
+   }
+else
+   {
+
+
+     schedule Seed_Magnetic_Fields_Func at CCTK_INITIAL after Margherita_ID BEFORE IllinoisGRMHD_ID_Converter
+     {
+  LANG: C
+     } "Set up binary neutron star seed magnetic fields BEFORE evolution."
+
+
+   }
