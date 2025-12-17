@@ -26,34 +26,35 @@ SCHEDULE ZelmaniTracers_ParamCheck AT CCTK_PARAMCHECK
 } "Check parameters"
 
 #SCHEDULE ZelmaniTracers_SetupTracers AT CCTK_INITIAL AFTER HydroBase_Initial
+if(!ID_from_ReadInterpolate) {
+	if(manual_pos_tracers) {
+			SCHEDULE Manual_SetupTracers AT CCTK_POSTPOSTINITIAL
+			{
+				LANG: C
+				OPTION: global
+			} "Manually setup tracers"
 
-if(manual_pos_tracers) {
-    SCHEDULE Manual_SetupTracers AT CCTK_POSTPOSTINITIAL
-    {
-      LANG: C
-      OPTION: global
-    } "Manually setup tracers"
+			SCHEDULE ZelmaniTracers_InterpBase AT CCTK_POSTPOSTINITIAL \
+					AFTER Manual_SetupTracers
+			{
+				LANG: C
+				OPTIONS: global
+			} "Interpolate basic physical quantities at the tracer locations"
+	}
+	else {
+			SCHEDULE ZelmaniTracers_SetupTracers AT CCTK_POSTPOSTINITIAL
+			{
+				LANG: C
+				OPTION: global
+			} "Setup tracers"
 
-    SCHEDULE ZelmaniTracers_InterpBase AT CCTK_POSTPOSTINITIAL \
-        AFTER Manual_SetupTracers
-    {
-      LANG: C
-      OPTIONS: global
-    } "Interpolate basic physical quantities at the tracer locations"
-}
-else {
-    SCHEDULE ZelmaniTracers_SetupTracers AT CCTK_POSTPOSTINITIAL
-    {
-      LANG: C
-      OPTION: global
-    } "Setup tracers"
-
-    SCHEDULE ZelmaniTracers_InterpBase AT CCTK_POSTPOSTINITIAL \
-        AFTER ZelmaniTracers_SetupTracers
-    {
-      LANG: C
-      OPTIONS: global
-    } "Interpolate basic physical quantities at the tracer locations"
+			SCHEDULE ZelmaniTracers_InterpBase AT CCTK_POSTPOSTINITIAL \
+					AFTER ZelmaniTracers_SetupTracers
+			{
+				LANG: C
+				OPTIONS: global
+			} "Interpolate basic physical quantities at the tracer locations"
+	}
 }
 
 if(reset_tracers_on_recover) {
@@ -87,28 +88,30 @@ if(reset_tracers_on_recover) {
   } 
 }
 
-SCHEDULE ZelmaniTracers_EvolveTracers AT CCTK_EVOL AFTER MoL_Evolution
-{
-  LANG: C
-  OPTION: global-late
-} "evolve tracers"
+if (!init_TLs) {
+	SCHEDULE ZelmaniTracers_EvolveTracers AT CCTK_EVOL AFTER MoL_Evolution
+	{
+		LANG: C
+		OPTION: global-late
+	} "evolve tracers"
 
-SCHEDULE ZelmaniTracers_InterpBase AT CCTK_EVOL AFTER ZelmaniTracers_EvolveTracers
-{
-  LANG: C
-  OPTIONS: global-late
-} "Interpolate basic physical quantities at the tracer locations"
+	SCHEDULE ZelmaniTracers_InterpBase AT CCTK_EVOL AFTER ZelmaniTracers_EvolveTracers
+	{
+		LANG: C
+		OPTIONS: global-late
+	} "Interpolate basic physical quantities at the tracer locations"
 
-SCHEDULE ZelmaniTracers_InterpExtra AT CCTK_ANALYSIS
-{
-  LANG: C
-  OPTIONS: global
-} "Interpolate extra analysis quantities at the tracer locations"
+	SCHEDULE ZelmaniTracers_InterpExtra AT CCTK_ANALYSIS
+	{
+		LANG: C
+		OPTIONS: global
+	} "Interpolate extra analysis quantities at the tracer locations"
 
-SCHEDULE ZelmaniTracers_OutputTracers AT CCTK_ANALYSIS AFTER ZelmaniTracers_InterpExtra
-{
-  LANG: C
-  OPTION: global
-} "output tracers"
+	SCHEDULE ZelmaniTracers_OutputTracers AT CCTK_ANALYSIS AFTER ZelmaniTracers_InterpExtra
+	{
+		LANG: C
+		OPTION: global
+	} "output tracers"
+} # don't evolve tracers when initializing timelevels via backwards integration
 
 } # if(ntracers > 0)
