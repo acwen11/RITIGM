@@ -76,7 +76,7 @@ def main(args):
 
     # Create New Table
     original_tablepath = args.table
-    output_tablepath   = original_tablepath.split(".h5")[0]+"_ext_norad.h5"
+    output_tablepath   = original_tablepath.split(".h5")[0]+"_ext.h5"
 
     os.system("cp %s %s"%(original_tablepath,output_tablepath))
 
@@ -236,8 +236,10 @@ def main(args):
 
         helm_Tspace = np.tile(10**T_space_final / K_TO_MEV, (new_shape[2], 1)).T
 
+        Abar_tot = Xp[iYe,:,:] + Xn[iYe,:,:] + Xa[iYe,:,:] * 4 + Xh[iYe,:,:] * Abar[iYe,:,:]
+
         # Create Helmholtz 2D table
-        h = helmholtz.helmeos(dens=helm_rhospace, temp=helm_Tspace, abar=Abar[iYe,:,:], zbar=Abar[iYe,:,:]*valYe) # Y_e = zbar / abar 
+        h = helmholtz.helmeos(dens=helm_rhospace, temp=helm_Tspace, abar=Abar_tot, zbar=Abar_tot*valYe) # Y_e = zbar / abar 
 
         # Extend tables
         P = extend_std_table_at_Ye(iYe, num_new_pts_T, num_new_pts_rho, irho_plus, irho_minus, iT_plus, iT_minus, chi_rho, chi_temp, P, tab_P, h.ptot, do_temp_extend)
