@@ -1,0 +1,12 @@
+# Interface definition for thorn Seed_Magnetic_Fields_Privt
+
+IMPLEMENTS: Seed_B_Fields
+
+INHERITS: grid ADMBase HydroBase BNSTrackerGen IllinoisGRMHD
+
+private:
+
+CCTK_INT SeedingVars type = SCALAR tags='checkpoint="yes"'
+{
+  EvalMyScalar, DoneSeeding
+} "Integers indicating whether the magnetic field should be seeded or not. Only important for magnetic field seeding during evolution"

@@ -369,7 +369,8 @@ extern "C" void ID_TabEOS_HydroQuantities(CCTK_ARGUMENTS) {
   // Now recompute the HydroBase quantities, to ensure consistency
   if( CCTK_EQUALS( initial_Y_e        ,"ID_TabEOS_HydroQuantities") ||
       CCTK_EQUALS( initial_temperature,"ID_TabEOS_HydroQuantities") ||
-      CCTK_EQUALS( initial_entropy    ,"ID_TabEOS_HydroQuantities") ) {
+      CCTK_EQUALS( initial_entropy    ,"ID_TabEOS_HydroQuantities") ||
+			ID_from_ReadInterpolate) {
 
     ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( cctkGH,cctk_lsh[0],cctk_lsh[1],cctk_lsh[2],
                                                               npoints,r,rho,Y_e,temperature,

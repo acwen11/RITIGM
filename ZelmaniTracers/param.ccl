@@ -32,6 +32,14 @@ BOOLEAN manual_tracers_mass "set the mass for each tracers from file" STEERABLE=
 {
 } "no"
 
+BOOLEAN ID_from_ReadInterpolate "Read tracer data from checkpoint as initial data?" STEERABLE=ALWAYS
+{
+} "no"
+
+BOOLEAN init_TLs "Are we evolving backwards to init timelevels? If yes, don't evolve tracers" STEERABLE=ALWAYS
+{
+} "no"
+
 KEYWORD evolution_method "Evolution method used to update the tracers position" STEERABLE=ALWAYS
 {
     "Euler" :: "First order Euler"

@@ -43,12 +43,12 @@ GSL
 HDF5 
 hwloc 
 HydroBase
-ID_converter_ILGRMHD 
-ID_TabEOS_HydroQuantities 
+# ID_converter_ILGRMHD 
+# ID_TabEOS_HydroQuantities 
 IllinoisGRMHD 
 InitBase 
 IOUtil 
-KadathImporter
+# KadathImporter
 LAPACK 
 LocalInterp 
 LocalReduce 
@@ -62,7 +62,8 @@ NewRad
 Outflow
 QuasiLocalMeasures 
 ReflectionSymmetry
-Seed_Magnetic_Fields
+#Seed_Magnetic_Fields
+#Seed_B_Fields
 Slab 
 SpaceMask 
 SphericalSurface 
@@ -88,12 +89,44 @@ ZelmaniTracers
 zlib
 "
 
+# READINTERPOLATE SETTINGS. SDLGKH:SFJBNKJENRGIU:BSFLNKJBNDLFK
+# Needed by ReadInterpolate
+IO::filereader_ID_dir = "/scratch2/09319/acw6923/simulations/BNS_mm_MR_recover/recover"
+IO::filereader_ID_files = "checkpoint.chkpt.it_364544"
+
+# What to interpolate
+# -------------------
+# ReadInterpolate::files                        = "checkpoint.chkpt.it_364544"
+# ReadInterpolate::max_number_of_read_variables = 42
+# ##ReadInterpolate::only_these_datasets          = "HYDROBASE[:][:]rho, HYDROBASE[:][:]press, HYDROBASE[:][:]vel\[0\], HYDROBASE[:][:]vel\[1\], HYDROBASE[:][:]vel\[2\], HYDROBASE[:][:]Aphi, HYDROBASE[:][:]Avec\[0\], HYDROBASE[:][:]Avec\[1\], HYDROBASE[:][:]Avec\[2\]"
+# ReadInterpolate::only_these_datasets          = ":rho, :vel, :entropy, :temperature, :Y_e, :Aphi, :Avec, :metric, :curv, :lapse, :shift, :rN, :rE, :rF"
+# ReadInterpolate::minimum_reflevel             = 0     # Default
+# ReadInterpolate::maximum_reflevel             = 1000  # Default
+# 
+# 
+# # Interpolator settings       
+# # ---------------------       
+# ReadInterpolate::epsilon                 = 1.e-12  # Default
+# ReadInterpolate::interpolator_half_width = -1      # Default, use cctk_nghostzones
+# # ReadInterpolate::interpolator_name       = "Lagrange polynomial interpolation" # Default = Hermite
+# # ReadInterpolate::interpolator_pars       = "
+# #     order = 3
+# #     boundary_off_centering_tolerance = {1. 1. 1. 1. 1. 1.}
+# #     boundary_extrapolation_tolerance = {1.e-12 1.e-12 1.e-12 1.e-12 1.e-12 1.e-12}
+# # "
+# 
+# # Fixing the read-in data
+# # -----------------------
+# ReadInterpolate::shift_read_datasets_by[0] = 0. # Default
+# ReadInterpolate::shift_read_datasets_by[1] = 0.
+# ReadInterpolate::shift_read_datasets_by[2] = 0.
+
 # Parameters of thorn ADMBase (implementing ADMBase)
-ADMBase::initial_data             = "Kadath"
+#ADMBase::initial_data             = "zero"
 ADMBase::initial_dtlapse          = "zero"
 ADMBase::initial_dtshift          = "zero"
-ADMBase::initial_lapse            = "Kadath"
-ADMBase::initial_shift            = "Kadath"
+#ADMBase::initial_lapse            = "zero"
+ADMBase::initial_shift            = "zero"
 
 ADMBase::metric_type              = "physical"
 ADMBase::evolution_method         = "CTGamma"
@@ -226,8 +259,8 @@ Carpet::convergence_level        = 0
 Carpet::domain_from_coordbase    = "yes"
 Carpet::enable_all_storage       = "no"
 Carpet::ghost_size               = 3
-Carpet::init_3_timelevels        = "no"
-Carpet::init_fill_timelevels     = "yes"
+Carpet::init_3_timelevels        = "yes"
+Carpet::init_fill_timelevels     = "no"
 Carpet::max_refinement_levels    = 14
 Carpet::output_timers_every      = 512
 Carpet::poison_new_timelevels    = "yes"
@@ -417,55 +450,55 @@ CarpetReduce::verbose = "no"
 # Parameters of thorn CarpetRegrid2 (implementing CarpetRegrid2)
 carpet::time_refinement_factors = "[1, 1, 1, 1, 1, 2,  4,  8,  16,  32,  64,  128,  256, 512]"
 
-carpetregrid2::num_centres               = 3
-carpetregrid2::num_levels_1              = 10 # Levels 0 to 9 already activated. 10 and 11 activate at merger. 12 activates at collapse. 13 can be activated if required
-carpetregrid2::num_levels_2              = 12
-carpetregrid2::num_levels_3              = 12
+carpetregrid2::num_centres               = 1
+carpetregrid2::num_levels_1              = 12 # Levels 0 to 9 already activated. 10 and 11 activate at merger. 12 activates at collapse. 13 can be activated if required
+# carpetregrid2::num_levels_2              = 12
+# carpetregrid2::num_levels_3              = 12
 
 carpetregrid2::position_x_1              = 0
-carpetregrid2::position_x_2              = -15.2 # Adjust according to ID. Corresponds to ~45 km sep.
-carpetregrid2::position_x_3              = 15.2
+# carpetregrid2::position_x_2              = -18.6224 # Adjust according to ID. Corresponds to 55 km sep.
+# carpetregrid2::position_x_3              = 18.6224
 
-carpetregrid2::radius_1[1]               = 16384 #dx=157.696
-carpetregrid2::radius_1[2]               = 8192  #dx=78.848
-carpetregrid2::radius_1[3]               = 4096  #dx=39.424
-carpetregrid2::radius_1[4]               = 2048  #dx=19.712
-carpetregrid2::radius_1[5]               = 1024  #dx=9.856
-carpetregrid2::radius_1[6]               = 512   #dx=4.928
-carpetregrid2::radius_1[7]               = 256   #dx=2.464
-carpetregrid2::radius_1[8]               = 128   #dx=1.232
-carpetregrid2::radius_1[9]               = 70    #dx=0.616
-carpetregrid2::radius_1[10]              = 40    #dx=0.308 #activated at merger
-carpetregrid2::radius_1[11]              = 20    #dx=0.154 #activated at merger
+carpetregrid2::radius_1[1]               = 16384 #dx=122.8
+carpetregrid2::radius_1[2]               = 8192  #dx=61.44
+carpetregrid2::radius_1[3]               = 4096  #dx=30.72
+carpetregrid2::radius_1[4]               = 2048  #dx=15.36
+carpetregrid2::radius_1[5]               = 1024  #dx=7.68
+carpetregrid2::radius_1[6]               = 512   #dx=3.84
+carpetregrid2::radius_1[7]               = 256   #dx=1.92
+carpetregrid2::radius_1[8]               = 128   #dx=0.96
+carpetregrid2::radius_1[9]               = 70    #dx=0.48
+carpetregrid2::radius_1[10]              = 40    #dx=0.24 #activated at merger
+carpetregrid2::radius_1[11]              = 20    #dx=0.12 #activated at merger
 
-carpetregrid2::radius_1[12]               = 3.2  #dx=0.077 #activated just before collapse
+carpetregrid2::radius_1[12]               = 3.2  #dx=0.06 #activated just before collapse
 carpetregrid2::radius_1[13]               = 2.4  #disabled
 
 #during inspiral
 
-carpetregrid2::radius_2[1]               = 1944.0 #dx=157.696
-carpetregrid2::radius_2[2]               = 1296   #dx=78.848
-carpetregrid2::radius_2[3]               = 864    #dx=39.424
-carpetregrid2::radius_2[4]               = 576    #dx=19.712
-carpetregrid2::radius_2[5]               = 384    #dx=9.856
-carpetregrid2::radius_2[6]               = 192    #dx=4.928
-carpetregrid2::radius_2[7]               = 96     #dx=2.464
-carpetregrid2::radius_2[8]               = 48     #dx=1.232
-carpetregrid2::radius_2[9]               = 24     #dx=0.616
-carpetregrid2::radius_2[10]               = 18    #dx=0.308
-carpetregrid2::radius_2[11]               = 12    #dx=0.154
-
-carpetregrid2::radius_3[1]               = 1944.0 #dx=157.696
-carpetregrid2::radius_3[2]               = 1296   #dx=78.848
-carpetregrid2::radius_3[3]               = 864    #dx=39.424
-carpetregrid2::radius_3[4]               = 576    #dx=19.712
-carpetregrid2::radius_3[5]               = 384    #dx=9.856
-carpetregrid2::radius_3[6]               = 192    #dx=4.928
-carpetregrid2::radius_3[7]               = 96     #dx=2.464
-carpetregrid2::radius_3[8]               = 48     #dx=1.232
-carpetregrid2::radius_3[9]               = 24     #dx=0.616
-carpetregrid2::radius_3[10]               = 18    #dx=0.308
-carpetregrid2::radius_3[11]               = 12    #dx=0.154
+# carpetregrid2::radius_2[1]               = 1944.0 #dx=122.88
+# carpetregrid2::radius_2[2]               = 1296   #dx=61.44
+# carpetregrid2::radius_2[3]               = 864    #dx=30.72
+# carpetregrid2::radius_2[4]               = 576    #dx=15.36
+# carpetregrid2::radius_2[5]               = 384    #dx=7.68
+# carpetregrid2::radius_2[6]               = 192    #dx=3.84
+# carpetregrid2::radius_2[7]               = 96     #dx=1.92
+# carpetregrid2::radius_2[8]               = 48     #dx=0.96
+# carpetregrid2::radius_2[9]               = 24     #dx=0.48
+# carpetregrid2::radius_2[10]               = 18    #dx=0.24
+# carpetregrid2::radius_2[11]               = 12    #dx=0.12
+# 
+# carpetregrid2::radius_3[1]               = 1944.0 #dx=122.88
+# carpetregrid2::radius_3[2]               = 1296   #dx=61.44
+# carpetregrid2::radius_3[3]               = 864    #dx=30.72
+# carpetregrid2::radius_3[4]               = 576    #dx=15.36
+# carpetregrid2::radius_3[5]               = 384    #dx=7.68
+# carpetregrid2::radius_3[6]               = 192    #dx=3.84
+# carpetregrid2::radius_3[7]               = 96     #dx=1.92
+# carpetregrid2::radius_3[8]               = 48     #dx=0.96
+# carpetregrid2::radius_3[9]               = 24     #dx=0.48
+# carpetregrid2::radius_3[10]               = 18    #dx=0.24
+# carpetregrid2::radius_3[11]               = 12    #dx=0.12
 
 ###
 
@@ -489,11 +522,11 @@ CoordBase::boundary_shiftout_z_lower = 1
 
 CoordBase::domainsize            = "minmax"
 CoordBase::spacing               = "gridspacing"
-CoordBase::dx                    = 315.392
+CoordBase::dx                    = 245.76
 CoordBase::dy                    = CoordBase::dx
 CoordBase::dz                    = CoordBase::dx
-CoordBase::xmin                  = -35008.512 
-CoordBase::xmax                  = 35008.512 
+CoordBase::xmin                  = -34897.92 #245.76*142
+CoordBase::xmax                  = 34897.92 #245.76*142
 CoordBase::ymin                  = CoordBase::xmin
 CoordBase::ymax                  = CoordBase::xmax
 CoordBase::zmin                  = 0.0
@@ -510,17 +543,19 @@ EOS_Omni::nuceos_read_table = "yes"
 EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APRLDP_3335_rho420_temp167_ye66_gitMf0fc21f_20250403_extended_adj_mineps0.h5"
 
 # Parameters of thorn HydroBase (implementing HydroBase)
-HydroBase::initial_Aphi        = "zero"
-HydroBase::initial_Avec        = "zero"
-HydroBase::initial_entropy     = "ID_TabEOS_HydroQuantities"
-HydroBase::initial_hydro       = "Kadath"
-HydroBase::initial_temperature = "ID_TabEOS_HydroQuantities"
-HydroBase::initial_Y_e         = "ID_TabEOS_HydroQuantities"
+HydroBase::initial_Bvec    = "read from file"
+HydroBase::initial_Avec    = "read from file"
+HydroBase::initial_Aphi    = "read from file"
+HydroBase::initial_entropy     = "read from file"
+HydroBase::initial_hydro       = "read from file"
+HydroBase::initial_temperature = "read from file"
+HydroBase::initial_Y_e         = "read from file"
 HydroBase::timelevels          = 3
 
 # Parameters of thorn ID_TabEOS_HydroQuantities (implementing ID_tabEOS_HydroQuantities)
-ID_TabEOS_HydroQuantities::id_temperature_type = "constant"
-ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDPex.txt"
+# ID_TabEOS_HydroQuantities::id_temperature_type = "constant"
+# ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDPex.txt"
+# ID_TabEOS_HydroQuantities::ID_from_ReadInterpolate = "yes"
 
 # Parameters of thorn IllinoisGRMHD (implementing IllinoisGRMHD)
 IllinoisGRMHD::Symmetry = "equatorial"
@@ -537,9 +572,8 @@ IllinoisGRMHD::igm_evolve_entropy             = "yes"
 IllinoisGRMHD::igm_T_max											= 240
 IllinoisGRMHD::conserv_to_prims_debug         = 0
 IllinoisGRMHD::Psi6threshold                  = 60 # This value should only be reached far inside the horizon! Verify this!
-IllinoisGRMHD::damp_lorenz                    = 0.217416512059369 #1.5/(dtfac*dx_coarsest)=1.5/(0.021875*315.392)
+IllinoisGRMHD::damp_lorenz                    = 0.6510416666666667 #1.5/(dtfac*dx_coarsest)=1.5/(0.009375*245.76)
 
-#0.279017857142857 #1.5/(dtfac*dx_coarsest)=1.5/(0.021875*245.76)
 IllinoisGRMHD::palenzuela_depsdT_threshold    = 1e-100 # Set to 1e100/1e-100 to only use entropy/energy equation
 IllinoisGRMHD::tau_atm_hybrid                 = 1e-20
 
@@ -572,8 +606,8 @@ IOUtil::recover_and_remove              = "no"
 IOUtil::recover_dir                     = "../checkpoints"
 
 #---------KadathImporter----------
-KadathImporter::type = "BNS"
-KadathImporter::filename = "/work2/09319/acw6923/frontera/EOS/BNS_ECC_RED.APRLDPex.30.47.0.0.2.7.q1.0.0.13.info"
+# KadathImporter::type = "BNS"
+# KadathImporter::filename = "/work2/09319/acw6923/frontera/EOS/BNS_ECC_RED.APRLDPex.37.2448.-0.43.-0.43.2.7.q1.0.0.13.info"
 
 # Parameters of thorn MHD_Diagnostics
 MHD_Diagnostics::diagnostics_compute_every = 256
@@ -684,12 +718,47 @@ quasilocalmeasures::surface_index[8]     = 11
 quasilocalmeasures::surface_index[9]     = 12
 
 # Parameters of thorn Seed_Magnetic_Fields
-Seed_Magnetic_Fields::Afield_type                             = "BNS_poloidal_A_interior"
-Seed_Magnetic_Fields::A_b                                     = 94079.23592602537 # E_mag = 5e49
-Seed_Magnetic_Fields::enable_IllinoisGRMHD_staggered_A_fields = "yes"
-Seed_Magnetic_Fields::have_two_NSs_along_x_axis               = "yes"
-Seed_Magnetic_Fields::n_s                                     = 2
-Seed_Magnetic_Fields::P_cut                                   = 0.04 * 0.00016629
+# Seed_Magnetic_Fields::Afield_type                             = "BNS_poloidal_A_interior"
+# Seed_Magnetic_Fields::A_b                                     = 89698.18024629103 # E_mag = 2.5e49 erg
+# Seed_Magnetic_Fields::enable_IllinoisGRMHD_staggered_A_fields = "yes"
+# Seed_Magnetic_Fields::have_two_NSs_along_x_axis               = "yes"
+# Seed_Magnetic_Fields::x_c1 																		= -18.6224
+# Seed_Magnetic_Fields::x_c2 																		=  18.6224
+# Seed_Magnetic_Fields::n_s                                     = 2
+# Seed_Magnetic_Fields::P_cut                                   = 0.04 * 0.000137596226588397
+
+# Seed_B_Fields::enable_IllinoisGRMHD_staggered_A_fields = "yes"
+# 
+# Seed_B_Fields::P_cut = 1e-8
+# Seed_B_Fields::n_s = 2.0
+# 
+# Seed_B_Fields::have_two_NSs = "yes"
+# 
+# #Seed_B_Fields::x_c1 = -15.23
+# #Seed_B_Fields::x_c2 = 15.23
+# 
+# #Seed_B_Fields::r_NS1 = 10.0
+# #Seed_B_Fields::r_NS1_low = -1.0
+# #Seed_B_Fields::r_NS2 = 10.0
+# #Seed_B_Fields::r_NS2_low = -1.0
+# 
+# Seed_B_Fields::A_field_type = "poloidal_A_interior"
+# Seed_B_Fields::A_b = 39835.08842171014 # Tune s.t. E_mag = 2.5e49 erg at merger
+# 
+# Seed_B_Fields::g_width = 0.0
+# Seed_B_Fields::g_r0 = 0.0
+# 
+# Seed_B_Fields::use_separation = "yes"
+# Seed_B_Fields::use_time = "no"
+# 
+# Seed_B_Fields::seeding_separation = 11
+# #Seed_B_Fields::seeding_time = 20.0
+# 
+# Seed_B_Fields::seed_every = 8192
+# 
+# # ===============================
+# # MARKER: 2^(14 - 1) = 8192
+# # ===============================
 
 # Parameters of thorn SpaceMask (implementing SpaceMask)
 SpaceMask::use_mask = "yes"
@@ -801,13 +870,17 @@ TerminationTrigger::termination_file        = "TERMINATE"
 TerminationTrigger::termination_from_file   = "yes"
 
 # Parameters of thorn THC_M1
+THC_M1::ID_from_ReadInterpolate															= "yes"
+THC_M1::copy_levels 																				= "no"
+# THC_M1::reset_to_equilibrium = "yes"
+
 THC_M1::backreact                                           = "yes"
 THC_M1::closure                                             = "minerbo"
 THC_M1::fiducial_velocity                                   = "fluid"
 THC_M1::include_GR_sources                                  = "yes"
 THC_M1::source_Ye_min                                       = 0.005
 THC_M1::source_Ye_max                                       = 0.655
-THC_M1::source_limiter                                      = 0.5
+THC_M1::source_limiter                                      = 1.0 #0.5
 THC_M1::m1_dis																							= 0.1
 
 THC_M1::verbose                                             = "yes"
@@ -820,7 +893,7 @@ WeakRates::use_ye_max_ext                                   = "yes"
 WeakRates::use_ye_min_ext                                   = "yes"
 
 # Parameters of thorn Time (implementing time)
-Time::dtfac = 0.021875 #0.35/16.0
+Time::dtfac = 0.009375 #0.15/16.0 ###0.021875 #0.35/16.0
 
 # Parameters of thorn TmunuBase (implementing TmunuBase)
 TmunuBase::prolongation_type     = "none"
@@ -903,6 +976,8 @@ VolumeIntegrals_vacuum::volintegral_outside_sphere__radius[13] = 300
 WeylScal4::fd_order = "4th"
 
 #--------ZelmaniTracers----------------------
+ZelmaniTracers::ID_from_ReadInterpolate 	= "yes"
+ZelmaniTracers::init_TLs 									= "no"
 ZelmaniTracers::tracers_with_m1			    	= "no"
 ZelmaniTracers::ntracers    							= 96000
 Zelmanitracers::interpolator_options 			= "order=2"
@@ -913,18 +988,18 @@ ZelmaniTracers::seed_method = "randomize_vol"
 ZelmaniTracers::init_dens_min = IllinoisGRMHD::rho_b_atm_max * 1e4
 
 zelmanitracers::tracerproblem = "BinaryNS"
-zelmanitracers::center_ns1[0] = 15.2
+zelmanitracers::center_ns1[0] = 18.6224
 zelmanitracers::center_ns1[1] = 0.0
 zelmanitracers::center_ns1[2] = 0.0
 
-zelmanitracers::center_ns2[0] = -15.2
+zelmanitracers::center_ns2[0] = -18.6224
 zelmanitracers::center_ns2[1] = 0.0
 zelmanitracers::center_ns2[2] = 0.0
 
-zelmanitracers::rad_max[0] = 10.0
+zelmanitracers::rad_max[0] = 11.0
 zelmanitracers::rad_min[0] = 0.0
 
-zelmanitracers::rad_max[1] = 10.0
+zelmanitracers::rad_max[1] = 11.0
 zelmanitracers::rad_min[1] = 0.0
 
 ZelmaniTracers::outTracers_every    = 128

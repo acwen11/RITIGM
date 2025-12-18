@@ -49,6 +49,10 @@ CCTK_STRING temperature_filename "Initial data file for temperature"
   ""   :: "Forbidden value"
 } ""
 
+BOOLEAN ID_from_ReadInterpolate "Load ID from file"
+{
+} "no"
+
 #----------------- Initial data type ------------------
 restricted:
 CCTK_STRING id_temperature_type "Type of initial temperature"
