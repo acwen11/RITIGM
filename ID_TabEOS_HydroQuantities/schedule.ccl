@@ -16,3 +16,20 @@ if( CCTK_EQUALS( initial_Y_e        ,"ID_tabEOS_HydroQuantities" ) ||
     WRITES: HydroBase::entropy(Everywhere)
   } "Set up general relativistic hydrodynamic (GRHD) fields"
 }
+
+if(reset_hydro_on_recovery)
+{
+  schedule ID_TabEOS_HydroQuantities_Reset AT CCTK_POST_RECOVER_VARIABLES
+  {
+    LANG: C
+    WRITES: HydroBase::vel[0](Everywhere)
+    WRITES: HydroBase::vel[1](Everywhere)
+    WRITES: HydroBase::vel[2](Everywhere)
+    WRITES: HydroBase::press(Everywhere)
+    WRITES: HydroBase::rho(Everywhere)
+    WRITES: HydroBase::eps(Everywhere)
+    WRITES: HydroBase::Y_e(Everywhere)
+    WRITES: HydroBase::temperature(Everywhere)
+    WRITES: HydroBase::entropy(Everywhere)
+  } "Set up general relativistic hydrodynamic (GRHD) fields"
+}

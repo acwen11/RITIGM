@@ -381,3 +381,20 @@ extern "C" void ID_TabEOS_HydroQuantities(CCTK_ARGUMENTS) {
   CCTK_VInfo(CCTK_THORNSTRING,"All done!");
 
 }
+
+extern "C" void ID_TabEOS_HydroQuantities_Reset(CCTK_ARGUMENTS) {
+
+  DECLARE_CCTK_ARGUMENTS;
+  DECLARE_CCTK_PARAMETERS;
+
+  // Set total number of grid points
+  const CCTK_INT npoints = cctk_lsh[0]*cctk_lsh[1]*cctk_lsh[2];
+
+  // Recompute the HydroBase quantities, assuming rho, T, Y_e are valid
+	ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( cctkGH,cctk_lsh[0],cctk_lsh[1],cctk_lsh[2],
+																														npoints,r,rho,Y_e,temperature,
+																														press,eps,entropy,
+																														vel );
+
+  CCTK_VInfo(CCTK_THORNSTRING,"Reset hydro quantities.");
+}

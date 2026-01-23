@@ -19,6 +19,9 @@ USES REAL GAMMA_SPEED_LIMIT
 USES REAL Psi6threshold
 USES BOOLEAN update_Tmunu
 
+shares: ID_TabEOS_HydroQuantities
+USES BOOLEAN reset_hydro_on_recovery
+
 private:
 
 INT random_seed "Random seed for random, generally roundoff-level perturbation on initial data. Seeds srand(), and rand() is used for the RNG."
