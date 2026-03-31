@@ -109,8 +109,8 @@ ADMBase::metric_timelevels        = 3
 ADMMacros::spatial_order = 4
 
 # Parameters of thorn AHFinderDirect (implementing AHFinderDirect)
-AHFinderDirect::find_after_individual_time[1]            = 100000 #remnant not expected to collapse
-AHFinderDirect::find_after_individual_time[2]            = 100000 #remnant not expected to collapse
+AHFinderDirect::find_after_individual_time[1]            = 3000
+AHFinderDirect::find_after_individual_time[2]            = 3000
 AHFinderDirect::find_every                               = 512
 AHFinderDirect::geometry_interpolator_name               = "Lagrange polynomial interpolation"
 AHFinderDirect::geometry_interpolator_pars               = "order=4"
@@ -207,12 +207,12 @@ BNSTrackerGen::analyze_every    = 128
 BNSTrackerGen::merge_separation   = 9.0
 BNSTrackerGen::follow_hmns = "yes"
 BNSTrackerGen::move_z = "yes"
-BNSTrackerGen::collapse_separation    = -1
+BNSTrackerGen::collapse_separation    = 1.5
 BNSTrackerGen::add_levels_post_merge    = 2
 BNSTrackerGen::index_region1 = 1
 BNSTrackerGen::index_region2 = 2
 BNSTrackerGen::index_region3 = 0
-#BNSTrackerGen::add_levels_post_collapse   = 0
+BNSTrackerGen::add_levels_post_collapse   = 1
 
 # Parameters of thorn Cactus (implementing Cactus)
 Cactus::cctk_full_warnings = "yes"
@@ -508,7 +508,9 @@ ReflectionSymmetry::avoid_origin_z = "no"
 # Parameters of thorn EOS_Omni (implementing EOS_Omni)
 EOS_Omni::do_energy_shift   = "yes"
 EOS_Omni::nuceos_read_table = "yes"
-EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APRLDP_3335_rho420_temp167_ye66_gitMf0fc21f_20250403_extended_adj_mineps0.h5"
+# EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APRLDP_3335_rho420_temp167_ye66_gitMf0fc21f_20250403_extended_adj_mineps0.h5"
+# SWITCH TO COLLAPSE TRIGGER EOS
+EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APRLDP_3335_rho420_temp167_ye66_gitMf0fc21f_20250403_ext_adj_mineps0_collapse.h5"
 
 # Parameters of thorn HydroBase (implementing HydroBase)
 HydroBase::initial_Aphi        = "zero"
@@ -522,6 +524,8 @@ HydroBase::timelevels          = 3
 # Parameters of thorn ID_TabEOS_HydroQuantities (implementing ID_tabEOS_HydroQuantities)
 ID_TabEOS_HydroQuantities::id_temperature_type = "constant"
 ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDPex.txt"
+# SWITCH TO COLLAPSE TRIGGER EOS
+ID_TabEOS_HydroQuantities::reset_hydro_on_recovery = "yes"
 
 # Parameters of thorn IllinoisGRMHD (implementing IllinoisGRMHD)
 IllinoisGRMHD::Symmetry = "equatorial"
@@ -810,6 +814,8 @@ THC_M1::source_Ye_min                                       = 0.005
 THC_M1::source_Ye_max                                       = 0.655
 THC_M1::source_limiter                                      = 0.5
 THC_M1::m1_dis																							= 0.1
+
+THC_M1::m1_excision																		= "yes"
 
 THC_M1::verbose                                             = "yes"
 
