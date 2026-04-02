@@ -53,7 +53,7 @@ BOOLEAN ID_from_ReadInterpolate "Load ID from file"
 {
 } "no"
 
-BOOLEAN reset_hydro_on_recovery "Recompute hydro quantities from recovered rho, T, Y_e"
+BOOLEAN reset_hydro_on_recovery "Recompute hydro quantities from recovered rho, T, Y_e" STEERABLE=ALWAYS
 {
 } "no"
 
