@@ -346,6 +346,8 @@ CarpetIOHDF5::out2D_vars                    = "
   THC_M1::opacs
 	THC_M1::fluidsources
 	THC_M1::neutrino_fractions
+	THC_M1::nueave
+	THC_M1::thc_m1_mask
 "
 CarpetIOHDF5::out_dir                       = "$parfile/hdf5_output_3d"
 CarpetIOHDF5::out_every                     = 8192

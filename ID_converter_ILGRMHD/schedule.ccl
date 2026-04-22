@@ -4,6 +4,13 @@ schedule group IllinoisGRMHD_ID_Converter at CCTK_INITIAL after HydroBase_Initia
 {
 } "Translate ET-generated, HydroBase-compatible initial data and convert into variables used by IllinoisGRMHD"
 
+if (reset_hydro_on_recovery) {
+	schedule set_IllinoisGRMHD_GRHD_variables_only at CCTK_POST_RECOVER_VARIABLES after ID_TabEOS_HydroQuantities_Reset 
+	{
+		LANG:       C
+	} "Translate ET-generated, HydroBase-compatible initial data and convert into variables used by IllinoisGRMHD"
+}
+
 schedule set_IllinoisGRMHD_metric_GRMHD_variables_based_on_HydroBase_and_ADMBase_variables IN IllinoisGRMHD_ID_Converter as first_initialdata before TOV_Initial_Data
 {
    LANG:       C
