@@ -26,6 +26,7 @@ def solve_tov_equations(
         print(f"Could not auto-detect EOS name. Output file: {outfile}")
 
     eos = read_and_slice_EOS_table_at_given_temperature(eos_table_path, tov_temperature)
+    # eos = read_and_slice_EOS_table_at_given_entropy(eos_table_path, tov_temperature)
     # eos = set_up_EOS_parameters__Read_et_al_input_variables(eos_table_path, units="G=c=Msun=1")
 
     # Compute M0

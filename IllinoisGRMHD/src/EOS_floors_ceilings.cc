@@ -68,7 +68,7 @@ void apply_floors_and_ceilings_to_prims__recompute_prims( const igm_eos_paramete
   // Tabulated EOS specific floors and ceilings
   else if( eos.is_Tabulated ) {
     // Apply floors and ceilings to Y_e and T
-    const CCTK_REAL xye   = MIN(MAX(PRIMS[YEPRIM     ],eos.Ye_min),eos.Ye_atm);
+    const CCTK_REAL xye   = MIN(MAX(PRIMS[YEPRIM     ],eos.Ye_min),eos.Ye_max);
     const CCTK_REAL xtemp = MIN(MAX(PRIMS[TEMPERATURE],T_atm ),eos.T_max );
 
     // Additional variables used for the EOS call
