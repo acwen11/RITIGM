@@ -168,9 +168,11 @@ CactusBase/Time
 !REPO_BRANCH = $ET_RELEASE
 !REPO_PATH= $2
 !CHECKOUT =
+CactusNumerical/Dissipation
 CactusNumerical/LocalInterp
 CactusNumerical/LocalReduce
 CactusNumerical/MoL
+CactusNumerical/ReflectionSymmetry
 CactusNumerical/Slab
 CactusNumerical/SpaceMask
 CactusNumerical/SphericalSurface
@@ -209,6 +211,7 @@ CactusNumerical/SummationByParts
 !REPO_PATH= $2
 !CHECKOUT = CactusUtils/Accelerator CactusUtils/OpenCLRunTime
 #DISABLED CactusUtils/Accelerator
+CactusUtils/Formaline
 CactusUtils/NaNChecker
 #DISABLED CactusUtils/OpenCLRunTime
 CactusUtils/SystemStatistics
@@ -263,6 +266,20 @@ Carpet/TestCarpetGridInfo
 Carpet/TestLoopControl
 Carpet/Timers
 
+# CTGamma
+!TARGET   = $ARR
+!TYPE     = git
+!URL      = https://bitbucket.org/llamacode/ctgamma.git
+!REPO_BRANCH = $ET_RELEASE
+!REPO_PATH= $2
+!CHECKOUT =
+CTGamma/CTGBase
+CTGamma/CTGEvolution
+CTGamma/CTGGauge
+CTGamma/CTGConstraints
+CTGamma/CartesianCoordinates
+CTGamma/CTGMatter
+CTGamma/CTGRadiativeBC
 
 # Thorns developed at the University of Catania
 !TARGET   = $ARR
@@ -345,6 +362,7 @@ EinsteinEvolve/NewRad
 !CHECKOUT =
 EinsteinInitialData/Meudon_Bin_NS
 EinsteinInitialData/ID_NrotStar
+EinsteinInitialData/ReadInterpolate
 
 # FLRW cosmological initial data
 !TARGET   = $ARR
@@ -475,6 +493,8 @@ KrancNumericalTools/GenericFD
 !REPO_BRANCH = $ET_RELEASE
 !REPO_PATH= $2
 !CHECKOUT = Llama/doc
+Llama/ADMDerivatives
+Llama/GlobalDerivative
 
 
 # McLachlan, the spacetime code
@@ -578,6 +598,7 @@ WVUThorns_Diagnostics/particle_tracerET
 !URL      = git@github.com:RITnumrel/RITIGM_BNS.git
 !REPO_PATH= $2
 !CHECKOUT =
+RITIGM_BNS/BNSTrackerGen
 RITIGM_BNS/Convert_to_HydroBase
 RITIGM_BNS/EOS_Omni
 RITIGM_BNS/ID_converter_ILGRMHD
@@ -588,17 +609,21 @@ RITIGM_BNS/NRPyLeakageET
 RITIGM_BNS/smallbPoynET
 RITIGM_BNS/VolumeIntegrals_GRMHD
 RITIGM_BNS/WVU_EOS
+RITIGM_BNS/ZelmaniTracers
 
-# THCCore/THC_Core
-# 
-# THCBase/CPPUtils
-# THCBase/FDCore
+THCCore/THC_M1
+# THCCore/THC_LeakageBase
+# THCCore/THC_LeakageM0
+THCCore/THC_UtilsLite
+
+THCBase/CPPUtils
+THCBase/FDCore
 # THCBase/HRSCCore
 
-THCExtra/BNSAnalysis
-THCExtra/BNSTrackerGen
 THCExtra/PizzaBase
 THCExtra/PizzaNumUtils
+THCExtra/Units
+THCExtra/WeakRates
 
 # Private thorns
 !TARGET   = $ARR

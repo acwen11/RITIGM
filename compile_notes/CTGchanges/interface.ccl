@@ -1,0 +1,191 @@
+implements: CTGBase
+inherits: ADMBase SummationByParts GlobalDerivative Coordinates
+
+uses include: loopcontrol.h
+
+includes header: util.h in ctgbase_util.h
+
+### From Carpet
+CCTK_INT FUNCTION                         \
+    GetRefinementLevel                    \
+        (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION GetRefinementLevel
+
+### From LSUThorns/SummationByParts
+
+SUBROUTINE Diff_coeff ( CCTK_POINTER_TO_CONST IN cctkGH, \
+                        CCTK_INT IN dir, \
+                        CCTK_INT IN nsize, \
+                        CCTK_INT OUT ARRAY imin, \
+                        CCTK_INT OUT ARRAY imax, \
+                        CCTK_REAL OUT ARRAY q, \
+                        CCTK_INT IN table_handle )
+USES FUNCTION Diff_coeff
+
+SUBROUTINE Diff2_coeff ( CCTK_POINTER_TO_CONST IN cctkGH, \
+                         CCTK_INT IN dir, \
+                         CCTK_INT IN nsize, \
+                         CCTK_INT OUT ARRAY imin, \
+                         CCTK_INT OUT ARRAY imax, \
+                         CCTK_REAL OUT ARRAY q, \
+                         CCTK_INT IN table_handle )
+USES FUNCTION Diff2_coeff
+
+SUBROUTINE Diff_up_coeff ( CCTK_POINTER_TO_CONST IN cctkGH, \
+                           CCTK_INT IN dir,                 \
+                           CCTK_INT IN nsize,               \
+                           CCTK_INT OUT ARRAY imin,         \
+                           CCTK_INT OUT ARRAY imax,         \
+                           CCTK_REAL OUT ARRAY q,           \
+                           CCTK_INT IN up,                  \
+                           CCTK_INT IN table_handle )
+USES FUNCTION Diff_up_coeff
+
+
+### From CTGamma/CartesianCoordinates
+
+CCTK_INT FUNCTION                         \
+    MultiPatch_GetBbox                    \
+        (CCTK_POINTER_TO_CONST IN cctkGH, \
+         CCTK_INT IN size,                \
+         CCTK_INT OUT ARRAY bbox)
+USES FUNCTION MultiPatch_GetBbox
+
+CCTK_INT FUNCTION                           \
+    MultiPatch_GetBoundarySpecification     \
+        (CCTK_INT IN map,                   \
+         CCTK_INT IN size,                  \
+         CCTK_INT OUT ARRAY nboundaryzones, \
+         CCTK_INT OUT ARRAY is_internal,    \
+         CCTK_INT OUT ARRAY is_staggered,   \
+         CCTK_INT OUT ARRAY shiftout)
+USES FUNCTION MultiPatch_GetBoundarySpecification
+
+CCTK_INT FUNCTION                         \
+    MultiPatch_GetMap                     \
+        (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION MultiPatch_GetMap
+
+### From CactusBase/SymBase
+
+CCTK_INT FUNCTION \
+    SymmetryTableHandleForGrid (CCTK_POINTER_TO_CONST IN cctkGH)
+REQUIRES FUNCTION SymmetryTableHandleForGrid
+
+### From CoordBase
+
+CCTK_INT FUNCTION \
+    GetBoundarySpecification (CCTK_INT IN size,                  \
+                              CCTK_INT OUT ARRAY nboundaryzones, \
+                              CCTK_INT OUT ARRAY is_internal,    \
+                              CCTK_INT OUT ARRAY is_staggered,   \
+                              CCTK_INT OUT ARRAY shiftout)
+USES FUNCTION GetBoundarySpecification
+
+### From AEIDevelopment/GlobalDerivative
+
+uses include: GlobalDerivative.h
+
+
+### Provided functions
+
+void FUNCTION Util_GetPhysicalBoundaries(CCTK_POINTER_TO_CONST IN GH, \
+                                         CCTK_INT ARRAY OUT do_bc)
+PROVIDES FUNCTION Util_GetPhysicalBoundaries \
+  WITH CTGBase_Util_GetPhysicalBoundaries \
+  LANGUAGE C
+
+CCTK_INT FUNCTION Util_GetGridRanges (CCTK_POINTER_TO_CONST IN GH, \
+                                      CCTK_INT ARRAY OUT istart,   \
+                                      CCTK_INT ARRAY OUT iend)
+PROVIDES FUNCTION Util_GetGridRanges \
+  WITH CTGBase_Util_GetGridRanges    \
+  LANGUAGE C
+
+CCTK_INT FUNCTION Util_SetStencil (CCTK_POINTER_TO_CONST IN GH, \
+                                   CCTK_POINTER_TO_CONST OUT imin, \
+                                   CCTK_POINTER_TO_CONST OUT imax, \
+                                   CCTK_POINTER_TO_CONST OUT q, \
+                                   CCTK_INT IN deriv, \
+                                   CCTK_INT IN dir)
+PROVIDES FUNCTION Util_SetStencil \
+  WITH CTGBase_Util_SetStencil \
+  LANGUAGE C
+
+
+### Local storage
+
+public:
+
+real conformal_factor type=GF timelevels=3 \
+  tags='tensortypealias="Scalar" tensorweight=0.16666666666666667 tensorspecial="log" tensormetric="CTGamma::metric"'
+{
+  phi
+} "phi"
+
+real conformal_metric type=GF timelevels=3 \
+  tags='tensortypealias="dd_sym" tensorweight=-0.66666666666666667 tensormetric="CTGamma::metric"'
+{
+  gamma11, gamma12, gamma13, gamma22, gamma23, gamma33
+} "gamma_ij"
+
+real curvature_scalar type=GF timelevels=3 \
+  tags='tensortypealias="Scalar" tensormetric="CTGamma::metric"'
+{
+  K
+} "K"
+
+real curvature_scalar_a type=GF timelevels=3 \
+  tags='tensortypealias="Scalar" tensormetric="CTGamma::metric"'
+{
+  Khat
+} "\hat{K}"
+
+real curvature_scalar_b type=GF timelevels=3 \
+  tags='tensortypealias="Scalar" tensormetric="CTGamma::metric"'
+{
+  Theta
+} "\Theta"
+
+
+real curvature_tensor type=GF timelevels=3 \
+  tags='tensortypealias="dd_sym" tensorweight=-0.66666666666666667 tensormetric="CTGamma::metric"'
+{
+  A11, A12, A13, A22, A23, A33
+} "A_ij"
+
+real Gamma type=GF timelevels=3 \
+  tags='tensortypealias="U" tensorweight=0.66666666666666667 tensorspecial="gamma" tensormetric="CTGamma::metric"'
+{
+  Gamma1, Gamma2, Gamma3
+} "Gamma^i"
+
+private:
+
+### Temporary storage
+
+real inverse_conformal_metric type=GF timelevels=1 \
+    tags='tensortypalias="uu_sym" tensorweight=-0.66666666666666667 tensormetric="CTGamma::metric" prolongation="none"'
+{
+  igamma11, igamma12, igamma13, igamma22, igamma23, igamma33
+} "gamma^ij"
+
+real metric_determinant type=GF timelevels=1 \
+  tags='tensortypealias="Scalar" tensorweight=0.16666666666666667 tensormetric="CTGamma::metric" prolongation="none"'
+{
+  detg
+} "detg"
+
+public:
+
+### Flags and scalars
+
+int upwind_offset_group type=SCALAR
+{
+  upwind_offset
+} "Stencil offset for upwinded derivatives."
+
+real detg_exponent_group type=SCALAR
+{
+  detg_exponent
+}

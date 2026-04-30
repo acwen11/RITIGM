@@ -168,6 +168,7 @@ CactusBase/Time
 !REPO_BRANCH = $ET_RELEASE
 !REPO_PATH= $2
 !CHECKOUT =
+CactusNumerical/Dissipation
 CactusNumerical/LocalInterp
 CactusNumerical/LocalReduce
 CactusNumerical/MoL
@@ -249,6 +250,20 @@ Carpet/CycleClock
 Carpet/LoopControl
 Carpet/Timers
 
+# CTGamma
+!TARGET   = $ARR
+!TYPE     = git
+!URL      = https://bitbucket.org/llamacode/ctgamma.git
+!REPO_BRANCH = $ET_RELEASE
+!REPO_PATH= $2
+!CHECKOUT =
+CTGamma/CTGBase
+CTGamma/CTGEvolution
+CTGamma/CTGGauge
+CTGamma/CTGConstraints
+CTGamma/CartesianCoordinates
+CTGamma/CTGMatter
+CTGamma/CTGRadiativeBC
 
 # Thorns developed at the University of Catania
 !TARGET   = $ARR
@@ -322,6 +337,7 @@ EinsteinEvolve/NewRad
 !REPO_PATH= $2
 !CHECKOUT =
 EinsteinInitialData/Meudon_Bin_NS
+EinsteinInitialData/ReadInterpolate
 
 # FLRW cosmological initial data
 !TARGET   = $ARR
@@ -452,6 +468,8 @@ KrancNumericalTools/GenericFD
 !REPO_BRANCH = $ET_RELEASE
 !REPO_PATH= $2
 !CHECKOUT = Llama/doc
+Llama/ADMDerivatives
+Llama/GlobalDerivative
 
 
 # McLachlan, the spacetime code
@@ -462,6 +480,9 @@ KrancNumericalTools/GenericFD
 !REPO_PATH= $2
 !CHECKOUT = McLachlan/doc McLachlan/m McLachlan/par McLachlan/ML_WaveToy_CL
 #DISABLED McLachlan/ML_WaveToy_CL
+#McLachlan/ML_ADMConstraints
+#McLachlan/ML_BSSN
+#McLachlan/ML_BSSN_Helper
 
 
 # Numerical
@@ -527,7 +548,6 @@ Numerical/AEILocalInterp
 !REPO_BRANCH = $ET_RELEASE
 !REPO_PATH= $2
 !CHECKOUT =
-WVUThorns/Baikal
 WVUThorns/Seed_Magnetic_Fields
 
 
@@ -560,9 +580,9 @@ RITIGM_BNS/ID_converter_ILGRMHD
 RITIGM_BNS/ID_TabEOS_HydroQuantities
 RITIGM_BNS/IllinoisGRMHD
 RITIGM_BNS/MHD_Diagnostics
-RITIGM_BNS/NRPyLeakageET
-RITIGM_BNS/particle_tracerET
-RITIGM_BNS/smallbPoynET
+# RITIGM_BNS/NRPyLeakageET
+# RITIGM_BNS/particle_tracerET
+# RITIGM_BNS/smallbPoynET
 RITIGM_BNS/VolumeIntegrals_GRMHD
 RITIGM_BNS/WVU_EOS
 RITIGM_BNS/ZelmaniTracers
