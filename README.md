@@ -1,3 +1,5 @@
+The code in this repository is heavily derived from: https://github.com/leowerneck/Tabulated_EOS_IllinoisGRMHD
+
 # Tabulated Equation of State Support
 
 In this repository we will be giving `IllinoisGRMHD` tabulated equation of state (TEOS) support. Our numerical experiments indicate that to achieve the best results with the conservative-to-primitive (con2prim) routine we are using, we should also evolve the entropy $S$ along with the other GRMHD quantities.
