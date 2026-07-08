@@ -62,8 +62,7 @@ NewRad
 Outflow
 QuasiLocalMeasures 
 ReflectionSymmetry
-#Seed_Magnetic_Fields
-Seed_B_Fields
+Seed_Magnetic_Fields
 Slab 
 SpaceMask 
 SphericalSurface 
@@ -110,8 +109,8 @@ ADMBase::metric_timelevels        = 3
 ADMMacros::spatial_order = 4
 
 # Parameters of thorn AHFinderDirect (implementing AHFinderDirect)
-AHFinderDirect::find_after_individual_time[1]            = 2000
-AHFinderDirect::find_after_individual_time[2]            = 2000
+AHFinderDirect::find_after_individual_time[1]            = 100000 #remnant not expected to collapse
+AHFinderDirect::find_after_individual_time[2]            = 100000 #remnant not expected to collapse
 AHFinderDirect::find_every                               = 512
 AHFinderDirect::geometry_interpolator_name               = "Lagrange polynomial interpolation"
 AHFinderDirect::geometry_interpolator_pars               = "order=4"
@@ -148,7 +147,7 @@ CTGBase::conformal_factor_type          = "w"
 CTGBase::use_matter                     = "yes"
 
 CTGEvolution::bc                        = radiative
-CTGGauge::eta                           = 1.0/2.66161 # M_ADM = 2.67530 (from FUKA)
+CTGGauge::eta                           = 1.0/2.47661 # M_ADM (from FUKA)
 CTGGauge::damping_factor_method         = prescribed
 CTGGauge::damping_factor_type           = "Schnetter-Simple"
 CTGGauge::eta_damping_radius            = 250.0
@@ -208,17 +207,17 @@ BNSTrackerGen::analyze_every    = 128
 BNSTrackerGen::merge_separation   = 9.0
 BNSTrackerGen::follow_hmns = "yes"
 BNSTrackerGen::move_z = "yes"
-BNSTrackerGen::collapse_separation    = 1.5
+BNSTrackerGen::collapse_separation    = -1
 BNSTrackerGen::add_levels_post_merge    = 2
 BNSTrackerGen::index_region1 = 1
 BNSTrackerGen::index_region2 = 2
 BNSTrackerGen::index_region3 = 0
-BNSTrackerGen::add_levels_post_collapse   = 1
+#BNSTrackerGen::add_levels_post_collapse   = 0
 
 # Parameters of thorn Cactus (implementing Cactus)
 Cactus::cctk_full_warnings = "yes"
 Cactus::cctk_itlast        = 10000000
-Cactus::cctk_run_title     = "IGM_APR4_BNS_Magnetized"
+Cactus::cctk_run_title     = "IGM_APR_BNS_Magnetized"
 Cactus::terminate          = "iteration"
 
 # Parameters of thorn Carpet (implementing Driver)
@@ -351,7 +350,7 @@ CarpetIOHDF5::out2D_vars                    = "
 	THC_M1::thc_m1_mask
 "
 CarpetIOHDF5::out_dir                       = "$parfile/hdf5_output_3d"
-CarpetIOHDF5::out_every                     = 8192
+CarpetIOHDF5::out_every                     = 40960
 CarpetIOHDF5::out_vars                      = "
   ADMBase::metric
   ADMBase::curv
@@ -509,7 +508,7 @@ ReflectionSymmetry::avoid_origin_z = "no"
 # Parameters of thorn EOS_Omni (implementing EOS_Omni)
 EOS_Omni::do_energy_shift   = "yes"
 EOS_Omni::nuceos_read_table = "yes"
-EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/stampede3/EOS/SLy4_3335_rho420_temp167_ye66_gitM6eba730_20251218_ext_adj_mineps0.h5"
+EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APRLDP_3335_rho420_temp167_ye66_gitMf0fc21f_20250403_ext_adj_mineps0.h5"
 
 # Parameters of thorn HydroBase (implementing HydroBase)
 HydroBase::initial_Aphi        = "zero"
@@ -522,7 +521,7 @@ HydroBase::timelevels          = 3
 
 # Parameters of thorn ID_TabEOS_HydroQuantities (implementing ID_tabEOS_HydroQuantities)
 ID_TabEOS_HydroQuantities::id_temperature_type = "constant"
-ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/stampede3/EOS/Ye_beq_SLy4ex.txt"
+ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDPex.txt"
 
 # Parameters of thorn IllinoisGRMHD (implementing IllinoisGRMHD)
 IllinoisGRMHD::Symmetry = "equatorial"
@@ -548,8 +547,8 @@ IllinoisGRMHD::tau_atm_hybrid                 = 1e-20
 # Graded Atmo params
 IllinoisGRMHD::atmo_falloff                   = "yes"
 IllinoisGRMHD::atmo_falloff_T                 = "yes"
-IllinoisGRMHD::r_power 			                  = -6
-IllinoisGRMHD::r_power_T 			                = -0.4111701437845368
+IllinoisGRMHD::r_power 			      = -6
+IllinoisGRMHD::r_power_T 		      = -0.8759226975726387
 IllinoisGRMHD::rho_b_atm_max                  = 1e-13
 IllinoisGRMHD::igm_Ye_atm                     = 0.5
 IllinoisGRMHD::igm_T_atm                      = 1e-2
@@ -575,7 +574,7 @@ IOUtil::recover_dir                     = "../checkpoints"
 
 #---------KadathImporter----------
 KadathImporter::type = "BNS"
-KadathImporter::filename = "/work2/09319/acw6923/stampede3/EOS/BNS_ECC_RED.SLy4ex.30.473.0.0.2.7.q1.0.0.13.info"
+KadathImporter::filename = "/work2/09319/acw6923/frontera/EOS/BNS_ECC_RED.APRLDPex.30.47.0.0.2.5.q0.388889.0.0.11.info"
 
 # Parameters of thorn MHD_Diagnostics
 MHD_Diagnostics::diagnostics_compute_every = 256
@@ -689,45 +688,12 @@ quasilocalmeasures::surface_index[8]     = 11
 quasilocalmeasures::surface_index[9]     = 12
 
 # Parameters of thorn Seed_Magnetic_Fields
-# Seed_Magnetic_Fields::Afield_type                             = "BNS_poloidal_A_interior"
-# Seed_Magnetic_Fields::A_b                                     = 42658.902730337686 # E_mag = 2.5e49
-# Seed_Magnetic_Fields::enable_IllinoisGRMHD_staggered_A_fields = "yes"
-# Seed_Magnetic_Fields::have_two_NSs_along_x_axis               = "yes"
-# Seed_Magnetic_Fields::n_s                                     = 2
-# Seed_Magnetic_Fields::P_cut                                   = 0.04 * 0.000221818954431187
-
-Seed_B_Fields::enable_IllinoisGRMHD_staggered_A_fields = "yes"
-
-Seed_B_Fields::P_cut = 0.0001 * 0.000221818954431187
-Seed_B_Fields::n_s = 2.0
-
-Seed_B_Fields::have_two_NSs = "yes"
-
-#Seed_B_Fields::x_c1 = -15.23
-#Seed_B_Fields::x_c2 = 15.23
-
-#Seed_B_Fields::r_NS1 = 10.0
-#Seed_B_Fields::r_NS1_low = -1.0
-#Seed_B_Fields::r_NS2 = 10.0
-#Seed_B_Fields::r_NS2_low = -1.0
-
-Seed_B_Fields::A_field_type = "poloidal_A_interior"
-Seed_B_Fields::A_b = 40648.71810356797 # Tune s.t. E_mag = 2.5e49
-
-Seed_B_Fields::g_width = 0.0
-Seed_B_Fields::g_r0 = 0.0
-
-Seed_B_Fields::use_separation = "yes"
-Seed_B_Fields::use_time = "no"
-
-Seed_B_Fields::seeding_separation = 11
-#Seed_B_Fields::seeding_time = 20.0
-
-Seed_B_Fields::seed_every = 8192
-
-# ===============================
-# MARKER: 2^(14 - 1) = 8192
-# ===============================
+Seed_Magnetic_Fields::Afield_type                             = "BNS_poloidal_A_interior"
+Seed_Magnetic_Fields::A_b                                     = 68601.49940531788 # E_mag = 2.5e49
+Seed_Magnetic_Fields::enable_IllinoisGRMHD_staggered_A_fields = "yes"
+Seed_Magnetic_Fields::have_two_NSs_along_x_axis               = "yes"
+Seed_Magnetic_Fields::n_s                                     = 2
+Seed_Magnetic_Fields::P_cut                                   = 0.04 * 0.00016629
 
 # Parameters of thorn SpaceMask (implementing SpaceMask)
 SpaceMask::use_mask = "yes"
