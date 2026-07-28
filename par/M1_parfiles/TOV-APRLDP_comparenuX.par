@@ -68,9 +68,9 @@ WeakRates
 "
 
 #---------Cactus---------
-Cactus::cctk_run_title     = "Baikal_IGM_APR4_TOV"
+Cactus::cctk_run_title     = "IGM_APRLDP_TOV"
 Cactus::cctk_full_warnings = "yes"
-Cactus::terminate          = "iteration"
+Cactus::terminate          = "time"
 Cactus::cctk_final_time    = 200 #more or less 0.5 ms # divide by ~203 to get ms
 Cactus::cctk_itlast = 1632 #more or less 0.5 ms # divide by ~203 to get ms
 
@@ -160,7 +160,7 @@ Carpet::ghost_size               = 3
 Carpet::output_timers_every      = 512
 Carpet::prolongation_order_space = 5
 Carpet::prolongation_order_time  = 2
-Carpet::max_refinement_levels    = 3 # <- This will set the regrid/output frequency
+Carpet::max_refinement_levels    = 6 # <- This will set the regrid/output frequency
 #Carpet::time_refinement_factors  = "[1,2,4,8,16]"
 
 #---------CarpetInterp---------
@@ -181,10 +181,13 @@ CarpetRegrid2::num_centres             = 1
 
 # Grid #1: centered at "left" star
 # The values below are set to match Spritz
-CarpetRegrid2::num_levels_1 = 3
-CarpetRegrid2::radius_1[1]  = 20
-CarpetRegrid2::radius_1[2]  = 10
-CarpetRegrid2::regrid_every = 16
+CarpetRegrid2::num_levels_1 = 6
+CarpetRegrid2::radius_1[1]  = 256
+CarpetRegrid2::radius_1[2]  = 128
+CarpetRegrid2::radius_1[3]  = 64
+CarpetRegrid2::radius_1[4]  = 32
+CarpetRegrid2::radius_1[5]  = 16
+CarpetRegrid2::regrid_every = 32
 
 #---------CartGrid3D---------
 CartGrid3D::avoid_origin = "no"
@@ -200,12 +203,11 @@ CoordBase::boundary_size_z_upper = 3
 CoordBase::domainsize            = "minmax"
 CoordBase::spacing               = "gridspacing"
 
-# The values below are set to match Spritz
-CoordBase::dx   = 0.625
+CoordBase::dx   = 8.0
 CoordBase::dy   = CoordBase::dx
 CoordBase::dz   = CoordBase::dx
-CoordBase::xmin = -40 + 0.0625
-CoordBase::xmax = +40 + 0.0625
+CoordBase::xmin = -512
+CoordBase::xmax = +512
 CoordBase::ymin = CoordBase::xmin
 CoordBase::ymax = CoordBase::xmax
 CoordBase::zmin = CoordBase::xmin
@@ -213,7 +215,7 @@ CoordBase::zmax = CoordBase::xmax
 
 #---------EOS_Omni---------
 EOS_Omni::nuceos_read_table = "yes"
-EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APRLDP_3335_rho420_temp167_ye66_gitMf0fc21f_20250403_extended_adj_mineps0.h5"
+EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/frontera/EOS/APRLDP_3335_rho393_temp133_ye66_gitM180edd5_20190225_adj_mineps0.h5"
 EOS_Omni::do_energy_shift   = "yes"
 
 #---------HydroBase---------
@@ -224,10 +226,9 @@ HydroBase::initial_entropy     = "ID_TabEOS_HydroQuantities"
 HydroBase::timelevels          = 3
 
 #---------ID_TabEOS_HydroQuantities---------
-ID_TabEOS_HydroQuantities::id_temperature_type = "constant"
-ID_TabEOS_HydroQuantities::id_entropy_type     = "constant"
+ID_TabEOS_HydroQuantities::id_temperature_type = "from entropy"
 ID_TabEOS_HydroQuantities::id_entropy          = 1.0
-ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDPex.txt"
+ID_TabEOS_HydroQuantities::Y_e_filename        = "/work2/09319/acw6923/frontera/EOS/Ye_beq_APRLDP_s1.txt"
 
 #---------IllinoisGRMHD---------
 # Setting up the EOS parameters like this
@@ -250,14 +251,11 @@ IllinoisGRMHD::palenzuela_depsdT_threshold    = 1e-100 # Set to 1e100/1e-100 to 
 IllinoisGRMHD::tau_atm_hybrid                 = 1e-20
 
 # Graded Atmo params
-IllinoisGRMHD::atmo_falloff                   = "yes"
-IllinoisGRMHD::atmo_falloff_T                 = "yes"
-IllinoisGRMHD::r_power                        = -6
-IllinoisGRMHD::r_power_T                      = -0.8759226975726387
+IllinoisGRMHD::atmo_falloff                   = "no"
+IllinoisGRMHD::atmo_falloff_T                 = "no"
 IllinoisGRMHD::rho_b_atm_max                  = 1e-13
 IllinoisGRMHD::igm_Ye_atm                     = 0.5
 IllinoisGRMHD::igm_T_atm                      = 1e-2
-IllinoisGRMHD::r_atmo_min                     = 50
 IllinoisGRMHD::atmo_tol                       = 1e-3
 
 IllinoisGRMHD::update_HydroBase               = yes
@@ -283,7 +281,7 @@ NaNChecker::check_every     = 1024
 NaNChecker::check_vars      = "ADMBase::metric ADMBase::lapse ADMBase::shift"
 
 #---------NRPyPlusTOVID---------
-NRPyPlusTOVID::TOV_filename     = "/work2/09319/acw6923/frontera/EOS/outputTOV_APR4LDP.txt"
+NRPyPlusTOVID::TOV_filename     = "/work2/09319/acw6923/frontera/EOS/outputTOV_APRLDP_s1.txt"
 NRPyPlusTOVID::rho_atmosphere   = IllinoisGRMHD::rho_b_atm_max
 NRPyPlusTOVID::K_atmosphere     = 1
 NRPyPlusTOVID::Gamma_atmosphere = 1
@@ -349,9 +347,9 @@ sphericalsurface::ntheta[0]              = 55
 sphericalsurface::ntheta[1]              = 55
 sphericalsurface::ntheta[2]              = 55
 
-sphericalsurface::radius[0]              = 10
-sphericalsurface::radius[1]              = 20
-sphericalsurface::radius[2]              = 30
+sphericalsurface::radius[0]              = 100
+sphericalsurface::radius[1]              = 200
+sphericalsurface::radius[2]              = 400
 
 sphericalsurface::set_spherical[0]       = yes
 sphericalsurface::set_spherical[1]       = yes
@@ -455,7 +453,7 @@ CarpetIOHDF5::compression_level             = 0
 CarpetIOHDF5::one_file_per_group            = "no"
 CarpetIOHDF5::open_one_input_file_at_a_time = "yes"
 CarpetIOHDF5::out2D_dir                     = "$parfile/hdf5_output_2d"
-CarpetIOHDF5::out2D_every                   = 32
+CarpetIOHDF5::out2D_every                   = 64
 CarpetIOHDF5::out2D_vars                    = "
   ADMBase::metric
   ADMBase::curv

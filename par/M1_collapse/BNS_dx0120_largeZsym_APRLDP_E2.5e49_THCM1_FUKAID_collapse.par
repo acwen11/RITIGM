@@ -566,7 +566,7 @@ InitBase::initial_data_setup_method = "init_all_levels"
 
 # Parameters of thorn IOUtil (implementing IO)
 IOUtil::checkpoint_dir                  = "../checkpoints"
-IOUtil::checkpoint_every_walltime_hours = 3 #16
+IOUtil::checkpoint_every_walltime_hours = 16
 IOUtil::checkpoint_keep                 = 3
 IOUtil::checkpoint_on_terminate         = "yes"
 IOUtil::out_dir                         = "$parfile"
