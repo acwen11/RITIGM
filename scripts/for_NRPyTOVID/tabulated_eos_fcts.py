@@ -6,10 +6,10 @@ from bisect import bisect_left                  # Bisection algorithm
 import h5py as h5                               # HDF5 file system support
 from collections import namedtuple              # C-like struct functionality
 # 1d and 2d interpolating functions
-from scipy.interpolate import interp1d, interp2d
+from scipy.interpolate import interp1d, interp2d, RegularGridInterpolator
 import bisect                                   # Bisection algorithms
 import astropy.constants as constants
-from numpy import empty, array, zeros, log, exp, loadtxt
+from numpy import empty, array, zeros, log, exp, loadtxt, zeros_like, savetxt
 
 sys.path.append("/Users/allenwen/Research/Carpet/Cactus/repos/thcextra/tools/eos_tables/modules")
 import betaeq
@@ -241,10 +241,9 @@ def read_and_slice_EOS_table_at_given_entropy(eos_file_path, S_in_kb):
     tab_ent = array(eos_file['entropy'])[:]
 
     # Read in the chemical potentials
-#     munu     =     array(eos_file['munu'   ])[:]
     mu_e = array(eos_file['mu_e'])[:]
-    mu_hat = array(eos_file['muhat'])[:]
-    mu_l = mu_e - mu_hat
+    mu_n = array(eos_file['mu_n'])[:]
+    mu_p = array(eos_file['mu_p'])[:]
 
     # Now, loop over the density and set the array
     Ye_be = empty(len(tab_lr))
@@ -257,26 +256,29 @@ def read_and_slice_EOS_table_at_given_entropy(eos_file_path, S_in_kb):
 
         # Find temperature index
         # Set temperatures at fixed entropy and beta eq. Pretty hacky, I'm just importing THC interpolators
-        t_of_s = betaeq.find_temp_given_ent(table["temp"], table["ye"],
-                    table["entropy"][:,:,rho_idx], args.entropy)
-        mu_e_1d = np.zeros_like(tab_Ye)
-        mu_p_1d = np.zeros_like(tab_Ye)
-        mu_n_1d = np.zeros_like(tab_Ye)
+        t_of_s = betaeq.find_temp_given_ent(tab_lt, tab_Ye,
+                    tab_ent[:,:,rho_idx], S_in_kb)
+        mu_e_1d = zeros_like(tab_Ye)
+        mu_p_1d = zeros_like(tab_Ye)
+        mu_n_1d = zeros_like(tab_Ye)
         for iye in range(mu_e_1d.shape[0]):
-            mu_e_1d[iye] = myinterp1d(table["temp"], table["mu_e"][iye,:,rho_idx])(t_of_s[iye])
-            mu_n_1d[iye] = myinterp1d(table["temp"], table["mu_n"][iye,:,rho_idx])(t_of_s[iye])
-            mu_p_1d[iye] = myinterp1d(table["temp"], table["mu_p"][iye,:,rho_idx])(t_of_s[iye])
-        Ye_be[rho_idx] = betaeq.find_beta_eq(table["ye"], mu_e_1d, mu_n_1d, mu_p_1d)
-        T_be[rho_idx] = myinterp1d(table["ye"], t_of_s)(ye_slice[inb])
-        T_idx = bisect.bisect_left(tab_lt, log(T_be[rho_idx]))
+            mu_e_1d[iye] = myinterp1d(tab_lt, mu_e[iye,:,rho_idx])(t_of_s[iye])
+            mu_n_1d[iye] = myinterp1d(tab_lt, mu_n[iye,:,rho_idx])(t_of_s[iye])
+            mu_p_1d[iye] = myinterp1d(tab_lt, mu_p[iye,:,rho_idx])(t_of_s[iye])
+        Ye_be[rho_idx] = betaeq.find_beta_eq(tab_Ye, mu_e_1d, mu_n_1d, mu_p_1d)
+        T_be[rho_idx] = myinterp1d(tab_Ye, t_of_s)(Ye_be[rho_idx])
+        T_idx = bisect.bisect_left(tab_lt, T_be[rho_idx])
         print("Slicing table at index %d. T[%d] = %.3lf MeV" % (
             T_idx, T_idx, exp(tab_lt[T_idx])))
 
         # Set 2d interpolators for P and eps
         # as functions of rho and Ye
-        lp_interp = interp2d(tab_lr, tab_Ye, tab_lp[:, T_idx, :])
-        le_interp = interp2d(tab_lr, tab_Ye, tab_le[:, T_idx, :])
-        ent_interp = interp2d(tab_lr, tab_Ye, tab_ent[:, T_idx, :])
+        # lp_interp = interp2d(tab_lr, tab_Ye, tab_lp[:, T_idx, :])
+        # le_interp = interp2d(tab_lr, tab_Ye, tab_le[:, T_idx, :])
+        # ent_interp = interp2d(tab_lr, tab_Ye, tab_ent[:, T_idx, :])
+        lp_interp = RegularGridInterpolator((tab_Ye, tab_lr), tab_lp[:, T_idx, :])
+        le_interp = RegularGridInterpolator((tab_Ye, tab_lr), tab_le[:, T_idx, :])
+        ent_interp =RegularGridInterpolator((tab_Ye, tab_lr), tab_ent[:, T_idx, :])
 
         # # Set the interpolator
         # #         Ye_ito_munu_of_T_and_rho = interp1d(munu[:,T_idx,rho_idx],tab_Ye)
@@ -289,10 +291,11 @@ def read_and_slice_EOS_table_at_given_entropy(eos_file_path, S_in_kb):
         # # Set Ye in beta equilibrium
         # Ye_be[rho_idx] = YeL
         # Finally, determine P and eps in beta equilibrium
-        lp_be[rho_idx] = lp_interp(tab_lr[rho_idx], Ye_be[rho_idx])
-        le_be[rho_idx] = le_interp(tab_lr[rho_idx], Ye_be[rho_idx])
-        ent_be[rho_idx] = ent_interp(tab_lr[rho_idx], Ye_be[rho_idx])
+        lp_be[rho_idx] = lp_interp([Ye_be[rho_idx], tab_lr[rho_idx]])
+        le_be[rho_idx] = le_interp([Ye_be[rho_idx], tab_lr[rho_idx]])
+        ent_be[rho_idx] = ent_interp([Ye_be[rho_idx], tab_lr[rho_idx]])
 
+    savetxt("Ye_beq_s{:g}.txt".format(S_in_kb), Ye_be)
     # Convert table to code units
     # Set physical constants in cgs units
     G = 6.6738480e-8   # cm^3/g/s^2

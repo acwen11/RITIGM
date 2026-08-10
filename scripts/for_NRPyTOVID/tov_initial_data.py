@@ -1,7 +1,7 @@
 from sys import argv, exit
 from numpy import log10, fabs
 from TOV_Solver import TOV_Solver
-from tabulated_eos_fcts import read_and_slice_EOS_table_at_given_temperature
+from tabulated_eos_fcts import read_and_slice_EOS_table_at_given_entropy
 
 # from TOV.Polytropic_EOSs import set_up_EOS_parameters__Read_et_al_input_variables
 from time import time
@@ -25,8 +25,8 @@ def solve_tov_equations(
         outfile = outfile.replace("@name@", "tabulated")
         print(f"Could not auto-detect EOS name. Output file: {outfile}")
 
-    eos = read_and_slice_EOS_table_at_given_temperature(eos_table_path, tov_temperature)
-    # eos = read_and_slice_EOS_table_at_given_entropy(eos_table_path, tov_temperature)
+    # eos = read_and_slice_EOS_table_at_given_temperature(eos_table_path, tov_temperature)
+    eos = read_and_slice_EOS_table_at_given_entropy(eos_table_path, tov_temperature)
     # eos = set_up_EOS_parameters__Read_et_al_input_variables(eos_table_path, units="G=c=Msun=1")
 
     # Compute M0
