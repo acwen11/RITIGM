@@ -276,3 +276,151 @@ void IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(const int
     CONSERVS[YESTAR ] = CONSERVS[RHOSTAR] * PRIMS[YEPRIM];
   }
 }
+
+// template <typename EOSType, bool limiting>
+// CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline void
+void bh_interior(CCTK_REAL* PRIMS, CCTK_REAL* CONSERVS, CCTK_REAL* METRIC, CCTK_REAL* METRIC_PHYS, CCTK_REAL* METRIC_LAP_PSI4, 
+  const CCTK_REAL T_atm, const CCTK_REAL ye_atm, const CCTK_BOOL limiting) {
+
+  DECLARE_CCTK_PARAMETERS;
+  // Treatment for BH interiors after C2P failures
+  // NOTE: By default, alp_thresh=0 so the if condition below is never
+  // triggered. One must be very careful when using this functionality and
+  // must correctly set alp_thresh, rho_BH, eps_BH and vwlim_BH in the
+  // parfile
+
+  const CCTK_REAL wlim_BH = sqrt(1.0 + vwlim_BH * vwlim_BH);
+  const CCTK_REAL vlim_BH = vwlim_BH / wlim_BH;
+
+  // Calculate Lorentz factor
+  const CCTK_REAL lapseL = METRIC_LAP_PSI4[LAPSE];
+  const CCTK_REAL lapseL_inv = 1.0/lapseL;
+  const CCTK_REAL vxL = (PRIMS[VX] + METRIC[SHIFTX])*lapseL_inv;
+  const CCTK_REAL vyL = (PRIMS[VY] + METRIC[SHIFTY])*lapseL_inv;
+  const CCTK_REAL vzL = (PRIMS[VZ] + METRIC[SHIFTZ])*lapseL_inv;
+
+  // // This is Valencia (HydroBase) v^2
+  CCTK_REAL one_minus_one_over_alpha_u0_squared = (METRIC_PHYS[GXX] * SQR(PRIMS[VX] + METRIC[SHIFTX]) +
+                                                  2.0*METRIC_PHYS[GXY] * (PRIMS[VX] + METRIC[SHIFTX])*(PRIMS[VY] + METRIC[SHIFTY]) +
+                                                  2.0*METRIC_PHYS[GXZ] * (PRIMS[VX] + METRIC[SHIFTX])*(PRIMS[VZ] + METRIC[SHIFTZ]) +
+                                                  METRIC_PHYS[GYY] * SQR(PRIMS[VY] + METRIC[SHIFTY]) +
+                                                  2.0*METRIC_PHYS[GYZ] * (PRIMS[VY] + METRIC[SHIFTY])*(PRIMS[VZ] + METRIC[SHIFTZ]) +
+                                                  METRIC_PHYS[GZZ] * SQR(PRIMS[VZ] + METRIC[SHIFTZ]))*SQR(lapseL_inv);
+  const wlorL = 1.0/sqrt(1.0-one_minus_one_over_alpha_u0_squared);
+
+  bool recomp_flag = false;
+
+  if (limiting) {
+
+    if (PRIMS[RHOB] > rho_BH) {
+      PRIMS[RHOB] = rho_BH; // typically set to 0.01% to 1% of rho_max of initial
+                       // NS or disk
+      recomp_flag = true;
+    };
+
+    if (PRIMS[EPSILON] > eps_BH) {
+      PRIMS[EPSILON] = eps_BH;
+      recomp_flag = true;
+    };
+
+    const CCTK_REAL sol_v = sqrt(one_minus_one_over_alpha_u0_squared)
+    if (sol_v > vlim_BH) {
+      vxL *= vlim_BH / sol_v;
+      vyL *= vlim_BH / sol_v;
+      vzL *= vlim_BH / sol_v;
+      PRIMS[VX] = lapseL * vxL - METRIC[SHIFTX];
+      PRIMS[VY] = lapseL * vyL - METRIC[SHIFTY];
+      PRIMS[VZ] = lapseL * vzL - METRIC[SHIFTZ];
+      recomp_flag = true;
+    };
+
+    if (recomp_flag) {
+      CCTK_REAL tempL, pressL, entL;
+      WVU_EOS_P_S_and_T_from_rho_Ye_eps(PRIMS[RHO], PRIMS[YE], PRIMS[EPSILON], T_atm, pressL, entL, tempL);
+      PRIMS[TEMPERATURE] = tempL;
+      PRIMS[PRESSURE] = pressL;
+      PRIMS[ENTROPY] = entL;
+
+      // cv.from_prim(pv, glo);
+    };
+
+  } else {
+
+    PRIMS[RHO] = rho_BH; // typically set to 0.01% to 1% of rho_max of initial
+                     // NS or disk
+    PRIMS[EPSILON] = eps_BH;
+    PRIMS[YE] = ye_atm;
+
+    CCTK_REAL tempL, pressL, entL;
+    WVU_EOS_P_S_and_T_from_rho_Ye_eps(PRIMS[RHO], PRIMS[YE], PRIMS[EPSILON], T_atm, pressL, entL, tempL);
+    PRIMS[TEMPERATURE] = tempL;
+    PRIMS[PRESSURE] = pressL;
+    PRIMS[ENTROPY] = entL;
+
+    // Set velocity such that new conserved momentum has same
+    // direction as before
+
+    // Inverse metric
+    const CCTK_REAL sqrt_detg = METRIC_LAP_PSI4[PSI6];
+    // const smat<CCTK_REAL, 3> gup = calc_inv(glo, spatial_detg);
+
+    // Compute Z = rho * h * W * W
+    const CCTK_REAL Z_loc =
+        (PRIMS[RHO] * (1.0 + PRIMS[EPSILON]) + PRIMS[PRESSURE]) * wlim_BH * wlim_BH;
+
+    // Get Bsq
+    // const vec<CCTK_REAL, 3> B_low = calc_contraction(glo, pv.Bvec);
+    // const CCTK_REAL Bsq = calc_contraction(B_low, pv.Bvec);
+    const CCTK_REAL BxL = PRIMS[BX_CENTER];
+    const CCTK_REAL ByL = PRIMS[BY_CENTER];
+    const CCTK_REAL BzL = PRIMS[BZ_CENTER];
+    const CCTK_REAL Bsq = METRIC_PHYS[GXX] * BxL*BxL + METRIC_PHYS[GYY] * ByL*ByL + METRIC_PHYS[GZZ] * BzL * BzL +
+      2.0 * (METRIC_PHYS[GXY] * BxL*ByL + METRIC_PHYS[GXZ] * BxL*BzL + METRIC_PHYS[GYZ] * ByL*BzL);
+
+    // Norm of conserved momentum, undensitize here
+    // vec<CCTK_REAL, 3> mom_low = cv.mom / sqrt_detg;
+    CCTK_REAL momx = CONSERVS[STILDEX] / sqrt_detg;
+    CCTK_REAL momy = CONSERVS[STILDEY] / sqrt_detg;
+    CCTK_REAL momz = CONSERVS[STILDEZ] / sqrt_detg;
+    // vec<CCTK_REAL, 3> mom_up = calc_contraction(gup, mom_low);
+    CCTK_REAL momupx = METRIC_PHYS[GXX] * momx + METRIC_PHYS[GXY] * momy + METRIC_PHYS[GXZ] * momz;
+    CCTK_REAL momupy = METRIC_PHYS[GXY] * momx + METRIC_PHYS[GYY] * momy + METRIC_PHYS[GYZ] * momz;
+    CCTK_REAL momupz = METRIC_PHYS[GXZ] * momx + METRIC_PHYS[GYZ] * momy + METRIC_PHYS[GZZ] * momz;
+    const CCTK_REAL Ssq_old = momx * momupx + momy * momupy + momz * momupz;
+    const CCTK_REAL S_old = sqrt(Ssq_old) + 1e-50;
+
+    // Get BiSi = S_iB^i
+    // const CCTK_REAL BiSi_old = calc_contraction(mom_low, pv.Bvec);
+    const CCTK_REAL BiSi_old = momx * BxL + momy * ByL + momz * BzL;
+
+    // Normalize S_iB^i by S = sqrt(S_iS^i)
+    const CCTK_REAL BiEsi = BiSi_old / S_old;
+
+    // Compute magnitude of new conserved momentum
+    const CCTK_REAL Ssq_new =
+        ((Z_loc + Bsq) * (Z_loc + Bsq) * vlim_BH * vlim_BH) /
+        (1.0 + BiEsi * BiEsi * (2.0 * Z_loc + Bsq) / (Z_loc * Z_loc));
+    const CCTK_REAL S_new = sqrt(Ssq_new);
+
+    // Rescale momenta
+    // mom_low *= S_new / S_old;
+    mom_upx *= S_new / S_old;
+    mom_upy *= S_new / S_old;
+    mom_upz *= S_new / S_old;
+
+    // Finally, compute velocity
+    // This is (24) from https://arxiv.org/pdf/1712.07538
+    PRIMS[VX] = momupx / (Z_loc + Bsq);
+    PRIMS[VX] += BiEsi * S_new * BxL / (Z_loc * (Z_loc + Bsq));
+
+    PRIMS[VY] = momupy / (Z_loc + Bsq);
+    PRIMS[VY] += BiEsi * S_new * ByL / (Z_loc * (Z_loc + Bsq));
+
+    PRIMS[VZ] = momupz / (Z_loc + Bsq);
+    PRIMS[VZ] += BiEsi * S_new * BzL / (Z_loc * (Z_loc + Bsq));
+
+    // pv.w_lor = wlim_BH;
+
+    // cv.from_prim(pv, glo);
+  }
+};
