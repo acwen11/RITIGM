@@ -696,6 +696,7 @@ quasilocalmeasures::surface_index[9]     = 12
 # Seed_Magnetic_Fields::n_s                                     = 2
 # Seed_Magnetic_Fields::P_cut                                   = 0.04 * 0.000221818954431187
 
+ID_converter_ILGRMHD::pure_hydro_run = "yes" # Needed to initialize Avec = 0
 Seed_B_Fields::enable_IllinoisGRMHD_staggered_A_fields = "yes"
 
 Seed_B_Fields::P_cut = 0.0001 * 0.000221818954431187
@@ -847,6 +848,9 @@ THC_M1::source_Ye_min                                       = 0.005
 THC_M1::source_Ye_max                                       = 0.655
 THC_M1::source_limiter                                      = 0.5
 THC_M1::m1_dis																							= 0.1
+
+THC_M1::m1_excision																		= "yes"
+THC_M1::excision_surface = 1
 
 THC_M1::verbose                                             = "yes"
 
