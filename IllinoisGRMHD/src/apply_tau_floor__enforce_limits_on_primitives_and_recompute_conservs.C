@@ -279,8 +279,8 @@ void IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(const int
 
 // template <typename EOSType, bool limiting>
 // CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline void
-void bh_interior(CCTK_REAL* PRIMS, CCTK_REAL* CONSERVS, CCTK_REAL* METRIC, CCTK_REAL* METRIC_PHYS, CCTK_REAL* METRIC_LAP_PSI4, 
-  const CCTK_REAL T_atm, const CCTK_REAL ye_atm, const CCTK_BOOL limiting) {
+void bh_interior(igm_eos_parameters &eos, CCTK_REAL* PRIMS, CCTK_REAL* CONSERVS, CCTK_REAL* METRIC, CCTK_REAL* METRIC_PHYS, CCTK_REAL* METRIC_LAP_PSI4, 
+  const CCTK_REAL T_atm, const CCTK_REAL ye_atm, const bool limiting) {
 
   DECLARE_CCTK_PARAMETERS;
   // Treatment for BH interiors after C2P failures
@@ -295,9 +295,9 @@ void bh_interior(CCTK_REAL* PRIMS, CCTK_REAL* CONSERVS, CCTK_REAL* METRIC, CCTK_
   // Calculate Lorentz factor
   const CCTK_REAL lapseL = METRIC_LAP_PSI4[LAPSE];
   const CCTK_REAL lapseL_inv = 1.0/lapseL;
-  const CCTK_REAL vxL = (PRIMS[VX] + METRIC[SHIFTX])*lapseL_inv;
-  const CCTK_REAL vyL = (PRIMS[VY] + METRIC[SHIFTY])*lapseL_inv;
-  const CCTK_REAL vzL = (PRIMS[VZ] + METRIC[SHIFTZ])*lapseL_inv;
+  CCTK_REAL vxL = (PRIMS[VX] + METRIC[SHIFTX])*lapseL_inv;
+  CCTK_REAL vyL = (PRIMS[VY] + METRIC[SHIFTY])*lapseL_inv;
+  CCTK_REAL vzL = (PRIMS[VZ] + METRIC[SHIFTZ])*lapseL_inv;
 
   // // This is Valencia (HydroBase) v^2
   CCTK_REAL one_minus_one_over_alpha_u0_squared = (METRIC_PHYS[GXX] * SQR(PRIMS[VX] + METRIC[SHIFTX]) +
@@ -306,7 +306,7 @@ void bh_interior(CCTK_REAL* PRIMS, CCTK_REAL* CONSERVS, CCTK_REAL* METRIC, CCTK_
                                                   METRIC_PHYS[GYY] * SQR(PRIMS[VY] + METRIC[SHIFTY]) +
                                                   2.0*METRIC_PHYS[GYZ] * (PRIMS[VY] + METRIC[SHIFTY])*(PRIMS[VZ] + METRIC[SHIFTZ]) +
                                                   METRIC_PHYS[GZZ] * SQR(PRIMS[VZ] + METRIC[SHIFTZ]))*SQR(lapseL_inv);
-  const wlorL = 1.0/sqrt(1.0-one_minus_one_over_alpha_u0_squared);
+  const CCTK_REAL wlorL = 1.0/sqrt(1.0-one_minus_one_over_alpha_u0_squared);
 
   bool recomp_flag = false;
 
@@ -322,8 +322,13 @@ void bh_interior(CCTK_REAL* PRIMS, CCTK_REAL* CONSERVS, CCTK_REAL* METRIC, CCTK_
       PRIMS[EPSILON] = eps_BH;
       recomp_flag = true;
     };
+    
+    if ((PRIMS[YE] < eos.Ye_min) || (PRIMS[YE] > eos.Ye_max)) {
+      PRIMS[YE] = MIN(MAX(PRIMS[YE], eos.Ye_min ),eos.Ye_max );
+      recomp_flag = true;
+    }
 
-    const CCTK_REAL sol_v = sqrt(one_minus_one_over_alpha_u0_squared)
+    const CCTK_REAL sol_v = sqrt(one_minus_one_over_alpha_u0_squared);
     if (sol_v > vlim_BH) {
       vxL *= vlim_BH / sol_v;
       vyL *= vlim_BH / sol_v;
@@ -336,7 +341,7 @@ void bh_interior(CCTK_REAL* PRIMS, CCTK_REAL* CONSERVS, CCTK_REAL* METRIC, CCTK_
 
     if (recomp_flag) {
       CCTK_REAL tempL, pressL, entL;
-      WVU_EOS_P_S_and_T_from_rho_Ye_eps(PRIMS[RHO], PRIMS[YE], PRIMS[EPSILON], T_atm, pressL, entL, tempL);
+      WVU_EOS_P_S_and_T_from_rho_Ye_eps(PRIMS[RHO], PRIMS[YE], PRIMS[EPSILON], T_atm, &pressL, &entL, &tempL);
       PRIMS[TEMPERATURE] = tempL;
       PRIMS[PRESSURE] = pressL;
       PRIMS[ENTROPY] = entL;
@@ -352,7 +357,7 @@ void bh_interior(CCTK_REAL* PRIMS, CCTK_REAL* CONSERVS, CCTK_REAL* METRIC, CCTK_
     PRIMS[YE] = ye_atm;
 
     CCTK_REAL tempL, pressL, entL;
-    WVU_EOS_P_S_and_T_from_rho_Ye_eps(PRIMS[RHO], PRIMS[YE], PRIMS[EPSILON], T_atm, pressL, entL, tempL);
+    WVU_EOS_P_S_and_T_from_rho_Ye_eps(PRIMS[RHO], PRIMS[YE], PRIMS[EPSILON], T_atm, &pressL, &entL, &tempL);
     PRIMS[TEMPERATURE] = tempL;
     PRIMS[PRESSURE] = pressL;
     PRIMS[ENTROPY] = entL;
@@ -404,9 +409,9 @@ void bh_interior(CCTK_REAL* PRIMS, CCTK_REAL* CONSERVS, CCTK_REAL* METRIC, CCTK_
 
     // Rescale momenta
     // mom_low *= S_new / S_old;
-    mom_upx *= S_new / S_old;
-    mom_upy *= S_new / S_old;
-    mom_upz *= S_new / S_old;
+    momupx *= S_new / S_old;
+    momupy *= S_new / S_old;
+    momupz *= S_new / S_old;
 
     // Finally, compute velocity
     // This is (24) from https://arxiv.org/pdf/1712.07538
@@ -423,4 +428,5 @@ void bh_interior(CCTK_REAL* PRIMS, CCTK_REAL* CONSERVS, CCTK_REAL* METRIC, CCTK_
 
     // cv.from_prim(pv, glo);
   }
-};
+  // CCTK_VINFO("BH Interior Fix Done! rho = %g, P = %g, eps = %g, T = %g v^i = %g %g %g", PRIMS[RHOB], PRIMS[PRESSURE], PRIMS[EPSILON], PRIMS[TEMPERATURE], PRIMS[VX], PRIMS[VY], PRIMS[VZ]);
+}
