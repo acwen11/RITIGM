@@ -96,10 +96,31 @@ INT conserv_to_prims_debug "0: no, 1: yes" STEERABLE=ALWAYS
  0:1 :: "zero (no) or one (yes)"
 } 0
 
-REAL Psi6threshold "Where Psi^6 > Psi6threshold, we assume we're inside the horizon in the primitives solver, and certain limits are relaxed or imposed" STEERABLE=ALWAYS
+REAL c2p_alp_lim "Where lapse < c2p_alp_lim, we assume we're inside the horizon in the primitives solver, and certain limits are relaxed or imposed" STEERABLE=ALWAYS
+{
+ *:* :: "Can set to anything"
+} 0
+
+CCTK_REAL rho_BH " Maximum density allowed in regions where alp<alp_thresh" STEERABLE=ALWAYS
+{
+  0.0:* :: ""
+} 1.0e100
+
+CCTK_REAL eps_BH " Maximum eps allowed in regions where alp<alp_thresh" STEERABLE=ALWAYS
+{
+  0.0:* :: ""
+} 1.0e100
+
+CCTK_REAL vwlim_BH " Maximum zvec (v*w) allowed in regions where alp<alp_thresh" STEERABLE=ALWAYS
+{
+  0.0:* :: ""
+} 1.0e100
+
+REAL Psi6threshold "NOT ACTIVE: Where Psi^6 > Psi6threshold, we assume we're inside the horizon in the primitives solver, and certain limits are relaxed or imposed" STEERABLE=ALWAYS
 {
  *:* :: "Can set to anything"
 } 1e100
+
 #########################################################
 
 #########################################################

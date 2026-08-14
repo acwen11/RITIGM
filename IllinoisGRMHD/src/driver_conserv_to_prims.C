@@ -411,13 +411,23 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 							}
 						}
 
+            bool bh_fix = false; 
 						if( check != 0 ) {
 							//--------------------------------------------------
 							//----------- Primitive recovery failed ------------
 							//--------------------------------------------------
 							// Increment the failure flag
 							con2prim_failed_flag[index] += 1;
-							if( con2prim_failed_flag[index] > 4 ) {
+							if( METRIC_LAP_PSI4[LAPSE] < c2p_alp_lim ) {
+                // Failure inside horizon
+                // CCTK_VINFO("Perfoming BH Interior reset");
+                bh_interior(eos, PRIMS, CONSERVS, METRIC, METRIC_PHYS, METRIC_LAP_PSI4, T_atm, eos.Ye_atm, false);
+                bh_fix = true;
+								// Then flag this point as a "success"
+								check = 0;
+								con2prim_failed_flag[index] = 0;
+              }
+							else if( con2prim_failed_flag[index] > 4 ) {
 								// Sigh, reset to atmosphere
 								reset_prims_to_atmosphere( eos, rho_b_atm, T_atm, P_atm, eps_atm, S_atm, METRIC[SHIFTX], METRIC[SHIFTY], METRIC[SHIFTZ], PRIMS );
 								atm_resets++;
@@ -443,6 +453,12 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 							//--------------------------------------------------
 							//---------- Primitive recovery succeeded ----------
 							//--------------------------------------------------
+							if( (METRIC_LAP_PSI4[LAPSE] < c2p_alp_lim) && !bh_fix ) {
+                // If not previously fixed, limit values inside horizon
+                // CCTK_VINFO("Perfoming BH Interior limiting");
+                bh_interior(eos, PRIMS, CONSERVS, METRIC, METRIC_PHYS, METRIC_LAP_PSI4, T_atm, eos.Ye_atm, true);
+                bh_fix = true;
+              }
 							// Enforce limits on primitive variables and recompute conservatives.
 							static const int already_computed_physical_metric_and_inverse=1;
 							CCTK_REAL TUPMUNU[10],TDNMUNU[10];
@@ -588,6 +604,8 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 								error_int_numer += fabs(Ye_star[index] - Ye_star_orig);
 								error_int_denom += Ye_star_orig;
 							}
+
+              error_int_numer *= !bh_fix; // ignore diagnostic if BH interior fix is performed
 
 							if(stats.atm_reset==1) {
 								atm_resets++;
