@@ -540,7 +540,6 @@ IllinoisGRMHD::igm_T_max											= 240
 IllinoisGRMHD::conserv_to_prims_debug         = 0
 IllinoisGRMHD::Psi6threshold                  = 60 # This value should only be reached far inside the horizon! Verify this!
 IllinoisGRMHD::damp_lorenz                    = 0.27901785714285715 #1.5/(dtfac*dx_coarsest)=1.5/(0.021875*245.76)
-
 #0.279017857142857 #1.5/(dtfac*dx_coarsest)=1.5/(0.021875*245.76)
 IllinoisGRMHD::palenzuela_depsdT_threshold    = 1e-100 # Set to 1e100/1e-100 to only use entropy/energy equation
 IllinoisGRMHD::tau_atm_hybrid                 = 1e-20
@@ -555,6 +554,12 @@ IllinoisGRMHD::igm_Ye_atm                     = 0.5
 IllinoisGRMHD::igm_T_atm                      = 1e-2
 IllinoisGRMHD::r_atmo_min                     = 50
 IllinoisGRMHD::atmo_tol                       = 1e-3
+
+# BH Limiting params
+IllinoisGRMHD::c2p_alp_lim = 0.1
+IllinoisGRMHD::rho_BH = 1e-3
+IllinoisGRMHD::eps_BH = 1.0
+IllinoisGRMHD::vwlim_BH = 0.4
 
 IllinoisGRMHD::update_HydroBase               = yes
 

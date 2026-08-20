@@ -184,7 +184,7 @@ extern "C" void ID_TabEOS_HydroQuantities__recompute_HydroBase_variables( const 
 					CCTK_INT  keyerr       = 0;
 					CCTK_INT  anyerr       = 0;
 
-					if( xrho > rho_b_atm_max) {
+					if( xrho > id_rho_atm) {
 						CCTK_REAL xye     = Y_e[index];
 						CCTK_REAL xtemp   = temperature[index];
 						CCTK_REAL xpress  = 0.0;
