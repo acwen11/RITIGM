@@ -260,6 +260,10 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 								num_of_conservative_averagings_needed--;
 								con2prim_failed_flag[index] = 0;
 								atm_resets++;
+								if( eos.is_Tabulated ) {
+									CCTK_VInfo(CCTK_THORNSTRING,"Not enough neighbors: coord = (%g %g %g),  %e %e %e %e %e %e %e, Psi6=%e, Bx=%e, By=%e, Bz=%e, gij_phys=%e %e %e %e %e %e, alpha=%e",
+											x[index], y[index], z[index], tau[index],rho_star[index],mhd_st_x[index],mhd_st_y[index],mhd_st_z[index],Ye_star[index],S_star[index],METRIC_LAP_PSI4[PSI6],PRIMS[BX_CENTER],PRIMS[BY_CENTER],PRIMS[BZ_CENTER],METRIC_PHYS[GXX],METRIC_PHYS[GXY],METRIC_PHYS[GXZ],METRIC_PHYS[GYY],METRIC_PHYS[GYZ],METRIC_PHYS[GZZ],METRIC_LAP_PSI4[LAPSE]);
+								}
 							}
 
 						}
@@ -439,8 +443,8 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 											tau_orig,rho_star_orig,mhd_st_x_orig,mhd_st_y_orig,mhd_st_z_orig,rho_star_orig/METRIC_LAP_PSI4[PSI6],eos.rho_atm_max,PRIMS[BX_CENTER],PRIMS[BY_CENTER],PRIMS[BZ_CENTER],METRIC_PHYS[GXX],METRIC_PHYS[GXY],METRIC_PHYS[GXZ],METRIC_PHYS[GYY],METRIC_PHYS[GYZ],METRIC_PHYS[GZZ],METRIC_LAP_PSI4[LAPSE]);
 								}
 								else if( eos.is_Tabulated ) {
-									CCTK_VInfo(CCTK_THORNSTRING,"Couldn't find root from: %e %e %e %e %e %e %e, rhob approx=%e, rho_b_atm=%e, Bx=%e, By=%e, Bz=%e, gij_phys=%e %e %e %e %e %e, alpha=%e",
-											tau_orig,rho_star_orig,mhd_st_x_orig,mhd_st_y_orig,mhd_st_z_orig,Ye_star_orig,S_star_orig,rho_star_orig/METRIC_LAP_PSI4[PSI6],eos.rho_atm_max,PRIMS[BX_CENTER],PRIMS[BY_CENTER],PRIMS[BZ_CENTER],METRIC_PHYS[GXX],METRIC_PHYS[GXY],METRIC_PHYS[GXZ],METRIC_PHYS[GYY],METRIC_PHYS[GYZ],METRIC_PHYS[GZZ],METRIC_LAP_PSI4[LAPSE]);
+									CCTK_VInfo(CCTK_THORNSTRING,"Couldn't find root from: coord = (%g %g %g),  %e %e %e %e %e %e %e, rhob approx=%e, rho_b_atm=%e, Bx=%e, By=%e, Bz=%e, gij_phys=%e %e %e %e %e %e, alpha=%e",
+											x[index], y[index], z[index], tau_orig,rho_star_orig,mhd_st_x_orig,mhd_st_y_orig,mhd_st_z_orig,Ye_star_orig,S_star_orig,rho_star_orig/METRIC_LAP_PSI4[PSI6],eos.rho_atm_max,PRIMS[BX_CENTER],PRIMS[BY_CENTER],PRIMS[BZ_CENTER],METRIC_PHYS[GXX],METRIC_PHYS[GXY],METRIC_PHYS[GXZ],METRIC_PHYS[GYY],METRIC_PHYS[GYZ],METRIC_PHYS[GZZ],METRIC_LAP_PSI4[LAPSE]);
 								}
 							}
 							else {
@@ -668,10 +672,11 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 	if( ( (conserv_to_prims_debug==1) && (error_int_numer/error_int_denom > 0.05) ) ||
 			( atm_resets != 0 ) ) {
 
+		CCTK_VWARN(CCTK_WARN_ALERT,"High C2P error at ref lvl %d, iter %d, %d atm resets", (int)GetRefinementLevel(cctkGH), cctk_iteration, atm_resets);
 		ofstream myfile;
 		char filename[100];
 		srand(time(NULL));
-		sprintf(filename,"primitives_debug-%e.dat",error_int_numer/error_int_denom);
+		sprintf(filename,"primitives_debug-%d-%d-%e.dat",(int)GetRefinementLevel(cctkGH), cctk_iteration, error_int_numer/error_int_denom);
 		//Alternative, for debugging purposes as well:
 		//srand(time(NULL));
 		//sprintf(filename,"primitives_debug-%d.dat",rand());
