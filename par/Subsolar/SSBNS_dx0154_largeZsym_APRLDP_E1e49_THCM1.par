@@ -424,8 +424,8 @@ carpetregrid2::num_levels_2              = 12
 carpetregrid2::num_levels_3              = 12
 
 carpetregrid2::position_x_1              = 0
-carpetregrid2::position_x_2              = -15.2 # Adjust according to ID. Corresponds to ~45 km sep.
-carpetregrid2::position_x_3              = 15.2
+carpetregrid2::position_x_2              = -8.52342 # Adjust according to ID. Corresponds to ~45 km sep.
+carpetregrid2::position_x_3              = 21.94658
 
 carpetregrid2::radius_1[1]               = 16384 #dx=157.696
 carpetregrid2::radius_1[2]               = 8192  #dx=78.848
@@ -689,11 +689,13 @@ quasilocalmeasures::surface_index[9]     = 12
 
 # Parameters of thorn Seed_Magnetic_Fields
 Seed_Magnetic_Fields::Afield_type                             = "BNS_poloidal_A_interior"
-Seed_Magnetic_Fields::A_b                                     = 68601.49940531788 # E_mag = 2.5e49
+Seed_Magnetic_Fields::A_b                                     = 68601.49940531788 # Set E_mag = 1e49
 Seed_Magnetic_Fields::enable_IllinoisGRMHD_staggered_A_fields = "yes"
 Seed_Magnetic_Fields::have_two_NSs_along_x_axis               = "yes"
+Seed_Magnetic_Fields::x_c1																		= -8.52342
+Seed_Magnetic_Fields::x_c2																		= 21.9465
 Seed_Magnetic_Fields::n_s                                     = 2
-Seed_Magnetic_Fields::P_cut                                   = 0.04 * 0.00016629
+Seed_Magnetic_Fields::P_cut                                   = 0.04 * 4.6e-5
 
 # Parameters of thorn SpaceMask (implementing SpaceMask)
 SpaceMask::use_mask = "yes"
@@ -917,11 +919,11 @@ ZelmaniTracers::seed_method = "randomize_vol"
 ZelmaniTracers::init_dens_min = IllinoisGRMHD::rho_b_atm_max * 1e4
 
 zelmanitracers::tracerproblem = "BinaryNS"
-zelmanitracers::center_ns1[0] = 15.2
+zelmanitracers::center_ns1[0] = 21.9465
 zelmanitracers::center_ns1[1] = 0.0
 zelmanitracers::center_ns1[2] = 0.0
 
-zelmanitracers::center_ns2[0] = -15.2
+zelmanitracers::center_ns2[0] = -8.52342
 zelmanitracers::center_ns2[1] = 0.0
 zelmanitracers::center_ns2[2] = 0.0
 
