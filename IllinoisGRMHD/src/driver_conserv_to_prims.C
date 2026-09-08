@@ -624,6 +624,7 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 							vel_limited_ptcount+=stats.vel_limited;
 							if(check!=0) {
 								failures++;
+                // TODO: make this consistent with new limiting. This stat currently tells us nothing.
 								if(exp(METRIC[PHI]*6.0)>Psi6threshold) {
 									failures_inhoriz++;
 									pointcount_inhoriz++;

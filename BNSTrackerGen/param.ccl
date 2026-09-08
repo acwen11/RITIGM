@@ -11,15 +11,15 @@ BOOLEAN track_only "Do not change grid structure, only track stars."
 {
 } "no"
 
-BOOLEAN follow_hmns "move central grid along barycenter between merger and collapse."
+BOOLEAN follow_hmns "move central grid along barycenter between merger and collapse." STEERABLE=ALWAYS
 {
 } "no"
 
-BOOLEAN follow_bh "move central grid along BH after collapse."
+BOOLEAN follow_bh "move central grid along BH after collapse." STEERABLE=ALWAYS
 {
 } "no"
 
-BOOLEAN move_z "allow following remnants also in z-direction"
+BOOLEAN move_z "allow following remnants also in z-direction" STEERABLE=ALWAYS
 {
 } "no"
 
