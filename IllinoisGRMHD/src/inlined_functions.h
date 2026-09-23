@@ -1,6 +1,20 @@
 #ifndef INLINED_FUNCTIONS_H_
 #define INLINED_FUNCTIONS_H_
 
+inline CCTK_REAL contract_cglo(CCTK_REAL* METRIC, CCTK_REAL* METRIC_LAP_PSI4, CCTK_REAL* v1, CCTK_REAL* v2) {
+  CCTK_REAL res = 0.0;
+  for (int ii = 0; ii < 3; ii++) {
+    for (int jj = 0; jj < 3; jj++) {
+      CCTK_INT is = MIN(ii, jj);
+      CCTK_INT js = MAX(ii, jj);
+      CCTK_INT symfac = 0;
+      for (int ss = is; ss >= 0; ss--) symfac += ss;
+      res += v1[ii] * v2[jj] * METRIC[GXX + 3*is + js - symfac];
+    }
+  }
+  return res * METRIC_LAP_PSI4[PSI4]; // Multiply by Psi4 since METRIC is the conformal metric
+}
+
 static inline void find_cp_cm(CCTK_REAL &cplus,CCTK_REAL &cminus,CCTK_REAL v02,CCTK_REAL u0,
                               CCTK_REAL vi,CCTK_REAL ONE_OVER_LAPSE_SQUARED,CCTK_REAL shifti,CCTK_REAL psim4,CCTK_REAL gupii) {
   // This computes phase speeds in the direction given by flux_dirn.

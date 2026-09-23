@@ -140,7 +140,89 @@ static inline int apply_tau_floor(const int index,const CCTK_REAL Psi6threshold,
 /***********************************************************/
 /***********************************************************/
 
+bool set_mag_lims(CCTK_REAL *METRIC, CCTK_REAL *METRIC_LAP_PSI4, CCTK_REAL *PRIMS, CCTK_REAL *uUP, CCTK_REAL *SMALLB, CCTK_REAL h_old, const CCTK_REAL T_atm,
+                  const CCTK_REAL sigma_max, const CCTK_REAL inv_beta_max) {
 
+  // Calculate Lorentz factor
+  const CCTK_REAL lapseL = METRIC_LAP_PSI4[LAPSE];
+  const CCTK_REAL lapseL_inv = 1.0/lapseL;
+  // // This is Valencia (HydroBase) v^2
+  CCTK_REAL one_minus_one_over_alpha_u0_squared = (METRIC[GXX] * SQR(PRIMS[VX] + METRIC[SHIFTX]) +
+                                                  2.0*METRIC[GXY] * (PRIMS[VX] + METRIC[SHIFTX])*(PRIMS[VY] + METRIC[SHIFTY]) +
+                                                  2.0*METRIC[GXZ] * (PRIMS[VX] + METRIC[SHIFTX])*(PRIMS[VZ] + METRIC[SHIFTZ]) +
+                                                  METRIC[GYY] * SQR(PRIMS[VY] + METRIC[SHIFTY]) +
+                                                  2.0*METRIC[GYZ] * (PRIMS[VY] + METRIC[SHIFTY])*(PRIMS[VZ] + METRIC[SHIFTZ]) +
+                                                  METRIC[GZZ] * SQR(PRIMS[VZ] + METRIC[SHIFTZ]))*SQR(lapseL_inv) * METRIC_LAP_PSI4[PSI4];
+  // // Multiply by Psi4 since METRIC is the conformal metric
+  const CCTK_REAL w_lor = 1.0/sqrt(1.0-one_minus_one_over_alpha_u0_squared);
+
+  CCTK_REAL vL[3];
+  CCTK_REAL BL[3];
+  // Calculate Valencia v^i
+  for (int ii = 0; ii < 3; ii++) {
+    vL[ii] =  (PRIMS[VX + ii] + METRIC[SHIFTX + ii])*lapseL_inv;
+    BL[ii] = PRIMS[BX_CENTER + ii];
+  }
+
+  const CCTK_REAL Bdotv = contract_cglo(METRIC, METRIC_LAP_PSI4, vL, BL);
+  const CCTK_REAL B2 = contract_cglo(METRIC, METRIC_LAP_PSI4, BL, BL);
+
+  const CCTK_REAL rho_h_fluid_old = PRIMS[RHOB] * h_old;
+
+  // Add mass and energy for sigma and inv beta ceiling
+  bool mag_ceiling = false;
+
+  // Save old vals, for debugging only
+  const CCTK_REAL rhoold = PRIMS[RHOB];
+  const CCTK_REAL Pold = PRIMS[PRESSURE];
+
+  if (SMALLB[SMALLB2] > sigma_max * PRIMS[RHOB]) {
+    PRIMS[RHOB] = SMALLB[SMALLB2] / sigma_max;
+    mag_ceiling = true;
+  }
+
+  if (SMALLB[SMALLB2] > 2.0 * inv_beta_max * PRIMS[PRESSURE]) {
+    PRIMS[PRESSURE] = 0.5 * SMALLB[SMALLB2] / inv_beta_max;
+    mag_ceiling = true;
+  }
+
+  if (mag_ceiling) {
+    // Recompute T from adjusted rho, P
+    CCTK_REAL xeps, xent, xtemp;
+    WVU_EOS_eps_S_and_T_from_rho_Ye_P(PRIMS[RHOB], PRIMS[YEPRIM], PRIMS[PRESSURE], T_atm, &xeps, &xent, &xtemp);
+    PRIMS[EPSILON] = xeps;
+    PRIMS[ENTROPY] = xent;
+    PRIMS[TEMPERATURE] = xtemp;
+
+    // Drift floors from https://arxiv.org/pdf/1611.09365
+    // to correct parallel velocity, adapted from SphericalNR
+    // by Vassilios Mewes
+
+    const CCTK_REAL B = MAX(sqrt(B2), 1e-64);
+    const CCTK_REAL v_par_old = w_lor * Bdotv / B / uUP[0];
+
+    const CCTK_REAL ut_perp =
+        1.0 / sqrt(1.0 / (uUP[0] * uUP[0]) + v_par_old * v_par_old);
+
+    const CCTK_REAL u1_perp = ut_perp * (uUP[1] / uUP[0] - v_par_old * BL[0] / B);
+    const CCTK_REAL u2_perp = ut_perp * (uUP[2] / uUP[0] - v_par_old * BL[1] / B);
+    const CCTK_REAL u3_perp = ut_perp * (uUP[3] / uUP[0] - v_par_old * BL[2] / B);
+
+    const CCTK_REAL BdotQ = w_lor * rho_h_fluid_old * Bdotv * uUP[0];
+
+    const CCTK_REAL rho_h_fluid_new = PRIMS[RHOB] + PRIMS[RHOB] * PRIMS[EPSILON] + PRIMS[PRESSURE]; 
+
+    const CCTK_REAL xx = 2.0 * BdotQ / (B * rho_h_fluid_new * ut_perp);
+
+    const CCTK_REAL v_par_new = xx / (1.0 + sqrt(1.0 + xx * xx)) / ut_perp;
+
+    PRIMS[VX] = v_par_new * BL[0] / B + u1_perp / ut_perp;
+    PRIMS[VY] = v_par_new * BL[1] / B + u2_perp / ut_perp;
+    PRIMS[VZ] = v_par_new * BL[2] / B + u3_perp / ut_perp;
+  }
+      
+  return mag_ceiling;
+}
 
 void IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(const int already_computed_physical_metric_and_inverse,CCTK_REAL *PRIMS,struct output_stats &stats,igm_eos_parameters &eos,
                                                                        CCTK_REAL *METRIC,CCTK_REAL g4dn[4][4],CCTK_REAL g4up[4][4], CCTK_REAL *TUPMUNU,CCTK_REAL *TDNMUNU,CCTK_REAL *CONSERVS, const CCTK_REAL radius, const CCTK_REAL rho_b_atm, const CCTK_REAL T_atm) {
@@ -167,7 +249,7 @@ void IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(const int
   apply_floors_and_ceilings_to_prims__recompute_prims(eos, METRIC_LAP_PSI4, PRIMS,radius,METRIC[SHIFTX],METRIC[SHIFTY],METRIC[SHIFTZ],rho_b_atm, T_atm);
 
   // Now compute the enthalpy
-  const CCTK_REAL h_enthalpy = 1.0 + PRIMS[EPSILON] + PRIMS[PRESSURE]/PRIMS[RHOB];
+  CCTK_REAL h_enthalpy = 1.0 + PRIMS[EPSILON] + PRIMS[PRESSURE]/PRIMS[RHOB];
 
   CCTK_REAL uUP[4];
   impose_speed_limit_output_u0(METRIC,PRIMS,METRIC_LAP_PSI4[PSI4],METRIC_LAP_PSI4[LAPSEINV],stats, uUP[0]);
@@ -186,6 +268,25 @@ void IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(const int
   CCTK_REAL smallb[NUMVARS_SMALLB];
   compute_smallba_b2_and_u_i_over_u0_psi4(METRIC,METRIC_LAP_PSI4,PRIMS,uUP[0],ONE_OVER_LAPSE_SQRT_4PI,
                                           u_x_over_u0_psi4,u_y_over_u0_psi4,u_z_over_u0_psi4,smallb);
+
+  // Apply magnetization limits and recompute if adjusted
+  // TODO: extend this treatment for other EOSs
+  if (eos.is_Tabulated) {
+    if (set_mag_lims(METRIC, METRIC_LAP_PSI4, PRIMS, uUP, smallb, h_enthalpy, T_atm,
+                      sigma_max, inv_beta_max)) {
+      // Now compute the enthalpy
+      h_enthalpy = 1.0 + PRIMS[EPSILON] + PRIMS[PRESSURE]/PRIMS[RHOB];
+
+      impose_speed_limit_output_u0(METRIC,PRIMS,METRIC_LAP_PSI4[PSI4],METRIC_LAP_PSI4[LAPSEINV],stats, uUP[0]);
+      // Compute u^i. We've already set uUP[0] in the lines above.
+      for(int ii=0;ii<3;ii++) uUP[UX+ii] = uUP[0]*PRIMS[VX+ii];
+
+      // Compute b^{\mu}, b^2, and u_i/(u^0 Psi4)
+      compute_smallba_b2_and_u_i_over_u0_psi4(METRIC,METRIC_LAP_PSI4,PRIMS,uUP[0],ONE_OVER_LAPSE_SQRT_4PI,
+                                              u_x_over_u0_psi4,u_y_over_u0_psi4,u_z_over_u0_psi4,smallb);
+    }
+  }
+
   // Compute u_i; we compute u_0 below.
   CCTK_REAL uDN[4] = { 1e200, u_x_over_u0_psi4*uUP[0]*METRIC_LAP_PSI4[PSI4],u_y_over_u0_psi4*uUP[0]*METRIC_LAP_PSI4[PSI4],u_z_over_u0_psi4*uUP[0]*METRIC_LAP_PSI4[PSI4] };
 
@@ -277,8 +378,6 @@ void IllinoisGRMHD_enforce_limits_on_primitives_and_recompute_conservs(const int
   }
 }
 
-// template <typename EOSType, bool limiting>
-// CCTK_HOST CCTK_DEVICE CCTK_ATTRIBUTE_ALWAYS_INLINE inline void
 void bh_interior(igm_eos_parameters &eos, CCTK_REAL* PRIMS, CCTK_REAL* CONSERVS, CCTK_REAL* METRIC, CCTK_REAL* METRIC_PHYS, CCTK_REAL* METRIC_LAP_PSI4, 
   const CCTK_REAL T_atm, const CCTK_REAL ye_atm, const bool limiting) {
 
@@ -323,8 +422,8 @@ void bh_interior(igm_eos_parameters &eos, CCTK_REAL* PRIMS, CCTK_REAL* CONSERVS,
       recomp_flag = true;
     };
     
-    if ((PRIMS[YE] < eos.Ye_min) || (PRIMS[YE] > eos.Ye_max)) {
-      PRIMS[YE] = MIN(MAX(PRIMS[YE], eos.Ye_min ),eos.Ye_max );
+    if ((PRIMS[YEPRIM] < eos.Ye_min) || (PRIMS[YEPRIM] > eos.Ye_max)) {
+      PRIMS[YEPRIM] = MIN(MAX(PRIMS[YEPRIM], eos.Ye_min ),eos.Ye_max );
       recomp_flag = true;
     }
 
@@ -341,12 +440,10 @@ void bh_interior(igm_eos_parameters &eos, CCTK_REAL* PRIMS, CCTK_REAL* CONSERVS,
 
     if (recomp_flag) {
       CCTK_REAL tempL, pressL, entL;
-      WVU_EOS_P_S_and_T_from_rho_Ye_eps(PRIMS[RHO], PRIMS[YE], PRIMS[EPSILON], T_atm, &pressL, &entL, &tempL);
+      WVU_EOS_P_S_and_T_from_rho_Ye_eps(PRIMS[RHO], PRIMS[YEPRIM], PRIMS[EPSILON], T_atm, &pressL, &entL, &tempL);
       PRIMS[TEMPERATURE] = tempL;
       PRIMS[PRESSURE] = pressL;
       PRIMS[ENTROPY] = entL;
-
-      // cv.from_prim(pv, glo);
     };
 
   } else {
@@ -354,10 +451,10 @@ void bh_interior(igm_eos_parameters &eos, CCTK_REAL* PRIMS, CCTK_REAL* CONSERVS,
     PRIMS[RHO] = rho_BH; // typically set to 0.01% to 1% of rho_max of initial
                      // NS or disk
     PRIMS[EPSILON] = eps_BH;
-    PRIMS[YE] = ye_atm;
+    PRIMS[YEPRIM] = ye_atm;
 
     CCTK_REAL tempL, pressL, entL;
-    WVU_EOS_P_S_and_T_from_rho_Ye_eps(PRIMS[RHO], PRIMS[YE], PRIMS[EPSILON], T_atm, &pressL, &entL, &tempL);
+    WVU_EOS_P_S_and_T_from_rho_Ye_eps(PRIMS[RHO], PRIMS[YEPRIM], PRIMS[EPSILON], T_atm, &pressL, &entL, &tempL);
     PRIMS[TEMPERATURE] = tempL;
     PRIMS[PRESSURE] = pressL;
     PRIMS[ENTROPY] = entL;

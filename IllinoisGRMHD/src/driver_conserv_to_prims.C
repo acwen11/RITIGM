@@ -251,13 +251,13 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 								// Assume we won't need to fix this point again, so
 								// decrement the number of points that require the
 								// conservative averaging fix
-								num_of_conservative_averagings_needed--;
+								// num_of_conservative_averagings_needed--;
 							}
 							else {
 								// Probably should terminate in this case, but let us reset to ATM for now.
 								// Simplest way is to set rhostar to a negative value.
 								CONSERVS[RHOSTAR] = -1.0;
-								num_of_conservative_averagings_needed--;
+								// num_of_conservative_averagings_needed--;
 								con2prim_failed_flag[index] = 0;
 								atm_resets++;
 								if( eos.is_Tabulated ) {
@@ -424,7 +424,6 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 							con2prim_failed_flag[index] += 1;
 							if( METRIC_LAP_PSI4[LAPSE] < c2p_alp_lim ) {
                 // Failure inside horizon
-                // CCTK_VINFO("Perfoming BH Interior reset");
                 bh_interior(eos, PRIMS, CONSERVS, METRIC, METRIC_PHYS, METRIC_LAP_PSI4, T_atm, eos.Ye_atm, false);
                 bh_fix = true;
 								// Then flag this point as a "success"
@@ -443,8 +442,8 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 											tau_orig,rho_star_orig,mhd_st_x_orig,mhd_st_y_orig,mhd_st_z_orig,rho_star_orig/METRIC_LAP_PSI4[PSI6],eos.rho_atm_max,PRIMS[BX_CENTER],PRIMS[BY_CENTER],PRIMS[BZ_CENTER],METRIC_PHYS[GXX],METRIC_PHYS[GXY],METRIC_PHYS[GXZ],METRIC_PHYS[GYY],METRIC_PHYS[GYZ],METRIC_PHYS[GZZ],METRIC_LAP_PSI4[LAPSE]);
 								}
 								else if( eos.is_Tabulated ) {
-									CCTK_VInfo(CCTK_THORNSTRING,"Couldn't find root from: coord = (%g %g %g),  %e %e %e %e %e %e %e, rhob approx=%e, rho_b_atm=%e, Bx=%e, By=%e, Bz=%e, gij_phys=%e %e %e %e %e %e, alpha=%e",
-											x[index], y[index], z[index], tau_orig,rho_star_orig,mhd_st_x_orig,mhd_st_y_orig,mhd_st_z_orig,Ye_star_orig,S_star_orig,rho_star_orig/METRIC_LAP_PSI4[PSI6],eos.rho_atm_max,PRIMS[BX_CENTER],PRIMS[BY_CENTER],PRIMS[BZ_CENTER],METRIC_PHYS[GXX],METRIC_PHYS[GXY],METRIC_PHYS[GXZ],METRIC_PHYS[GYY],METRIC_PHYS[GYZ],METRIC_PHYS[GZZ],METRIC_LAP_PSI4[LAPSE]);
+									CCTK_VInfo(CCTK_THORNSTRING,"Couldn't find root from: idx = (%d, %d, %d), coord = (%g %g %g),  %e %e %e %e %e %e %e, rhob approx=%e, rho_b_atm=%e, Bx=%e, By=%e, Bz=%e, gij_phys=%e %e %e %e %e %e, alpha=%e",
+											i, j, k, x[index], y[index], z[index], tau_orig,rho_star_orig,mhd_st_x_orig,mhd_st_y_orig,mhd_st_z_orig,Ye_star_orig,S_star_orig,rho_star_orig/METRIC_LAP_PSI4[PSI6],eos.rho_atm_max,PRIMS[BX_CENTER],PRIMS[BY_CENTER],PRIMS[BZ_CENTER],METRIC_PHYS[GXX],METRIC_PHYS[GXY],METRIC_PHYS[GXZ],METRIC_PHYS[GYY],METRIC_PHYS[GYZ],METRIC_PHYS[GZZ],METRIC_LAP_PSI4[LAPSE]);
 								}
 							}
 							else {
@@ -459,7 +458,6 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 							//--------------------------------------------------
 							if( (METRIC_LAP_PSI4[LAPSE] < c2p_alp_lim) && !bh_fix ) {
                 // If not previously fixed, limit values inside horizon
-                // CCTK_VINFO("Perfoming BH Interior limiting");
                 bh_interior(eos, PRIMS, CONSERVS, METRIC, METRIC_PHYS, METRIC_LAP_PSI4, T_atm, eos.Ye_atm, true);
                 bh_fix = true;
               }
@@ -585,17 +583,19 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 								 	temperature[index]  = PRIMS[TEMPERATURE];
 								 }
 
-								// if(robust_isnan(rho[index]*press[index]*eps[index]*entropy[index]*
-								// 		Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,0)]*Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,1)]*Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,2)]
-								// 		*vel[CCTK_GFINDEX4D(cctkGH,i,j,k,0)]*vel[CCTK_GFINDEX4D(cctkGH,i,j,k,1)]*vel[CCTK_GFINDEX4D(cctkGH,i,j,k,2)]
-								// 		*Y_e[index]*temperature[index])) {
+                /*
+								if(std::isnan(rho[index]*press[index]*eps[index]*entropy[index]*
+										Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,0)]*Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,1)]*Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,2)]
+										*vel[CCTK_GFINDEX4D(cctkGH,i,j,k,0)]*vel[CCTK_GFINDEX4D(cctkGH,i,j,k,1)]*vel[CCTK_GFINDEX4D(cctkGH,i,j,k,2)]
+										*Y_e[index]*temperature[index])) {
 
-								// 		CCTK_VWARN(CCTK_WARN_ALERT,"NAN FOUND IN C2P2H: i,j,k = %d %d %d, x,y,z = %e %e %e , index = %d , rho = %e, press = %e, eps = %e, S = %e, B^i = %e %e %e, v^i = %e %e %e, Y_e = %e, Temp = %e",
-								// 			i,j,k,x[index],y[index],z[index],index,rho[index],press[index],eps[index],entropy[index],
-								// 			Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,0)],Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,1)],Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,2)],
-								// 			vel[CCTK_GFINDEX4D(cctkGH,i,j,k,0)],vel[CCTK_GFINDEX4D(cctkGH,i,j,k,1)],vel[CCTK_GFINDEX4D(cctkGH,i,j,k,2)],
-								// 			Y_e[index],temperature[index]);
-								// }
+										CCTK_VINFO("NAN FOUND IN C2P2H: i,j,k = %d %d %d, x,y,z = %e %e %e , index = %d , rho = %e, press = %e, eps = %e, S = %e, B^i = %e %e %e, v^i = %e %e %e, Y_e = %e, Temp = %e",
+											i,j,k,x[index],y[index],z[index],index,rho[index],press[index],eps[index],entropy[index],
+											Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,0)],Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,1)],Bvec[CCTK_GFINDEX4D(cctkGH,i,j,k,2)],
+											vel[CCTK_GFINDEX4D(cctkGH,i,j,k,0)],vel[CCTK_GFINDEX4D(cctkGH,i,j,k,1)],vel[CCTK_GFINDEX4D(cctkGH,i,j,k,2)],
+											Y_e[index],temperature[index]);
+								}
+                */
 
 							} // Copy to HydroBase
 
@@ -670,8 +670,8 @@ extern "C" void IllinoisGRMHD_conserv_to_prims(CCTK_ARGUMENTS) {
 
 	// Very useful con2prim debugger. If the primitives (con2prim) solver fails, this will output all data needed to
 	//     debug where and why the solver failed. Strongly suggested for experimenting with new fixes.
-	if( ( (conserv_to_prims_debug==1) && (error_int_numer/error_int_denom > 0.05) ) ||
-			( atm_resets != 0 ) ) {
+	if( (conserv_to_prims_debug==1) && ((error_int_numer/error_int_denom > 0.05) ||
+			( atm_resets != 0 )) ) {
 
 		CCTK_VWARN(CCTK_WARN_ALERT,"High C2P error at ref lvl %d, iter %d, %d atm resets", (int)GetRefinementLevel(cctkGH), cctk_iteration, atm_resets);
 		ofstream myfile;

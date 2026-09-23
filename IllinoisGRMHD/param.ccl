@@ -121,6 +121,18 @@ REAL Psi6threshold "NOT ACTIVE: Where Psi^6 > Psi6threshold, we assume we're ins
  *:* :: "Can set to anything"
 } 1e100
 
+# Parameters for highly mag. regions
+
+CCTK_REAL sigma_max "Maximum allowed magnetisation: sigma=b^2/rho" STEERABLE=ALWAYS
+{
+  (0.0:* :: "Must be positive"
+} 1.0e100
+
+CCTK_REAL inv_beta_max "Maximum allowed inverse plasma beta: inv_beta=b^2/(2*press)" STEERABLE=ALWAYS
+{
+  (0.0:* :: "Must be positive"
+} 1.0e100
+
 #########################################################
 
 #########################################################
