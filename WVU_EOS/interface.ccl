@@ -53,7 +53,6 @@ void FUNCTION WVU_EOS_P_eps_and_depsdT_from_rho_Ye_T( CCTK_REAL IN rho,  \
 
 PROVIDES FUNCTION WVU_EOS_P_eps_and_depsdT_from_rho_Ye_T WITH WVU_EOS_P_eps_and_depsdT_from_rho_Ye_T_impl LANGUAGE C
 # ------------------------------------------------------
-# ------------------------------------------------------
 void FUNCTION WVU_EOS_P_eps_dPdrho_dPdT_depsdrho_and_depsdT_from_rho_Ye_T( CCTK_REAL IN rho,       \
                                                                            CCTK_REAL IN Ye,        \
                                                                            CCTK_REAL IN T,         \
@@ -65,6 +64,13 @@ void FUNCTION WVU_EOS_P_eps_dPdrho_dPdT_depsdrho_and_depsdT_from_rho_Ye_T( CCTK_
                                                                            CCTK_REAL OUT depsdT )
 
 PROVIDES FUNCTION WVU_EOS_P_eps_dPdrho_dPdT_depsdrho_and_depsdT_from_rho_Ye_T WITH WVU_EOS_P_eps_dPdrho_dPdT_depsdrho_and_depsdT_from_rho_Ye_T_impl LANGUAGE C
+# ------------------------------------------------------
+void FUNCTION WVU_EOS_phase_from_rho_Ye_T( CCTK_REAL IN rho, \
+                                       CCTK_REAL IN Ye,  \
+                                       CCTK_REAL IN T,   \
+                                       CCTK_REAL OUT phase )
+
+PROVIDES FUNCTION WVU_EOS_phase_from_rho_Ye_T WITH WVU_EOS_phase_from_rho_Ye_T_impl LANGUAGE C
 # ------------------------------------------------------
 
 # ------------------------------------------------------
@@ -119,6 +125,14 @@ void FUNCTION WVU_EOS_P_eps_and_T_from_rho_Ye_S( CCTK_REAL IN rho,  \
                                                  CCTK_REAL OUT T )
 
 PROVIDES FUNCTION WVU_EOS_P_eps_and_T_from_rho_Ye_S WITH WVU_EOS_P_eps_and_T_from_rho_Ye_S_impl LANGUAGE C
+# ------------------------------------------------------
+void FUNCTION WVU_EOS_mue_mup_mun_from_rho_Ye_T( CCTK_REAL IN rho,    \
+                                                 CCTK_REAL IN Ye,     \
+                                                 CCTK_REAL IN T,      \
+                                                 CCTK_REAL OUT mu_e,  \
+                                                 CCTK_REAL OUT mu_p,  \
+                                                 CCTK_REAL OUT mu_n)
+PROVIDES FUNCTION WVU_EOS_mue_mup_mun_from_rho_Ye_T WITH WVU_EOS_mue_mup_mun_from_rho_Ye_T_impl LANGUAGE C
 # ------------------------------------------------------
 void FUNCTION WVU_EOS_mue_mup_mun_muhat_Xn_and_Xp_from_rho_Ye_T( CCTK_REAL IN rho,    \
                                                                  CCTK_REAL IN Ye,     \

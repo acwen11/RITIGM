@@ -25,18 +25,18 @@
 namespace WVU_EOS {
 
   // Number of entries in the EOS table
-  constexpr int ntables = 19;
+  constexpr int ntables = 20;
 
   // Keys for table entries
   enum table_var_key { press_key,eps_key,entropy_key,munu_key,cs2_key,depsdT_key,
                        dPdrho_key, dPdeps_key, muhat_key, mu_e_key, mu_p_key, mu_n_key,
-                       Xa_key, Xh_key, Xn_key, Xp_key, Abar_key, Zbar_key, Gamma_key };
+                       Xa_key, Xh_key, Xn_key, Xp_key, Abar_key, Zbar_key, Gamma_key, phase_key };
 
   // Name of the variables. This is only used to print
   // information about the keys during startup
   static std::string table_var_names[ntables] { "logpress","logenergy","entropy","munu","cs2","dedt",
                                                 "dpdrhoe", "dpderho", "muhat", "mu_e", "mu_p", "mu_n",
-                                                "Xa","Xh","Xn","Xp","Abar","Zbar","Gamma"};
+                                                "Xa","Xh","Xn","Xp","Abar","Zbar","Gamma", "phase"};
 
   // Error handling struct
   struct eos_error_report {
@@ -131,6 +131,11 @@ void WVU_EOS_mue_mup_mun_muhat_Xn_and_Xp_from_rho_Ye_T_impl( const CCTK_REAL rho
                                                              CCTK_REAL *restrict muhat,
                                                              CCTK_REAL *restrict X_n,
                                                              CCTK_REAL *restrict X_p);
+
+void WVU_EOS_phase_from_rho_Ye_T_impl( const CCTK_REAL rho,
+                                   const CCTK_REAL Ye,
+                                   const CCTK_REAL T,
+                                   CCTK_REAL *restrict phase );
 
 // ------------------------------------------------------
 // ---- Functions where the temperature is not known ----

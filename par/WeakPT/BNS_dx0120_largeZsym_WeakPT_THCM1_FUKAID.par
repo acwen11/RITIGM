@@ -507,7 +507,7 @@ ReflectionSymmetry::avoid_origin_z = "no"
 # Parameters of thorn EOS_Omni (implementing EOS_Omni)
 EOS_Omni::do_energy_shift   = "yes"
 EOS_Omni::nuceos_read_table = "yes"
-EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/stampede3/EOS/APRLDP_WEAKPT_3335_rho420_temp167_ye66.h5"
+EOS_Omni::nuceos_table_name = "/work2/09319/acw6923/stampede3/EOS/APRLDP_WEAKPT_rho420_temp167_ye66_new.h5"
 
 # Parameters of thorn HydroBase (implementing HydroBase)
 HydroBase::initial_Aphi        = "zero"

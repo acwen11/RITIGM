@@ -187,6 +187,8 @@ void nuc_eos_C_ReadTable(const cGH* cctkGH)
   READ_BCAST_EOSTABLE_HDF5("Zbar",     17, table_dims);
   // Gamma
   READ_BCAST_EOSTABLE_HDF5("gamma",    18, table_dims);
+  // Phase flag (0 for hadronic, 1 for mixed, 2 for quark matter)
+  READ_BCAST_EOSTABLE_HDF5("phase",    19, table_dims);
 
   // Read additional tables and variables
   READ_BCAST_EOS_HDF5("logrho",       logrho,        H5T_NATIVE_DOUBLE, H5S_ALL, nrho);

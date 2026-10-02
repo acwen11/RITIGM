@@ -64,6 +64,11 @@ void WVU_EOS_mue_mup_mun_muhat_Xn_and_Xp_from_rho_Ye_T_impl( const CCTK_REAL rho
                                                              CCTK_REAL *restrict X_n,
                                                              CCTK_REAL *restrict X_p );
 
+void WVU_EOS_phase_from_rho_Ye_T_impl( const CCTK_REAL rho,
+                                   const CCTK_REAL Ye,
+                                   const CCTK_REAL T,
+                                   CCTK_REAL *restrict phase );
+
 // ------------------------------------------------------
 // ---- Functions where the temperature is not known ----
 // ------------------------------------------------------

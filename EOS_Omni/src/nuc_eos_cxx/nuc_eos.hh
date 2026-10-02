@@ -8,7 +8,7 @@
 #define HAVEGR 1
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
-#define NTABLES 19
+#define NTABLES 20
 #define LENGTHGF 6.77269222552442e-06
 #define TIMEGF 2.03040204956746e05
 #define RHOGF 1.61887093132742e-18
@@ -52,9 +52,10 @@ namespace nuc_eos {
 // 16 Abar
 // 17 Zbar
 // 18 Gamma
+// 19 phase
   enum eos_var {i_logpress=0, i_logenergy, i_entropy, i_munu, i_cs2, i_dedt,
                 i_dpdrhoe, i_dpderho, i_muhat, i_mu_e, i_mu_p, i_mu_n, i_Xa,
-                i_Xh, i_Xn, i_Xp, i_Abar, i_Zbar, i_Gamma};
+                i_Xh, i_Xn, i_Xp, i_Abar, i_Zbar, i_Gamma, i_phase};
 }
 
 namespace nuc_eos_private {
