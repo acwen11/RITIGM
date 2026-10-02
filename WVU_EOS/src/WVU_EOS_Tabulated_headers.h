@@ -16,6 +16,11 @@ void WVU_EOS_P_from_rho_Ye_T_impl( const CCTK_REAL rho,
                                    const CCTK_REAL T,
                                    CCTK_REAL *restrict P );
 
+void WVU_EOS_eps_from_rho_Ye_T_impl( const CCTK_REAL rho,
+                                   const CCTK_REAL Ye,
+                                   const CCTK_REAL T,
+                                   CCTK_REAL *restrict eps );
+
 void WVU_EOS_P_and_eps_from_rho_Ye_T_impl( const CCTK_REAL rho,
                                            const CCTK_REAL Ye,
                                            const CCTK_REAL T,
@@ -53,6 +58,13 @@ void WVU_EOS_P_eps_dPdrho_dPdT_depsdrho_and_depsdT_from_rho_Ye_T_impl( const CCT
                                                                        CCTK_REAL *restrict dPdT,
                                                                        CCTK_REAL *restrict depsdrho,
                                                                        CCTK_REAL *restrict depsdT );
+
+void WVU_EOS_mue_mup_mun_from_rho_Ye_T_impl( const CCTK_REAL rho,
+                                             const CCTK_REAL Ye,
+                                             const CCTK_REAL T,
+                                             CCTK_REAL *restrict mu_e,
+                                             CCTK_REAL *restrict mu_p,
+                                             CCTK_REAL *restrict mu_n);
 
 void WVU_EOS_mue_mup_mun_muhat_Xn_and_Xp_from_rho_Ye_T_impl( const CCTK_REAL rho,
                                                              const CCTK_REAL Ye,

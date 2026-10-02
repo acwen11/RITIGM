@@ -17,6 +17,13 @@ void FUNCTION WVU_EOS_P_from_rho_Ye_T( CCTK_REAL IN rho, \
 
 PROVIDES FUNCTION WVU_EOS_P_from_rho_Ye_T WITH WVU_EOS_P_from_rho_Ye_T_impl LANGUAGE C
 # ------------------------------------------------------
+void FUNCTION WVU_EOS_eps_from_rho_Ye_T( CCTK_REAL IN rho, \
+                                       CCTK_REAL IN Ye,  \
+                                       CCTK_REAL IN T,   \
+                                       CCTK_REAL OUT eps )
+
+PROVIDES FUNCTION WVU_EOS_eps_from_rho_Ye_T WITH WVU_EOS_eps_from_rho_Ye_T_impl LANGUAGE C
+# ------------------------------------------------------
 void FUNCTION WVU_EOS_P_and_eps_from_rho_Ye_T( CCTK_REAL IN rho, \
                                                CCTK_REAL IN Ye,  \
                                                CCTK_REAL IN T,   \
