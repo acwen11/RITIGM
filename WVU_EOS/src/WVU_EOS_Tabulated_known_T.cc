@@ -9,7 +9,6 @@
 
 // -------------------------------------
 // -----------   P(rho,Ye,T) -----------
-// ----------- eps(rho,Ye,T) -----------
 // -------------------------------------
 extern "C"
 void WVU_EOS_P_from_rho_Ye_T_impl( const CCTK_REAL rho,
@@ -36,6 +35,36 @@ void WVU_EOS_P_from_rho_Ye_T_impl( const CCTK_REAL rho,
 
   // Then update P
   *P = outvars[0];
+}
+
+// -------------------------------------
+// -----------   eps(rho,Ye,T) ---------
+// -------------------------------------
+extern "C"
+void WVU_EOS_eps_from_rho_Ye_T_impl( const CCTK_REAL rho,
+                                   const CCTK_REAL Ye,
+                                   const CCTK_REAL T,
+                                   CCTK_REAL *restrict eps ) {
+  // Number of interpolated quantities: 1 (eps)
+  const CCTK_INT n = 1;
+  // Table variables keys
+  const CCTK_INT keys[n] = {WVU_EOS::eps_key};
+  // Declare error variable
+  WVU_EOS::eos_error_report report;
+  // Set output variable array
+  CCTK_REAL outvars[n];
+
+  // Get eps
+  WVU_EOS_from_rho_Ye_T_interpolate_n_quantities( n,rho,Ye,T, keys,outvars, &report );
+
+  // Error handling
+  if( report.error ) {
+    CCTK_VERROR("Inside WVU_EOS_eps_from_rho_Ye_T. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
+    // May want to terminate depending on the error. We'll just warn for now.
+  }
+
+  // Then update eps
+  *eps = outvars[0];
 }
 
 // -------------------------------------
@@ -247,6 +276,42 @@ void WVU_EOS_P_eps_dPdrho_dPdT_depsdrho_and_depsdT_from_rho_Ye_T_impl( const CCT
   *dPdT     = outvars[4]*(*depsdT);
   // and deps/drho
   *depsdrho = (*dPdrho)/outvars[4];
+}
+
+// -------------------------------------
+// ----------  mu_e(rho,Ye,T) ----------
+// ----------  mu_p(rho,Ye,T) ----------
+// ----------  mu_n(rho,Ye,T) ----------
+// -------------------------------------
+extern "C"
+void WVU_EOS_mue_mup_mun_from_rho_Ye_T_impl( const CCTK_REAL rho,
+                                                             const CCTK_REAL Ye,
+                                                             const CCTK_REAL T,
+                                                             CCTK_REAL *restrict mu_e,
+                                                             CCTK_REAL *restrict mu_p,
+                                                             CCTK_REAL *restrict mu_n) {
+  // Number of interpolated quantities: 3 (mu_e, mu_p, mu_n)
+  const CCTK_INT n = 3;
+  // Table variables keys
+  const CCTK_INT keys[n] = {WVU_EOS::mu_e_key, WVU_EOS::mu_p_key, WVU_EOS::mu_n_key};
+  // Declare error variable
+  WVU_EOS::eos_error_report report;
+  // Set output variable array
+  CCTK_REAL outvars[n];
+
+  // Get mus
+  WVU_EOS_from_rho_Ye_T_interpolate_n_quantities( n,rho,Ye,T, keys,outvars, &report );
+
+  // Error handling
+  if( report.error ) {
+    CCTK_VERROR("Inside WVU_EOS_mue_mup_mun_from_rho_Ye_T. Error message: %s (key = %d)",report.message.c_str(),report.error_key);
+    // May want to terminate depending on the error. We'll just warn for now.
+  }
+
+  // Then update mu_e, mu_p, mu_n, mu_hat, X_p, and X_n
+  *mu_e  = outvars[0];
+  *mu_p  = outvars[1];
+  *mu_n  = outvars[2];
 }
 
 // -------------------------------------
